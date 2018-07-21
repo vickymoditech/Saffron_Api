@@ -118,6 +118,8 @@ export function updateHomeImage(req,res) {
 }
 
 
+
+
 export function uploadHomeImage(req,res) {
         var form = new formidable.IncomingForm();
         let check_flow = true;
