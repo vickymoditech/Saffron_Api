@@ -9,7 +9,7 @@ var router = express.Router();
 
 // 01. GET   /api/WebSiteHomes/
 // API to Get all the slider images
-router.get('/',validations.validateAuthorization, controller.index);
+router.get('/', controller.index);
 
 
 //02. Delete /api/WebSiteHomes/

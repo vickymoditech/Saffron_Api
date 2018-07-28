@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 mongoose.Promise = require('bluebird');
 import config from './config/environment';
 import http from 'http';
+import cors from 'cors';
 
 import expressConfig from './config/express';
 import registerRoutes from './routes';
@@ -25,6 +26,7 @@ seedDatabaseIfNeeded();
 // Setup server
 var app = express();
 console.log(__dirname);
+app.use(cors());
 app.use('/images',express.static(__dirname+'/images'));
 var server = http.createServer(app);
 

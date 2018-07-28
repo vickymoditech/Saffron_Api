@@ -60,11 +60,22 @@ export default function seedDatabaseIfNeeded() {
         .catch(err => console.log('error populating oauth', err));
 
     let WebsiteHomePromise = WebsiteHome.find({}).remove()
-        .then(() => WebsiteHome.create({
+        .then(() => WebsiteHome.create(
+            {
             id: getGuid(),
-            image_url: "vicky",
+            image_url: "images/Slider1.png",
             visible:true
-        }))
+        },{
+                id: getGuid(),
+                image_url: "images/Slider2.jpg",
+                visible:true
+            },
+            {
+                id: getGuid(),
+                image_url: "images/Slider3.jpg",
+                visible:true
+            }
+        ))
         .then(() => console.log('finished populating WebsiteHome'))
         .catch(err => console.log('error populating WebsiteHome', err));
 
