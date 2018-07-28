@@ -146,6 +146,8 @@
     "npm": "^3.9.5"
   },
   "scripts": {
+    "build": "gulp build",
+    "build:server": "babel server -d dist/server --ignore spec.js,test.js,integration.js,local.env --source-maps",
     "postinstall": "gulp copy:fonts:dev",
     "lint": "npm run lint:client && npm run lint:server",
     "lint:client": "eslint ./client/**/*.js -c ./client/.eslintrc --ignore-pattern *.spec.js",
