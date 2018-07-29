@@ -121,38 +121,46 @@ export function updateHomeImage(req,res) {
 
 
 export function uploadHomeImage(req,res) {
+    try{
         var form = new formidable.IncomingForm();
         let check_flow = true;
         form.parse(req,function(err,fields,files) {
-            var oldpath = files.filetoupload.path;
-            //console.log(imageUploadLocation.path);
-            var newpath = imageUploadLocation.path+files.filetoupload.name;
-            var dbpath = imageUploadLocation.dbpath+files.filetoupload.name;
-            fs_extra.move(oldpath,newpath,function(err) {
-                if(err) {
-                    check_flow = false;
-                    res.status(500)
-                        .json(errorJsonResponse(err.toString(),"same name image already available on server"));
-                }
-                if(check_flow){
+            if(Object.keys(files).length > 0){
+                var oldpath = files.filetoupload.path;
+                //console.log(imageUploadLocation.path);
+                var newpath = imageUploadLocation.path+files.filetoupload.name;
+                var dbpath = imageUploadLocation.dbpath+files.filetoupload.name;
+                fs_extra.move(oldpath,newpath,function(err) {
+                    if(err) {
+                        check_flow = false;
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(),"same name image already available on server"));
+                    }
+                    if(check_flow){
 
-                    let WebSiteHome1= new WebSiteHome({id:getGuid(),image_url:dbpath,visible:true});
-                    WebSiteHome1.save()
-                        .then(function(InsertHomeImage,err) {
-                            if(!err) {
-                                if(InsertHomeImage) {
-                                    res.status(200)
-                                        .json({data:InsertHomeImage,result:"Save Successfully"});
+                        let WebSiteHome1= new WebSiteHome({id:getGuid(),image_url:dbpath,visible:true});
+                        WebSiteHome1.save()
+                            .then(function(InsertHomeImage,err) {
+                                if(!err) {
+                                    if(InsertHomeImage) {
+                                        res.status(200)
+                                            .json({data:InsertHomeImage,result:"Save Successfully"});
+                                    } else {
+                                        res.status(404)
+                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                    }
                                 } else {
-                                    res.status(404)
-                                        .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                    res.status(400)
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
                                 }
-                            } else {
-                                res.status(400)
-                                    .json(errorJsonResponse(err, "Contact to your Developer"));
-                            }
-                        });
-                }
-            })
+                            });
+                    }
+                })
+            }else{
+                res.status(400).json(errorJsonResponse("Invalid Image","Invalid Image"));
+            }
         })
+    }catch(Error){
+        res.status(400).json(errorJsonResponse(Error.toString(),"Invalid Image"));
+    }
 }
