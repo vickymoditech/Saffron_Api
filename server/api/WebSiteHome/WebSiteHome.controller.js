@@ -29,41 +29,46 @@ export function index(req, res) {
 }
 
 export function deleteHomeImage(req,res) {
+    try{
+        //console.log(req.decoded);
+        let check_field = true;
+        let imageId;
+        if(req.params.imageId){
+            imageId = req.params.imageId;
+        }else{
+            check_field = false;
+            res.status(500)
+                .json(errorJsonResponse("ImageId is required", "ImageId is required"));
+        }
 
-    //console.log(req.decoded);
-    let check_field = true;
-    let imageId;
-    if(req.params.imageId){
-        imageId = req.params.imageId;
-    }else{
-        check_field = false;
-        res.status(500)
-            .json(errorJsonResponse("ImageId is required", "ImageId is required"));
+        if(check_field) {
+            WebSiteHome.remove({id:imageId})
+                .exec(function(err, DeleteHomeImage) {
+                    if(!err) {
+                        if(DeleteHomeImage) {
+                            if(DeleteHomeImage.result.n == 1){
+                                res.status(200)
+                                    .json({id:imageId,result:"deleted Sucessfully "});
+                            }else{
+                                res.status(403)
+                                    .json({result:"deleted fail"});
+                            }
+
+                        } else {
+                            res.status(404)
+                                .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse(err, "Contact to your Developer"));
+                    }
+                });
+        }
+    }catch(error){
+        res.status(400)
+            .json(errorJsonResponse(error, error));
     }
 
-    if(check_field) {
-        WebSiteHome.remove({id:imageId})
-            .exec(function(err, DeleteHomeImage) {
-                if(!err) {
-                    if(DeleteHomeImage) {
-                        if(DeleteHomeImage.result.n == 1){
-                            res.status(200)
-                                .json({result:"deleted Sucessfully "});
-                        }else{
-                            res.status(403)
-                                .json({result:"deleted fail"});
-                        }
-
-                    } else {
-                        res.status(404)
-                            .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
-                    }
-                } else {
-                    res.status(400)
-                        .json(errorJsonResponse(err, "Contact to your Developer"));
-                }
-            });
-        }
 }
 
 export function updateHomeImage(req,res) {

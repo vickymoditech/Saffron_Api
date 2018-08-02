@@ -7,6 +7,8 @@
 import Thing from '../api/thing/thing.model';
 import Oauth from '../api/oauth/oauth.model';
 import WebsiteHome from '../api/WebSiteHome/WebSiteHome.model';
+import Gallery from '../api/Gallery/Gallery.model';
+import Service from '../api/Service/Service.model';
 
 import {getGuid} from './commonHelper';
 import config from './environment/';
@@ -80,9 +82,65 @@ export default function seedDatabaseIfNeeded() {
         .catch(err => console.log('error populating WebsiteHome', err));
 
 
+    let ServicePromise = Service.find({}).remove()
+        .then(() => Service.create(
+            {
+                id: getGuid(),
+                image_url: "images/Slider1.png",
+                title: "service - 1",
+                discription:"Service Discription - 1"
+            },{
+                id: getGuid(),
+                image_url: "images/Slider2.png",
+                title: "service - 2",
+                discription:"Service Discription - 2"
+            },
+            {
+                id: getGuid(),
+                image_url: "images/Slider3.png",
+                title: "service - 3",
+                discription:"Service Discription - 3"
+            }
+        ))
+        .then(() => console.log('finished populating Service'))
+        .catch(err => console.log('error populating Service', err));
+
+
+    let GalleryPromise = Gallery.find({}).remove()
+        .then(() => Gallery.create(
+            {
+                id: getGuid(),
+                service_id: getGuid(),
+                image_url: "images/Slider1.png",
+                title: "title - 1",
+                discription:"Discription - 1",
+                date: new Date().toISOString()
+            },{
+                id: getGuid(),
+                service_id: getGuid(),
+                image_url: "images/Slider2.png",
+                title: "title - 2",
+                discription:"Discription - 2",
+                date: '2018-08-02T11:24:30.304Z'
+            },
+            {
+                id: getGuid(),
+                service_id: getGuid(),
+                image_url: "images/Slider3.png",
+                title: "title - 3",
+                discription:"Discription - 3",
+                date: '2018-08-02T11:24:31.304Z'
+            }
+        ))
+        .then(() => console.log('finished populating Gallery'))
+        .catch(err => console.log('error populating Gallery', err));
+
+
     promises.push(thingPromise);
     promises.push(oauthPromise);
     promises.push(WebsiteHomePromise);
+    promises.push(ServicePromise);
+    promises.push(GalleryPromise);
 
 
     return Promise.all(promises);
