@@ -34,3 +34,46 @@ export function index(req, res) {
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
+
+export function deleteService(req,res,next) {
+    try{
+
+        let check_field = true;
+        let galleryId;
+        if(req.params.serviceId){
+            serviceId = req.params.serviceId;
+        }else{
+            check_field = false;
+            res.status(500)
+                .json(errorJsonResponse("Id is required", "Id is required"));
+        }
+
+        if(check_field) {
+            Gallery.remove({id:serviceId})
+                .exec(function(err, DeleteGallery) {
+                    if(!err) {
+                        if(DeleteGallery) {
+                            if(DeleteGallery.result.n == 1){
+                                res.status(200)
+                                    .json({id:galleryId,result:"deleted Sucessfully"});
+                            }else{
+                                res.status(403)
+                                    .json({result:"deleted fail"});
+                            }
+
+                        } else {
+                            res.status(404)
+                                .json(errorJsonResponse("Invalid_post", "Invalid_post"));
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse(err, "Contact to your Developer"));
+                    }
+                });
+        }
+
+
+    }catch(error){
+        res.status(400).json(error);
+    }
+}
