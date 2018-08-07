@@ -35,7 +35,7 @@ export default {
                     });
                 } else {
                     // if everything is good, save to request for use in other routes
-                    if(decoded.user.role == true){
+                    if(decoded.user.role === "Admin"){
                         req.decoded = decoded;
                         next();
                     }else{
@@ -59,10 +59,13 @@ export default {
     },
 
     // POST /api/oauth/login
-    loginValidate: {
+    registerValidate: {
         body: {
-            userId: Joi.string().required(),
-            password: Joi.string().required()
+            first_name: Joi.string().required(),
+            last_name: Joi.string().required(),
+            mobile_number: Joi.number().required(),
+            password: Joi.string().required(),
+            confirm_password : Joi.string().required().valid(Joi.ref('password'))
         }
     }
 

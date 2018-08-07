@@ -54,7 +54,7 @@ export default function seedDatabaseIfNeeded() {
             last_name : "modi",
             contact_no : 8401060120,
             email_id : "vicky123modi@gmail.com",
-            role : true,
+            role : "Admin",
             userId: 'vicky123modi@gmail.com',
             password: 'vicky123'
         }))

@@ -7,8 +7,9 @@
 
 import Oauth from './oauth.model';
 import moment from 'moment/moment';
-import {jwtdata,errorJsonResponse} from '../../config/commonHelper';
+import {jwtdata,errorJsonResponse,getGuid} from '../../config/commonHelper';
 import jwt from 'jsonwebtoken';
+
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -86,6 +87,44 @@ export function login(req, res) {
     }
 }
 
+export function register(req,res,next) {
+    if(req.body) {
+
+       let first_name = req.body.first_name;
+       let last_name = req.body.last_name;
+       let mobile_number = req.body.mobile_number;
+       let password = req.body.password;
+
+       try{
+
+           let registrationUser = new Oauth({id:getGuid(),first_name:first_name,last_name:last_name,contact_no:mobile_number,email_id:'',userId:mobile_number,password:password,role:'user'});
+           registrationUser.save()
+               .then(function(RegistrationSuccess,err) {
+                   if(!err) {
+                       if(RegistrationSuccess) {
+                           res.status(200)
+                               .json({data:RegistrationSuccess,result:"Save Successfully"});
+                       } else {
+                           res.status(404)
+                               .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                       }
+                   } else {
+                       res.status(400)
+                           .json(errorJsonResponse(err, "Contact to your Developer"));
+                   }
+               });
+
+
+       }catch (error){
+
+           res.status(501).json(errorJsonResponse(error,"contact to developer"))
+
+       }
+
+
+
+    }
+}
 
 
 
