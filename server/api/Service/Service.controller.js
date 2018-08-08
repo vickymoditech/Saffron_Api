@@ -8,13 +8,13 @@
  * DELETE  /api/Services/:id          ->  destroy
  */
 
-import { applyPatch } from 'fast-json-patch';
+import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
-    return function(entity) {
-        if(entity) {
+    return function (entity) {
+        if (entity) {
             return res.status(statusCode).json(entity);
         }
         return null;
@@ -23,7 +23,7 @@ function respondWithResult(res, statusCode) {
 
 function handleError(res, statusCode) {
     statusCode = statusCode || 500;
-    return function(err) {
+    return function (err) {
         res.status(statusCode).send(err);
     };
 }
@@ -35,30 +35,30 @@ export function index(req, res) {
         .catch(handleError(res));
 }
 
-export function deleteService(req,res,next) {
-    try{
+export function deleteService(req, res, next) {
+    try {
 
         let check_field = true;
-        let galleryId;
-        if(req.params.serviceId){
+        let serviceId;
+        if (req.params.serviceId) {
             serviceId = req.params.serviceId;
-        }else{
+        } else {
             check_field = false;
             res.status(500)
                 .json(errorJsonResponse("Id is required", "Id is required"));
         }
 
-        if(check_field) {
-            Gallery.remove({id:serviceId})
-                .exec(function(err, DeleteGallery) {
-                    if(!err) {
-                        if(DeleteGallery) {
-                            if(DeleteGallery.result.n == 1){
+        if (check_field) {
+            Gallery.remove({id: serviceId})
+                .exec(function (err, DeleteGallery) {
+                    if (!err) {
+                        if (DeleteGallery) {
+                            if (DeleteGallery.result.n == 1) {
                                 res.status(200)
-                                    .json({id:galleryId,result:"deleted Sucessfully"});
-                            }else{
+                                    .json({id: galleryId, result: "deleted Sucessfully"});
+                            } else {
                                 res.status(403)
-                                    .json({result:"deleted fail"});
+                                    .json({result: "deleted fail"});
                             }
 
                         } else {
@@ -73,7 +73,7 @@ export function deleteService(req,res,next) {
         }
 
 
-    }catch(error){
+    } catch (error) {
         res.status(400).json(error);
     }
 }

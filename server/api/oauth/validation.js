@@ -58,15 +58,35 @@ export default {
         }
     },
 
-    // POST /api/oauth/login
     registerValidate: {
         body: {
-            first_name: Joi.string().required(),
-            last_name: Joi.string().required(),
-            mobile_number: Joi.number().required(),
+            first_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            last_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            mobile_number: Joi.string().regex(/^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/).required(),
             password: Joi.string().required(),
-            confirm_password : Joi.string().required().valid(Joi.ref('password'))
+            confirm_password : Joi.string().required().valid(Joi.ref('password')),
+            role : Joi.string().regex(/^[a-zA-Z]{3,30}$/).required()
+        }
+    },
+
+    deleteUserId:{
+        params: {
+            userId: Joi.string().required()
+        }
+    },
+
+    updateUser:{
+        body: {
+            first_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            last_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            mobile_number: Joi.string().regex(/^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/).required(),
+            password: Joi.string().required(),
+            confirm_password : Joi.string().required().valid(Joi.ref('password')),
+            role : Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            block : Joi.boolean().required(),
+            old_mobile_number : Joi.string().regex(/^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/).required()
         }
     }
+
 
 };

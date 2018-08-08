@@ -10,8 +10,12 @@ router.get('/', controller.index);
 
 router.delete('/:serviceId',validations.validateAuthorization,validate(validations.deleteServiceId),controller.deleteService);
 
-router.use(function(err, req, res, next){
-    res.status(400).json(errorJsonResponse(err,'Invalid Data'));
+router.use(function (err, req, res, next) {
+    var allErrorField = "";
+    for (var i = 0; i < err.errors.length; i++) {
+        allErrorField += err.errors[i].field[0] + ",";
+    }
+    res.status(400).json(errorJsonResponse(allErrorField + " are invalid", 'Invalid Data'));
 });
 
 

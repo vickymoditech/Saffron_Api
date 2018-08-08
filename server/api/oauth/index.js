@@ -17,10 +17,21 @@ router.get('/', validations.validateAuthorization, controller.index);
 router.post('/login', controller.login);
 
 //03 . POST /api/oauth/register
-router.post('/register',validate(validations.registerValidate),controller.register);
+router.post('/register', validate(validations.registerValidate), controller.register);
 
-router.use(function(err, req, res, next){
-    res.status(400).json(errorJsonResponse(err,'Invalid Data'));
+//04 . DELETE /api/oauth/delete
+router.delete('/:userId',validations.validateAuthorization,validate(validations.deleteUserId),controller.deleteUser);
+
+
+router.put('/',validations.validateAuthorization,validate(validations.updateUser),controller.updateUser);
+
+
+router.use(function (err, req, res, next) {
+    var allErrorField = "";
+    for (var i = 0; i < err.errors.length; i++) {
+        allErrorField += err.errors[i].field[0] + ",";
+    }
+    res.status(400).json(errorJsonResponse(allErrorField + " are invalid", 'Invalid Data'));
 });
 
 

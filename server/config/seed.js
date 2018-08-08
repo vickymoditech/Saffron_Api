@@ -55,8 +55,9 @@ export default function seedDatabaseIfNeeded() {
             contact_no : 8401060120,
             email_id : "vicky123modi@gmail.com",
             role : "Admin",
-            userId: 'vicky123modi@gmail.com',
-            password: 'vicky123'
+            userId: '8401060120',
+            password: 'vicky123',
+            block: false
         }))
         .then(() => console.log('finished populating oauth'))
         .catch(err => console.log('error populating oauth', err));
