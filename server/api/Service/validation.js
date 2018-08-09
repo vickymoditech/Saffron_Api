@@ -35,7 +35,7 @@ export default {
                     });
                 } else {
                     // if everything is good, save to request for use in other routes
-                    if(decoded.user.role == true){
+                    if(decoded.user.role == "Admin"){
                         req.decoded = decoded;
                         next();
                     }else{

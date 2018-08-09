@@ -10,6 +10,7 @@
 
 import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
+import {errorJsonResponse} from '../../config/commonHelper';
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -49,13 +50,13 @@ export function deleteService(req, res, next) {
         }
 
         if (check_field) {
-            Gallery.remove({id: serviceId})
-                .exec(function (err, DeleteGallery) {
+            Service.remove({id: serviceId})
+                .exec(function (err, DeleteService) {
                     if (!err) {
-                        if (DeleteGallery) {
-                            if (DeleteGallery.result.n == 1) {
+                        if (DeleteService) {
+                            if (DeleteService.result.n == 1) {
                                 res.status(200)
-                                    .json({id: galleryId, result: "deleted Sucessfully"});
+                                    .json({id: serviceId, result: "deleted Sucessfully"});
                             } else {
                                 res.status(403)
                                     .json({result: "deleted fail"});
@@ -74,6 +75,6 @@ export function deleteService(req, res, next) {
 
 
     } catch (error) {
-        res.status(400).json(error);
+        res.status(400).json(errorJsonResponse(error,"Contact to your Developer"));
     }
 }

@@ -7,7 +7,8 @@ var GallerySchema = new mongoose.Schema({
     image_url: String,
     title: String,
     discription: Boolean,
-    date: String
+    date: String,
+    sex: String
 });
 
 registerEvents(GallerySchema);

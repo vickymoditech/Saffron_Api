@@ -115,14 +115,16 @@ export default function seedDatabaseIfNeeded() {
                 image_url: "images/Slider1.png",
                 title: "title - 1",
                 discription:"Discription - 1",
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                sex: "male"
             },{
                 id: getGuid(),
                 service_id: getGuid(),
                 image_url: "images/Slider2.png",
                 title: "title - 2",
                 discription:"Discription - 2",
-                date: '2018-08-02T11:24:30.304Z'
+                date: new Date().toISOString(),
+                sex: "female"
             },
             {
                 id: getGuid(),
@@ -130,7 +132,8 @@ export default function seedDatabaseIfNeeded() {
                 image_url: "images/Slider3.png",
                 title: "title - 3",
                 discription:"Discription - 3",
-                date: '2018-08-02T11:24:31.304Z'
+                date: new Date().toISOString(),
+                sex: "male"
             }
         ))
         .then(() => console.log('finished populating Gallery'))
