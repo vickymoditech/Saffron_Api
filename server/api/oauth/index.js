@@ -23,7 +23,7 @@ router.post('/register', validate(validations.registerValidate), controller.regi
 router.delete('/:userId',validations.validateAuthorization,validate(validations.deleteUserId),controller.deleteUser);
 
 
-router.put('/',validations.validateAuthorization,validate(validations.updateUser),controller.updateUser);
+router.put('/',validations.validateAuthorizationUser,validate(validations.updateUser),controller.updateUser);
 
 
 router.use(function (err, req, res, next) {

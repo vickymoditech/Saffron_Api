@@ -4,7 +4,10 @@ export const jwtdata = {jwtSecretKey: '12334'};
 
 var path  = __dirname.replace('config','');
 
+
 export const imageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/',dbpath:'images/'};
+export const serviceImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/service/',dbpath:'images/service/'};
+
 
 //error message response
 export function errorJsonResponse(dev_msg,user_msg) {

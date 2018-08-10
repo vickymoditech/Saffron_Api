@@ -10,7 +10,11 @@
 
 import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
-import {errorJsonResponse} from '../../config/commonHelper';
+import {errorJsonResponse,serviceImageUploadLocation,getGuid} from '../../config/commonHelper';
+
+var formidable = require('formidable');
+var fs = require('fs');
+var fs_extra = require('fs-extra');
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -56,15 +60,15 @@ export function deleteService(req, res, next) {
                         if (DeleteService) {
                             if (DeleteService.result.n == 1) {
                                 res.status(200)
-                                    .json({id: serviceId, result: "deleted Sucessfully"});
+                                    .json({id: serviceId, result: "Deleted Successfully"});
                             } else {
                                 res.status(403)
-                                    .json({result: "deleted fail"});
+                                    .json({result: "Deleted Fail"});
                             }
 
                         } else {
                             res.status(404)
-                                .json(errorJsonResponse("Invalid_post", "Invalid_post"));
+                                .json(errorJsonResponse("Invalid Post", "Invalid Post"));
                         }
                     } else {
                         res.status(400)
@@ -75,6 +79,59 @@ export function deleteService(req, res, next) {
 
 
     } catch (error) {
-        res.status(400).json(errorJsonResponse(error,"Contact to your Developer"));
+        res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
     }
 }
+
+export function addNewService(req, res, next) {
+    try {
+        var form = new formidable.IncomingForm();
+        let check_flow = true;
+        form.parse(req, function (err, fields, files) {
+
+            if (Object.keys(files).length > 0 && fields.title && fields.discription) {
+                var oldpath = files.filetoupload.path;
+                //console.log(imageUploadLocation.path);
+                var newpath = serviceImageUploadLocation.path + files.filetoupload.name;
+                var dbpath = serviceImageUploadLocation.dbpath + files.filetoupload.name;
+                var title = fields.title;
+                var discription = fields.discription;
+
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        check_flow = false;
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    }
+
+                    if (check_flow) {
+
+                        let ServiceNewAdd = new Service({id: getGuid(), image_url: dbpath, title: title, discription: discription});
+                        ServiceNewAdd.save()
+                            .then(function (InsertService, err) {
+                                if (!err) {
+                                    if (InsertService) {
+                                        res.status(200)
+                                            .json({data: InsertService, result: "Save Successfully"});
+                                    } else {
+                                        res.status(404)
+                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                    }
+                                } else {
+                                    res.status(400)
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                }
+                            });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
+    }
+    catch (Error) {
+        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    }
+}
+
+

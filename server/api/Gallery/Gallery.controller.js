@@ -54,15 +54,15 @@ export function deleteGallery(req,res) {
                     if(DeleteGallery) {
                         if(DeleteGallery.result.n == 1){
                             res.status(200)
-                                .json({id:galleryId,result:"deleted Sucessfully"});
+                                .json({id:galleryId,result:"Deleted Successfully"});
                         }else{
                             res.status(403)
-                                .json({result:"deleted fail"});
+                                .json({result:"Deleted Fail"});
                         }
 
                     } else {
                         res.status(404)
-                            .json(errorJsonResponse("Invalid_post", "Invalid_post"));
+                            .json(errorJsonResponse("Invalid Post", "Invalid Post"));
                     }
                 } else {
                     res.status(400)

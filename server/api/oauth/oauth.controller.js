@@ -178,22 +178,25 @@ export function updateUser(req, res, next) {
         let last_name = req.body.last_name;
         let mobile_number = req.body.mobile_number;
         let password = req.body.password;
-        let role = req.body.role;
+        let role = req.decoded.user.role;
         let block = req.body.block;
-        let old_mobile_number = req.body.old_mobile_number;
+        let old_mobile_number = req.decoded.user.contact_no;
 
         let userObject = {
+            id: req.decoded.user.id,
             first_name: req.body.first_name,
             last_name: req.body.last_name,
-            mobile_number: req.body.mobile_number,
+            contact_no: req.body.mobile_number,
+            email_id: req.decoded.user.email_id,
+            userId: req.body.mobile_number,
             password: req.body.password,
-            role: req.body.role,
+            role: role,
             block: req.body.block,
-        }
+            _id: req.decoded.user._id
+        };
 
 
         try {
-
 
             if (mobile_number === old_mobile_number) {
 
@@ -212,11 +215,24 @@ export function updateUser(req, res, next) {
                     if (!err) {
                         if (UpdateUser) {
                             if (UpdateUser.nModified == 1 && UpdateUser.n == 1) {
+
+                                let expiresIn = 60 * 60 * 24; // expires in 24 hours
+                                let issued = moment(Date.now());
+                                let token = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
+                                    expiresIn: expiresIn
+                                });
+                                let expires = moment(issued)
+                                    .add(expiresIn, 'seconds');
                                 res.status(200)
                                     .json({
-                                        data: {userObject},
-                                        result: "updated Successfully "
+                                        data: userObject,
+                                        token,
+                                        expiresIn,
+                                        issued,
+                                        expires,
+                                        result: "Updated Successfully"
                                     });
+
                             } else if (UpdateUser.n == 1) {
                                 res.status(200)
                                     .json({result: "already uptodate"});
@@ -262,22 +278,35 @@ export function updateUser(req, res, next) {
                             if (!err) {
                                 if (UpdateUser) {
                                     if (UpdateUser.nModified == 1 && UpdateUser.n == 1) {
+
+                                        let expiresIn = 60 * 60 * 24; // expires in 24 hours
+                                        let issued = moment(Date.now());
+                                        let token = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
+                                            expiresIn: expiresIn
+                                        });
+                                        let expires = moment(issued)
+                                            .add(expiresIn, 'seconds');
                                         res.status(200)
                                             .json({
-                                                data: {userObject},
-                                                result: "updated Successfully "
+                                                data: userObject,
+                                                token,
+                                                expiresIn,
+                                                issued,
+                                                expires,
+                                                result: "Updated Successfully"
                                             });
+
                                     } else if (UpdateUser.n == 1) {
                                         res.status(200)
-                                            .json({result: "already updated"});
+                                            .json({result: "Already Updated"});
                                     } else {
                                         res.status(403)
-                                            .json({result: "not found"});
+                                            .json({result: "Not Found"});
                                     }
 
                                 } else {
                                     res.status(404)
-                                        .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                        .json(errorJsonResponse("Invalid Image", "Invalid Image"));
                                 }
                             } else {
                                 res.status(400)
@@ -293,7 +322,7 @@ export function updateUser(req, res, next) {
         }
         catch
             (error) {
-            res.status(501).json(errorJsonResponse(error, "contact to developer"))
+            res.status(501).json(errorJsonResponse(error, "Contact to Developer"))
         }
     }
 }
@@ -307,15 +336,15 @@ export function deleteUser(req, res, next) {
                     if (DeleteUser) {
                         if (DeleteUser.result.n == 1) {
                             res.status(200)
-                                .json({id: userId, result: "deleted Sucessfully"});
+                                .json({id: userId, result: "Deleted Successfully"});
                         } else {
                             res.status(403)
-                                .json({result: "deleted fail"});
+                                .json({result: "Deleted Fail"});
                         }
 
                     } else {
                         res.status(404)
-                            .json(errorJsonResponse("Invalid_post", "Invalid_post"));
+                            .json(errorJsonResponse("Invalid Post", "Invalid Post"));
                     }
                 } else {
                     res.status(400)

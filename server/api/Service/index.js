@@ -11,6 +11,9 @@ router.get('/', controller.index);
 
 router.delete('/:serviceId', validations.validateAuthorization, validate(validations.deleteServiceId), controller.deleteService);
 
+router.post('/',validations.validateAuthorization,controller.addNewService);
+
+
 router.use(function (err, req, res, next) {
     var allErrorField = "";
     for (var i = 0; i < err.errors.length; i++) {
