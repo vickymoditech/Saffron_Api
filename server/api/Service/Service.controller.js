@@ -15,6 +15,7 @@ import {errorJsonResponse,serviceImageUploadLocation,getGuid} from '../../config
 var formidable = require('formidable');
 var fs = require('fs');
 var fs_extra = require('fs-extra');
+const isImage = require('is-image');
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -89,13 +90,12 @@ export function addNewService(req, res, next) {
         let check_flow = true;
         form.parse(req, function (err, fields, files) {
 
-            if (Object.keys(files).length > 0 && fields.title && fields.discription) {
+            if (Object.keys(files).length > 0 && fields.title && fields.discription && isImage(files.filetoupload.name)) {
                 var oldpath = files.filetoupload.path;
-                //console.log(imageUploadLocation.path);
                 var newpath = serviceImageUploadLocation.path + files.filetoupload.name;
                 var dbpath = serviceImageUploadLocation.dbpath + files.filetoupload.name;
-                var title = fields.title;
-                var discription = fields.discription;
+                var title = fields.title.toLowerCase();
+                var discription = fields.discription.toLowerCase();
 
                 fs_extra.move(oldpath, newpath, function (err) {
                     if (err) {

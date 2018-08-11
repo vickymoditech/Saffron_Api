@@ -114,7 +114,7 @@ export default function seedDatabaseIfNeeded() {
                 service_id: getGuid(),
                 image_url: "images/Slider1.png",
                 title: "title - 1",
-                discription:"Discription - 1",
+                description:"Description - 1",
                 date: new Date().toISOString(),
                 sex: "male"
             },{
@@ -122,7 +122,7 @@ export default function seedDatabaseIfNeeded() {
                 service_id: getGuid(),
                 image_url: "images/Slider2.png",
                 title: "title - 2",
-                discription:"Discription - 2",
+                description:"Description - 2",
                 date: new Date().toISOString(),
                 sex: "female"
             },
@@ -131,7 +131,7 @@ export default function seedDatabaseIfNeeded() {
                 service_id: getGuid(),
                 image_url: "images/Slider3.png",
                 title: "title - 3",
-                discription:"Discription - 3",
+                description:"Description - 3",
                 date: new Date().toISOString(),
                 sex: "male"
             }

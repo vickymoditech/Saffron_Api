@@ -7,4 +7,6 @@ router.get('/', controller.index);
 
 router.delete('/:galleryId',validations.validateAuthorization, controller.deleteGallery);
 
+router.post('/',validations.validateAuthorization,controller.addNewGallery);
+
 module.exports = router;
