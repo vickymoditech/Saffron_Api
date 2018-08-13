@@ -166,13 +166,12 @@ export default function seedDatabaseIfNeeded() {
         .catch(err => console.log('error populating Gallery', err));
 
 
-    promises.push(thingPromise);
+    //promises.push(thingPromise);
     promises.push(oauthPromise);
-    promises.push(WebsiteHomePromise);
-    promises.push(ServicePromise);
-    promises.push(GalleryPromise);
-    promises.push(TeamPromise);
-
+    //promises.push(WebsiteHomePromise);
+    //promises.push(ServicePromise);
+    //promises.push(GalleryPromise);
+    //promises.push(TeamPromise);
 
     return Promise.all(promises);
 }

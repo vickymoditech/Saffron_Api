@@ -37,7 +37,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of Gallerys
 export function index(req, res) {
-    return Gallery.find().sort({date: -1}).limit(10).exec()
+    return Gallery.find().sort({date: -1}).limit(8).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
