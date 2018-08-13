@@ -48,6 +48,7 @@ export default function seedDatabaseIfNeeded() {
     .then(() => console.log('finished populating things'))
     .catch(err => console.log('error populating things', err));
 
+
     let oauthPromise = Oauth.find({}).remove()
         .then(() => Oauth.create({
             id: getGuid(),
@@ -63,6 +64,7 @@ export default function seedDatabaseIfNeeded() {
         .then(() => console.log('finished populating oauth'))
         .catch(err => console.log('error populating oauth', err));
 
+    /*
     let WebsiteHomePromise = WebsiteHome.find({}).remove()
         .then(() => WebsiteHome.create(
             {
@@ -165,6 +167,7 @@ export default function seedDatabaseIfNeeded() {
         .then(() => console.log('finished populating Gallery'))
         .catch(err => console.log('error populating Gallery', err));
 
+        */
 
     //promises.push(thingPromise);
     promises.push(oauthPromise);
