@@ -9,6 +9,7 @@ import Oauth from '../api/oauth/oauth.model';
 import WebsiteHome from '../api/WebSiteHome/WebSiteHome.model';
 import Gallery from '../api/Gallery/Gallery.model';
 import Service from '../api/Service/Service.model';
+import Team from '../api/Team/Team.model';
 
 import {getGuid} from './commonHelper';
 import config from './environment/';
@@ -89,22 +90,47 @@ export default function seedDatabaseIfNeeded() {
                 id: getGuid(),
                 image_url: "images/Slider1.png",
                 title: "service - 1",
-                discription:"Service Discription - 1"
+                discription:"Service Description - 1"
             },{
                 id: getGuid(),
                 image_url: "images/Slider2.png",
                 title: "service - 2",
-                discription:"Service Discription - 2"
+                discription:"Service Description - 2"
             },
             {
                 id: getGuid(),
                 image_url: "images/Slider3.png",
                 title: "service - 3",
-                discription:"Service Discription - 3"
+                discription:"Service Description - 3"
             }
         ))
         .then(() => console.log('finished populating Service'))
         .catch(err => console.log('error populating Service', err));
+
+
+
+    let TeamPromise = Team.find({}).remove()
+        .then(() => Team.create(
+            {
+                id: getGuid(),
+                image_url: "images/Slider1.png",
+                name: "Vicky modi",
+                description:"Service Description - 1"
+            },{
+                id: getGuid(),
+                image_url: "images/Slider2.png",
+                name: "abc xyz",
+                description:"Service Description - 2"
+            },
+            {
+                id: getGuid(),
+                image_url: "images/Slider3.png",
+                title: "ayxz abc",
+                description:"Service Description - 3"
+            }
+        ))
+        .then(() => console.log('finished populating Team'))
+        .catch(err => console.log('error populating Team', err));
 
 
     let GalleryPromise = Gallery.find({}).remove()
@@ -145,6 +171,7 @@ export default function seedDatabaseIfNeeded() {
     promises.push(WebsiteHomePromise);
     promises.push(ServicePromise);
     promises.push(GalleryPromise);
+    promises.push(TeamPromise);
 
 
     return Promise.all(promises);

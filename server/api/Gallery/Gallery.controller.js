@@ -10,7 +10,7 @@
 
 import Gallery from './Gallery.model';
 import Service from '../Service/Service.model';
-import {errorJsonResponse, subServiceImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, GalleryImageUploadLocation, getGuid} from '../../config/commonHelper';
 
 var formidable = require('formidable');
 var fs = require('fs');
@@ -88,8 +88,8 @@ export function addNewGallery(req, res, next) {
             if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && isImage(files.filetoupload.name)) {
 
                 var oldpath = files.filetoupload.path;
-                var newpath = subServiceImageUploadLocation.path + files.filetoupload.name;
-                var dbpath = subServiceImageUploadLocation.dbpath + files.filetoupload.name;
+                var newpath = GalleryImageUploadLocation.path + files.filetoupload.name;
+                var dbpath = GalleryImageUploadLocation.dbpath + files.filetoupload.name;
                 var service_id = fields.service_id;
                 var title = fields.title.toLowerCase();
                 var description = fields.description.toLowerCase();

@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 import {registerEvents} from './Team.events';
 
 var TeamSchema = new mongoose.Schema({
-  name: String,
-  info: String,
-  active: Boolean
+    id: String,
+    name: String,
+    image_url: String,
+    description: String,
 });
 
 registerEvents(TeamSchema);

@@ -7,7 +7,8 @@ var path  = __dirname.replace('config','');
 
 export const imageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/',dbpath:'images/'};
 export const serviceImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/service/',dbpath:'images/service/'};
-export const subServiceImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/subService/',dbpath:'images/subService/'};
+export const GalleryImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/Gallery/',dbpath:'images/Gallery/'};
+export const TeamImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/Team/',dbpath:'images/Team/'};
 
 //error message response
 export function errorJsonResponse(dev_msg,user_msg) {

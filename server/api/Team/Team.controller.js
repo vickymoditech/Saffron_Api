@@ -1,112 +1,127 @@
-/**
- * Using Rails-like standard naming convention for endpoints.
- * GET     /api/Teams              ->  index
- * POST    /api/Teams              ->  create
- * GET     /api/Teams/:id          ->  show
- * PUT     /api/Teams/:id          ->  upsert
- * PATCH   /api/Teams/:id          ->  patch
- * DELETE  /api/Teams/:id          ->  destroy
- */
-
-import { applyPatch } from 'fast-json-patch';
 import Team from './Team.model';
+import {errorJsonResponse, getGuid, TeamImageUploadLocation} from '../../config/commonHelper';
+
+var formidable = require('formidable');
+var fs = require('fs');
+var fs_extra = require('fs-extra');
+const isImage = require('is-image');
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
     return function(entity) {
         if(entity) {
-            return res.status(statusCode).json(entity);
+            return res.status(statusCode)
+                .json(entity);
         }
         return null;
-    };
-}
-
-function patchUpdates(patches) {
-    return function(entity) {
-        try {
-            applyPatch(entity, patches, /*validate*/ true);
-        } catch(err) {
-            return Promise.reject(err);
-        }
-
-        return entity.save();
-    };
-}
-
-function removeEntity(res) {
-    return function(entity) {
-        if(entity) {
-            return entity.remove()
-                .then(() => res.status(204).end());
-        }
-    };
-}
-
-function handleEntityNotFound(res) {
-    return function(entity) {
-        if(!entity) {
-            res.status(404).end();
-            return null;
-        }
-        return entity;
     };
 }
 
 function handleError(res, statusCode) {
     statusCode = statusCode || 500;
     return function(err) {
-        res.status(statusCode).send(err);
+        res.status(statusCode)
+            .send(err);
     };
 }
 
 // Gets a list of Teams
 export function index(req, res) {
-    return Team.find().exec()
+    return Team.find()
+        .exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
 
-// Gets a single Team from the DB
-export function show(req, res) {
-    return Team.findById(req.params.id).exec()
-        .then(handleEntityNotFound(res))
-        .then(respondWithResult(res))
-        .catch(handleError(res));
-}
+export function deleteTeam(req, res, next) {
+    try {
 
-// Creates a new Team in the DB
-export function create(req, res) {
-    return Team.create(req.body)
-        .then(respondWithResult(res, 201))
-        .catch(handleError(res));
-}
+        let check_field = true;
+        let teamId;
+        if(req.params.teamId) {
+            teamId = req.params.teamId;
+        } else {
+            check_field = false;
+            res.status(500)
+                .json(errorJsonResponse('Id is required', 'Id is required'));
+        }
+        if(check_field) {
+            Team.remove({id: teamId})
+                .exec(function(err, DeleteTeam) {
+                    if(!err) {
+                        if(DeleteTeam) {
+                            if(DeleteTeam.result.n === 1) {
+                                res.status(200)
+                                    .json({id: teamId, result: 'Deleted Successfully'});
+                            } else {
+                                res.status(403)
+                                    .json({result: 'Deleted Fail'});
+                            }
 
-// Upserts the given Team in the DB at the specified ID
-export function upsert(req, res) {
-    if(req.body._id) {
-        Reflect.deleteProperty(req.body, '_id');
+                        } else {
+                            res.status(404)
+                                .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse(err, 'Contact to your Developer'));
+                    }
+                });
+        }
+    } catch(error) {
+        res.status(400)
+            .json(errorJsonResponse(error, 'Contact to your Developer'));
     }
-    return Team.findOneAndUpdate({_id: req.params.id}, req.body, {new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true}).exec()
-        .then(respondWithResult(res))
-        .catch(handleError(res));
 }
 
-// Updates an existing Team in the DB
-export function patch(req, res) {
-    if(req.body._id) {
-        Reflect.deleteProperty(req.body, '_id');
+export function addNewTeam(req, res, next) {
+    try {
+
+        var form = new formidable.IncomingForm();
+        let check_flow = true;
+        form.parse(req, function (err, fields, files) {
+
+            if (Object.keys(files).length > 0 && fields.name && fields.description && isImage(files.filetoupload.name)) {
+                var oldpath = files.filetoupload.path;
+                var newpath = TeamImageUploadLocation.path + files.filetoupload.name;
+                var dbpath = TeamImageUploadLocation.dbpath + files.filetoupload.name;
+                var name = fields.name.toLowerCase();
+                var description = fields.description.toLowerCase();
+
+
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        check_flow = false;
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    }
+
+                    if (check_flow) {
+
+                        let TeamNewAdd = new Team({id: getGuid(), image_url: dbpath, name: name, description: description});
+                        TeamNewAdd.save()
+                            .then(function (InsertTeam, err) {
+                                if (!err) {
+                                    if (InsertTeam) {
+                                        res.status(200)
+                                            .json({data: InsertTeam, result: "Save Successfully"});
+                                    } else {
+                                        res.status(404)
+                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                    }
+                                } else {
+                                    res.status(400)
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                }
+                            });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
     }
-    return Team.findById(req.params.id).exec()
-        .then(handleEntityNotFound(res))
-        .then(patchUpdates(req.body))
-        .then(respondWithResult(res))
-        .catch(handleError(res));
-}
-
-// Deletes a Team from the DB
-export function destroy(req, res) {
-    return Team.findById(req.params.id).exec()
-        .then(handleEntityNotFound(res))
-        .then(removeEntity(res))
-        .catch(handleError(res));
+    catch (Error) {
+        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    }
 }
