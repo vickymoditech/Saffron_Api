@@ -10,7 +10,7 @@
 
 import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
-import {errorJsonResponse,serviceImageUploadLocation,getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
 
 var formidable = require('formidable');
 var fs = require('fs');
@@ -106,7 +106,12 @@ export function addNewService(req, res, next) {
 
                     if (check_flow) {
 
-                        let ServiceNewAdd = new Service({id: getGuid(), image_url: dbpath, title: title, discription: discription});
+                        let ServiceNewAdd = new Service({
+                            id: getGuid(),
+                            image_url: dbpath,
+                            title: title,
+                            discription: discription
+                        });
                         ServiceNewAdd.save()
                             .then(function (InsertService, err) {
                                 if (!err) {
@@ -134,4 +139,75 @@ export function addNewService(req, res, next) {
     }
 }
 
+export function updateService(req, res, next) {
+    try {
+        var form = new formidable.IncomingForm();
+        let check_flow = true;
+        form.parse(req, function (err, fields, files) {
 
+            if (Object.keys(files).length > 0 && fields.title && fields.discription && fields.id && isImage(files.filetoupload.name)) {
+                var oldpath = files.filetoupload.path;
+                var newpath = serviceImageUploadLocation.path + files.filetoupload.name;
+                var dbpath = serviceImageUploadLocation.dbpath + files.filetoupload.name;
+                var title = fields.title.toLowerCase();
+                var discription = fields.discription.toLowerCase();
+                var id = fields.id;
+
+                let serviceObject = {
+                    id,
+                    image_url: dbpath,
+                    title,
+                    discription
+                };
+
+
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        check_flow = false;
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    }
+
+                    if (check_flow) {
+
+                        Service.update({id: id}, {
+                            image_url: dbpath,
+                            title: title,
+                            discription: discription
+                        }).exec(function (err, UpdateService) {
+                            if (!err) {
+                                if (UpdateService) {
+                                    if (UpdateService.nModified === 1 && UpdateService.n === 1) {
+                                        res.status(200)
+                                            .json({
+                                                data: serviceObject,
+                                                result: "updated Successfully "
+                                            });
+                                    } else if (UpdateService.n === 1) {
+                                        res.status(200)
+                                            .json({result: "already updated"});
+                                    } else {
+                                        res.status(403)
+                                            .json({result: "not found"});
+                                    }
+
+                                } else {
+                                    res.status(404)
+                                        .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                }
+                            } else {
+                                res.status(400)
+                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                            }
+                        });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
+    }
+    catch (Error) {
+        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    }
+}

@@ -14,17 +14,17 @@ router.get('/', controller.index);
 
 //02. Delete /api/WebSiteHomes/
 // API to delete the slider images
-router.delete('/:imageId',validations.validateAuthorization, controller.deleteHomeImage);
+router.delete('/:imageId', validations.validateAuthorization, controller.deleteHomeImage);
 
 
 //02. Update flag /api/WebSiteHomes/
 // API to update flag of slider images
-router.put('/:imageId',validations.validateAuthorization,controller.updateHomeImage);
+router.put('/:imageId', validations.validateAuthorization, controller.updateHomeImage);
 
 
 //03. Update flag /api/WebSiteHomes/
 // API to upload slider images
-router.post('/',validations.validateAuthorization,controller.uploadHomeImage);
+router.post('/', validations.validateAuthorization, controller.uploadHomeImage);
 
 
 module.exports = router;

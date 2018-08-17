@@ -59,7 +59,7 @@ export function deleteGallery(req, res) {
             .exec(function (err, DeleteGallery) {
                 if (!err) {
                     if (DeleteGallery) {
-                        if (DeleteGallery.result.n == 1) {
+                        if (DeleteGallery.result.n === 1) {
                             res.status(200)
                                 .json({id: galleryId, result: "Deleted Successfully"});
                         } else {
@@ -148,4 +148,95 @@ export function addNewGallery(req, res, next) {
     }
 }
 
+export function updateGallery(req, res, next) {
+    try {
+        var form = new formidable.IncomingForm();
+        let check_flow = true;
+        form.parse(req, function (err, fields, files) {
 
+            if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && fields.id && isImage(files.filetoupload.name)) {
+
+                var oldpath = files.filetoupload.path;
+                var newpath = GalleryImageUploadLocation.path + files.filetoupload.name;
+                var dbpath = GalleryImageUploadLocation.dbpath + files.filetoupload.name;
+                var service_id = fields.service_id;
+                var id = fields.id;
+                var title = fields.title.toLowerCase();
+                var description = fields.description.toLowerCase();
+                var sex = fields.sex.toLowerCase();
+
+                var response = {
+                    id,
+                    service_id,
+                    image_url: dbpath,
+                    title,
+                    description,
+                    sex
+                };
+
+
+                Service.findOne({id: service_id}).exec(function (err, findService) {
+
+                    if (findService) {
+
+                        if (check_flow) {
+
+                            Gallery.update({id: id}, {
+                                service_id: service_id,
+                                image_url: dbpath,
+                                title: title,
+                                description: description,
+                                date: new Date().toISOString(),
+                                sex: sex
+                            }).exec(function (err, UpdateGallery) {
+                                if (!err) {
+                                    if (UpdateGallery) {
+                                        if (UpdateGallery.nModified === 1 && UpdateGallery.n === 1) {
+
+                                            fs_extra.move(oldpath, newpath, function (err) {
+                                                if (err) {
+                                                    check_flow = false;
+                                                    res.status(500)
+                                                        .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                                                }
+                                            });
+
+                                            res.status(200)
+                                                .json({
+                                                    data: response,
+                                                    result: "updated Successfully "
+                                                });
+
+                                        } else if (UpdateGallery.n === 1) {
+                                            res.status(200)
+                                                .json({result: "already updated"});
+                                        } else {
+                                            res.status(403)
+                                                .json({result: "Record not found"});
+                                        }
+
+                                    } else {
+                                        res.status(404)
+                                            .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                    }
+                                } else {
+                                    res.status(400)
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                }
+                            });
+                        }
+                    } else {
+                        check_flow = false;
+                        res.status(500)
+                            .json(errorJsonResponse("Service Not Found ", "Service Not Found"));
+                    }
+                });
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
+    }
+    catch (Error) {
+        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    }
+}

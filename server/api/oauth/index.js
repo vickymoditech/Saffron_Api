@@ -20,10 +20,9 @@ router.post('/login', controller.login);
 router.post('/register', validate(validations.registerValidate), controller.register);
 
 //04 . DELETE /api/oauth/delete
-router.delete('/:userId',validations.validateAuthorization,validate(validations.deleteUserId),controller.deleteUser);
+router.delete('/:userId', validations.validateAuthorization, validate(validations.deleteUserId), controller.deleteUser);
 
-
-router.put('/',validations.validateAuthorizationUser,validate(validations.updateUser),controller.updateUser);
+router.put('/', validations.validateAuthorizationUser, validate(validations.updateUser), controller.updateUser);
 
 
 router.use(function (err, req, res, next) {
