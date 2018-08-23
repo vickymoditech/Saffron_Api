@@ -11,6 +11,7 @@
 import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
 import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
+import Gallery from '../Gallery/Gallery.model';
 
 var formidable = require('formidable');
 var fs = require('fs');
@@ -43,41 +44,46 @@ export function index(req, res) {
 
 export function deleteService(req, res, next) {
     try {
-
-        let check_field = true;
-        let serviceId;
         if (req.params.serviceId) {
-            serviceId = req.params.serviceId;
-        } else {
-            check_field = false;
-            res.status(500)
-                .json(errorJsonResponse("Id is required", "Id is required"));
-        }
-
-        if (check_field) {
-            Service.remove({id: serviceId})
-                .exec(function (err, DeleteService) {
+            let serviceId = req.params.serviceId;
+            Gallery.remove({service_id: serviceId})
+                .exec(function (err, DeleteGallery) {
                     if (!err) {
-                        if (DeleteService) {
-                            if (DeleteService.result.n == 1) {
-                                res.status(200)
-                                    .json({id: serviceId, result: "Deleted Successfully"});
+                        if (DeleteGallery) {
+
+                            if (DeleteGallery.result.n !== 0) {
+
+                                Service.remove({id: serviceId})
+                                    .exec(function (err, DeleteService) {
+                                        if (!err) {
+                                            if (DeleteService) {
+                                                if (DeleteService.result.n === 1) {
+                                                    res.status(200)
+                                                        .json({id: serviceId, result: "Deleted Successfully"});
+                                                }else{
+                                                    res.status(200)
+                                                        .json({id: serviceId, result: "Fail Main Service"});
+                                                }
+                                            }
+                                        }
+                                    });
                             } else {
                                 res.status(403)
                                     .json({result: "Deleted Fail"});
                             }
-
                         } else {
                             res.status(404)
-                                .json(errorJsonResponse("Invalid Post", "Invalid Post"));
+                                .json(errorJsonResponse("Invalid Service", "Invalid Service"));
                         }
                     } else {
                         res.status(400)
                             .json(errorJsonResponse(err, "Contact to your Developer"));
                     }
                 });
+        } else {
+            res.status(500)
+                .json(errorJsonResponse("Id is required", "Id is required"));
         }
-
 
     } catch (error) {
         res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
@@ -145,63 +151,107 @@ export function updateService(req, res, next) {
         let check_flow = true;
         form.parse(req, function (err, fields, files) {
 
-            if (Object.keys(files).length > 0 && fields.title && fields.discription && fields.id && isImage(files.filetoupload.name)) {
-                var oldpath = files.filetoupload.path;
-                var newpath = serviceImageUploadLocation.path + files.filetoupload.name;
-                var dbpath = serviceImageUploadLocation.dbpath + files.filetoupload.name;
-                var title = fields.title.toLowerCase();
-                var discription = fields.discription.toLowerCase();
-                var id = fields.id;
+            if (fields.title && fields.discription && fields.id) {
 
-                let serviceObject = {
-                    id,
-                    image_url: dbpath,
-                    title,
-                    discription
-                };
+                if (files.filetoupload && isImage(files.filetoupload.name)) {
+
+                    let oldpath = files.filetoupload.path;
+                    let newpath = serviceImageUploadLocation.path + files.filetoupload.name;
+                    let dbpath = serviceImageUploadLocation.dbpath + files.filetoupload.name;
+                    let title = fields.title.toLowerCase();
+                    let discription = fields.discription.toLowerCase();
+                    let id = fields.id;
+
+                    let serviceObject = {
+                        id,
+                        image_url: dbpath,
+                        title,
+                        discription
+                    };
 
 
-                fs_extra.move(oldpath, newpath, function (err) {
-                    if (err) {
-                        check_flow = false;
-                        res.status(500)
-                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
-                    }
+                    fs_extra.move(oldpath, newpath, function (err) {
+                        if (err) {
+                            res.status(500)
+                                .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                        } else {
+                            Service.update({id: id}, {
+                                image_url: dbpath,
+                                title: title,
+                                discription: discription
+                            }).exec(function (err, UpdateService) {
+                                if (!err) {
+                                    if (UpdateService) {
+                                        if (UpdateService.nModified === 1 && UpdateService.n === 1) {
+                                            res.status(200)
+                                                .json({
+                                                    data: serviceObject,
+                                                    result: "updated Successfully "
+                                                });
+                                        } else if (UpdateService.n === 1) {
+                                            res.status(200)
+                                                .json({result: "already updated"});
+                                        } else {
+                                            res.status(403)
+                                                .json({result: "not found"});
+                                        }
 
-                    if (check_flow) {
-
-                        Service.update({id: id}, {
-                            image_url: dbpath,
-                            title: title,
-                            discription: discription
-                        }).exec(function (err, UpdateService) {
-                            if (!err) {
-                                if (UpdateService) {
-                                    if (UpdateService.nModified === 1 && UpdateService.n === 1) {
-                                        res.status(200)
-                                            .json({
-                                                data: serviceObject,
-                                                result: "updated Successfully "
-                                            });
-                                    } else if (UpdateService.n === 1) {
-                                        res.status(200)
-                                            .json({result: "already updated"});
                                     } else {
-                                        res.status(403)
-                                            .json({result: "not found"});
+                                        res.status(404)
+                                            .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                     }
-
                                 } else {
-                                    res.status(404)
-                                        .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                    res.status(400)
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
                                 }
+                            });
+                        }
+                    })
+
+                } else {
+
+                    let title = fields.title.toLowerCase();
+                    let discription = fields.discription.toLowerCase();
+                    let id = fields.id;
+
+                    let serviceObject = {
+                        id,
+                        title,
+                        discription
+                    };
+
+                    Service.update({id: id}, {
+                        title: title,
+                        discription: discription
+                    }).exec(function (err, UpdateService) {
+                        if (!err) {
+                            if (UpdateService) {
+                                if (UpdateService.nModified === 1 && UpdateService.n === 1) {
+                                    res.status(200)
+                                        .json({
+                                            data: serviceObject,
+                                            result: "updated Successfully "
+                                        });
+                                } else if (UpdateService.n === 1) {
+                                    res.status(200)
+                                        .json({result: "already updated"});
+                                } else {
+                                    res.status(403)
+                                        .json({result: "not found"});
+                                }
+
                             } else {
-                                res.status(400)
-                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                                res.status(404)
+                                    .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                             }
-                        });
-                    }
-                })
+                        } else {
+                            res.status(400)
+                                .json(errorJsonResponse(err, "Contact to your Developer"));
+                        }
+                    });
+
+                }
+
             } else {
                 res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
             }

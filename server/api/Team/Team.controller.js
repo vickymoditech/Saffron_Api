@@ -35,17 +35,8 @@ export function index(req, res) {
 
 export function deleteTeam(req, res, next) {
     try {
-
-        let check_field = true;
-        let teamId;
         if (req.params.teamId) {
-            teamId = req.params.teamId;
-        } else {
-            check_field = false;
-            res.status(500)
-                .json(errorJsonResponse('Id is required', 'Id is required'));
-        }
-        if (check_field) {
+            let teamId = req.params.teamId;
             Team.remove({id: teamId})
                 .exec(function (err, DeleteTeam) {
                     if (!err) {
@@ -57,7 +48,6 @@ export function deleteTeam(req, res, next) {
                                 res.status(403)
                                     .json({result: 'Deleted Fail'});
                             }
-
                         } else {
                             res.status(404)
                                 .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
@@ -67,7 +57,11 @@ export function deleteTeam(req, res, next) {
                             .json(errorJsonResponse(err, 'Contact to your Developer'));
                     }
                 });
+        } else {
+            res.status(500)
+                .json(errorJsonResponse('Id is required', 'Id is required'));
         }
+
     } catch (error) {
         res.status(400)
             .json(errorJsonResponse(error, 'Contact to your Developer'));
@@ -157,13 +151,10 @@ export function updateTeam(req, res, next) {
 
                     fs_extra.move(oldpath, newpath, function (err) {
                         if (err) {
-                            check_flow = false;
                             res.status(500)
                                 .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
                         }
-
-                        if (check_flow) {
-
+                        else {
                             Team.update({id: id}, {
                                 image_url: dbpath,
                                 name: name,
@@ -200,9 +191,9 @@ export function updateTeam(req, res, next) {
 
                 } else {
 
-                    var name = fields.name.toLowerCase();
-                    var description = fields.description.toLowerCase();
-                    var id = fields.id;
+                    let name = fields.name.toLowerCase();
+                    let description = fields.description.toLowerCase();
+                    let id = fields.id;
 
                     let TeamObject = {
                         id,
@@ -211,7 +202,6 @@ export function updateTeam(req, res, next) {
                     };
 
                     Team.update({id: id}, {
-                        image_url: dbpath,
                         name: name,
                         description: description
                     }).exec(function (err, UpdateTeam) {
