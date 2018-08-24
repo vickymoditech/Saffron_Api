@@ -51,26 +51,21 @@ export function deleteService(req, res, next) {
                     if (!err) {
                         if (DeleteGallery) {
 
-                            if (DeleteGallery.result.n !== 0) {
-
-                                Service.remove({id: serviceId})
-                                    .exec(function (err, DeleteService) {
-                                        if (!err) {
-                                            if (DeleteService) {
-                                                if (DeleteService.result.n === 1) {
-                                                    res.status(200)
-                                                        .json({id: serviceId, result: "Deleted Successfully"});
-                                                }else{
-                                                    res.status(200)
-                                                        .json({id: serviceId, result: "Fail Main Service"});
-                                                }
+                            Service.remove({id: serviceId})
+                                .exec(function (err, DeleteService) {
+                                    if (!err) {
+                                        if (DeleteService) {
+                                            if (DeleteService.result.n === 1) {
+                                                res.status(200)
+                                                    .json({id: serviceId, result: "Deleted Successfully"});
+                                            } else {
+                                                res.status(200)
+                                                    .json({id: serviceId, result: "Fail Main Service"});
                                             }
                                         }
-                                    });
-                            } else {
-                                res.status(403)
-                                    .json({result: "Deleted Fail"});
-                            }
+                                    }
+                                });
+
                         } else {
                             res.status(404)
                                 .json(errorJsonResponse("Invalid Service", "Invalid Service"));

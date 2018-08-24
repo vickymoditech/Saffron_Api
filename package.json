@@ -41,6 +41,7 @@
     "moment": "^2.22.1",
     "mongodb": "^3.0.7",
     "mongoose": "^4.1.2",
+    "mongoose-ttl": "0.0.3",
     "morgan": "~1.8.2",
     "serve-favicon": "^2.3.0",
     "uuid": "^3.2.1"

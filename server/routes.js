@@ -12,7 +12,6 @@ export default function(app) {
     app.use('/api/Teams', require('./api/Team'));
     app.use('/api/Services', require('./api/Service'));
     app.use('/api/Gallerys', require('./api/Gallery'));
-    app.use('/api/WebSiteHomes', require('./api/WebSiteHome'));
     app.use('/api/oauths', require('./api/oauth'));
     app.use('/api/things', require('./api/thing'));
 

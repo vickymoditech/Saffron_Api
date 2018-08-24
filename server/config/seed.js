@@ -6,7 +6,6 @@
 'use strict';
 import Thing from '../api/thing/thing.model';
 import Oauth from '../api/oauth/oauth.model';
-import WebsiteHome from '../api/WebSiteHome/WebSiteHome.model';
 import Gallery from '../api/Gallery/Gallery.model';
 import Service from '../api/Service/Service.model';
 import Team from '../api/Team/Team.model';
