@@ -19,5 +19,5 @@ module.exports = {
             }
         }
     },
-    port: '9001',
+    port: '9000',
 };

@@ -15,7 +15,7 @@ import expressConfig from './config/express';
 import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
 
-mongoose.connect(config.mongo.uri, config.mongo.options);
+mongoose.connect(config.mongo.uri, {useMongoClient: true});
 mongoose.connection.on('error', function(err) {
     console.error(`MongoDB connection error: ${err}`);
     process.exit(-1); // eslint-disable-line no-process-exit
