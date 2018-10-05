@@ -74,59 +74,61 @@ export function deleteGallery(req, res) {
 
 export function addNewGallery(req, res, next) {
     try {
-        var form = new formidable.IncomingForm();
-        let check_flow = true;
+        let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 
             if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && isImage(files.filetoupload.name)) {
 
-                var oldpath = files.filetoupload.path;
-                var newpath = GalleryImageUploadLocation.path + files.filetoupload.name;
-                var dbpath = GalleryImageUploadLocation.dbpath + files.filetoupload.name;
-                var service_id = fields.service_id;
-                var title = fields.title.toLowerCase();
-                var description = fields.description.toLowerCase();
-                var sex = fields.sex.toLowerCase();
+                let uuid = getGuid();
+                let oldpath = files.filetoupload.path;
+                let newpath = GalleryImageUploadLocation.path + files.filetoupload.name;
+                let dbpath = GalleryImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                let renameFilePath = GalleryImageUploadLocation.path + uuid + files.filetoupload.name;
+                let service_id = fields.service_id;
+                let title = fields.title.toLowerCase();
+                let description = fields.description.toLowerCase();
+                let sex = fields.sex.toLowerCase();
 
                 Service.findOne({id: service_id}).exec(function (err, findService) {
                     if (findService) {
                         fs_extra.move(oldpath, newpath, function (err) {
                             if (err) {
-                                check_flow = false;
                                 res.status(500)
                                     .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
-                            }
-
-                            if (check_flow) {
-
-                                let GalleryNewAdd = new Gallery({
-                                    id: getGuid(),
-                                    service_id: service_id,
-                                    image_url: dbpath,
-                                    title: title,
-                                    description: description,
-                                    date: new Date().toISOString(),
-                                    sex: sex
+                            } else {
+                                fs.rename(newpath, renameFilePath, function (err) {
+                                    if (err) {
+                                        res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename json file"));
+                                    } else {
+                                        let GalleryNewAdd = new Gallery({
+                                            id: getGuid(),
+                                            service_id: service_id,
+                                            image_url: dbpath,
+                                            title: title,
+                                            description: description,
+                                            date: new Date().toISOString(),
+                                            sex: sex
+                                        });
+                                        GalleryNewAdd.save()
+                                            .then(function (InsertService, err) {
+                                                if (!err) {
+                                                    if (InsertService) {
+                                                        res.status(200)
+                                                            .json({data: InsertService, result: "Save Successfully"});
+                                                    } else {
+                                                        res.status(404)
+                                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                                    }
+                                                } else {
+                                                    res.status(400)
+                                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                }
+                                            });
+                                    }
                                 });
-                                GalleryNewAdd.save()
-                                    .then(function (InsertService, err) {
-                                        if (!err) {
-                                            if (InsertService) {
-                                                res.status(200)
-                                                    .json({data: InsertService, result: "Save Successfully"});
-                                            } else {
-                                                res.status(404)
-                                                    .json(errorJsonResponse("Error in db response", "Invalid_Image"));
-                                            }
-                                        } else {
-                                            res.status(400)
-                                                .json(errorJsonResponse(err, "Contact to your Developer"));
-                                        }
-                                    });
                             }
                         });
                     } else {
-                        check_flow = false;
                         res.status(500)
                             .json(errorJsonResponse("Service Not Found ", "Service Not Found"));
                     }
