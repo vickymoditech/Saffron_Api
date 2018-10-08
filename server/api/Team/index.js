@@ -6,14 +6,19 @@ import {errorJsonResponse} from '../../config/commonHelper';
 
 var router = express.Router();
 
+// 01. GET   /api/Teams/
 router.get('/', controller.index);
 
+// 02. DELETE   /api/Teams/:ID
 router.delete('/:teamId', validations.validateAuthorization, validate(validations.deleteTeamId), controller.deleteTeam);
 
+// 03. ADD NEW   /api/Teams/
 router.post('/', validations.validateAuthorization, controller.addNewTeam);
 
+// 04. UPDATE   /api/Teams/
 router.put('/', validations.validateAuthorization, controller.updateTeam);
 
+// 05. USER AVATAR
 
 router.use(function (err, req, res, next) {
     let allErrorField = [];

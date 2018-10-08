@@ -6,12 +6,16 @@ import {errorJsonResponse} from '../../config/commonHelper';
 
 var router = express.Router();
 
+// 01. GET   /api/Services/
 router.get('/', controller.index);
 
+// 02. DELETE   /api/Services/:ID
 router.delete('/:serviceId', validations.validateAuthorization, validate(validations.deleteServiceId), controller.deleteService);
 
+// 03. ADD NEW   /api/Services/
 router.post('/', validations.validateAuthorization, controller.addNewService);
 
+// 03. UPDATE   /api/Services/
 router.put('/', validations.validateAuthorization, controller.updateService);
 
 router.use(function (err, req, res, next) {

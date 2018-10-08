@@ -7,12 +7,16 @@ import {errorJsonResponse} from '../../config/commonHelper';
 
 var router = express.Router();
 
+// 01. GET   /api/Gallery/
 router.get('/', controller.index);
 
+// 02. DELETE   /api/Gallery/:ID
 router.delete('/:galleryId', validations.validateAuthorization, controller.deleteGallery);
 
+// 03. ADD NEW   /api/Gallery/
 router.post('/', validations.validateAuthorization, controller.addNewGallery);
 
+// 04. UPDATE   /api/Gallery/
 router.put('/', validations.validateAuthorization, controller.updateGallery);
 
 router.use(function (err, req, res, next) {

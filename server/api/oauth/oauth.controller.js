@@ -30,7 +30,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of oauth
 export function index(req, res) {
-    return Oauth.find().exec()
+    return Oauth.find({},{_id:0,__v:0}).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
@@ -154,20 +154,12 @@ export function register(req, res, next) {
                 } else {
                     res.status(403).json(errorJsonResponse("Mobile number is already register", "Mobile number is already register"));
                 }
-
-
             });
-
-
         }
         catch
             (error) {
-
             res.status(501).json(errorJsonResponse(error, "contact to developer"))
-
         }
-
-
     }
 }
 
@@ -214,7 +206,7 @@ export function updateUser(req, res, next) {
                 ).exec(function (err, UpdateUser) {
                     if (!err) {
                         if (UpdateUser) {
-                            if (UpdateUser.nModified == 1 && UpdateUser.n == 1) {
+                            if (UpdateUser.nModified === 1 && UpdateUser.n === 1) {
 
                                 let expiresIn = 60 * 60 * 24; // expires in 24 hours
                                 let issued = moment(Date.now());
@@ -233,7 +225,7 @@ export function updateUser(req, res, next) {
                                         result: "Updated Successfully"
                                     });
 
-                            } else if (UpdateUser.n == 1) {
+                            } else if (UpdateUser.n === 1) {
                                 res.status(200)
                                     .json({result: "already uptodate"});
                             } else {
@@ -277,7 +269,7 @@ export function updateUser(req, res, next) {
                         ).exec(function (err, UpdateUser) {
                             if (!err) {
                                 if (UpdateUser) {
-                                    if (UpdateUser.nModified == 1 && UpdateUser.n == 1) {
+                                    if (UpdateUser.nModified === 1 && UpdateUser.n === 1) {
 
                                         let expiresIn = 60 * 60 * 24; // expires in 24 hours
                                         let issued = moment(Date.now());
@@ -296,7 +288,7 @@ export function updateUser(req, res, next) {
                                                 result: "Updated Successfully"
                                             });
 
-                                    } else if (UpdateUser.n == 1) {
+                                    } else if (UpdateUser.n === 1) {
                                         res.status(200)
                                             .json({result: "Already Updated"});
                                     } else {
@@ -334,7 +326,7 @@ export function deleteUser(req, res, next) {
             .exec(function (err, DeleteUser) {
                 if (!err) {
                     if (DeleteUser) {
-                        if (DeleteUser.result.n == 1) {
+                        if (DeleteUser.result.n === 1) {
                             res.status(200)
                                 .json({id: userId, result: "Deleted Successfully"});
                         } else {
