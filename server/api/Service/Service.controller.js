@@ -37,7 +37,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of Services
 export function index(req, res) {
-    return Service.find({},{_id:0,__v:0}).exec()
+    return Service.find({}, {_id: 0, __v: 0}).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
@@ -87,60 +87,56 @@ export function deleteService(req, res, next) {
 
 export function addNewService(req, res, next) {
     try {
-        if (req.headers['content-type'].toString().startsWith('multipart/form-data')) {
-            let form = new formidable.IncomingForm();
-            form.parse(req, function (err, fields, files) {
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
 
-                if (Object.keys(files).length > 0 && fields.title && fields.discription && isImage(files.filetoupload.name)) {
-                    let uuid = getGuid();
-                    let oldpath = files.filetoupload.path;
-                    let newpath = serviceImageUploadLocation.path + files.filetoupload.name;
-                    let dbpath = serviceImageUploadLocation.dbpath + uuid + files.filetoupload.name;
-                    let renameFilePath = serviceImageUploadLocation.path + uuid + files.filetoupload.name;
-                    let title = fields.title.toLowerCase();
-                    let discription = fields.discription.toLowerCase();
+            if (Object.keys(files).length > 0 && fields.title && fields.discription && isImage(files.filetoupload.name)) {
+                let uuid = getGuid();
+                let oldpath = files.filetoupload.path;
+                let newpath = serviceImageUploadLocation.path + files.filetoupload.name;
+                let dbpath = serviceImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                let renameFilePath = serviceImageUploadLocation.path + uuid + files.filetoupload.name;
+                let title = fields.title.toLowerCase();
+                let discription = fields.discription.toLowerCase();
 
-                    fs_extra.move(oldpath, newpath, function (err) {
-                        if (err) {
-                            res.status(500)
-                                .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
-                        } else {
-                            fs.rename(newpath, renameFilePath, function (err) {
-                                if (err) {
-                                    res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
-                                } else {
-                                    let ServiceNewAdd = new Service({
-                                        id: getGuid(),
-                                        image_url: dbpath,
-                                        title: title,
-                                        discription: discription
-                                    });
-                                    ServiceNewAdd.save()
-                                        .then(function (InsertService, err) {
-                                            if (!err) {
-                                                if (InsertService) {
-                                                    res.status(200)
-                                                        .json({data: InsertService, result: "Save Successfully"});
-                                                } else {
-                                                    res.status(404)
-                                                        .json(errorJsonResponse("Error in db response", "Invalid_Image"));
-                                                }
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    } else {
+                        fs.rename(newpath, renameFilePath, function (err) {
+                            if (err) {
+                                res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                            } else {
+                                let ServiceNewAdd = new Service({
+                                    id: getGuid(),
+                                    image_url: dbpath,
+                                    title: title,
+                                    discription: discription
+                                });
+                                ServiceNewAdd.save()
+                                    .then(function (InsertService, err) {
+                                        if (!err) {
+                                            if (InsertService) {
+                                                res.status(200)
+                                                    .json({data: InsertService, result: "Save Successfully"});
                                             } else {
-                                                res.status(400)
-                                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                res.status(404)
+                                                    .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                             }
-                                        });
-                                }
-                            });
-                        }
-                    })
-                } else {
-                    res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
-                }
-            });
-        } else {
-            res.status(400).json(errorJsonResponse('Bad Request', 'Bad Request'));
-        }
+                                        } else {
+                                            res.status(400)
+                                                .json(errorJsonResponse(err, "Contact to your Developer"));
+                                        }
+                                    });
+                            }
+                        });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
     }
     catch (Error) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));

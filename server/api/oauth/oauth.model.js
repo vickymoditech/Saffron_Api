@@ -12,7 +12,8 @@ var OauthSchema = new mongoose.Schema({
     userId: String,
     password: String,
     role : String,
-    block: Boolean
+    block: Boolean,
+    image_url: String
 });
 
 registerEvents(OauthSchema);

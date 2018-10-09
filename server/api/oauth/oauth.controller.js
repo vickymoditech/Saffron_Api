@@ -7,9 +7,13 @@
 
 import Oauth from './oauth.model';
 import moment from 'moment/moment';
-import {jwtdata, errorJsonResponse, getGuid} from '../../config/commonHelper';
+import {jwtdata, errorJsonResponse, getGuid, UserAvatarImageUploadLocation} from '../../config/commonHelper';
 import jwt from 'jsonwebtoken';
 
+var formidable = require('formidable');
+var fs = require('fs');
+var fs_extra = require('fs-extra');
+const isImage = require('is-image');
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -30,7 +34,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of oauth
 export function index(req, res) {
-    return Oauth.find({},{_id:0,__v:0}).exec()
+    return Oauth.find({}, {_id: 0, __v: 0}).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
@@ -57,7 +61,7 @@ export function login(req, res) {
 
         if (check_field) {
 
-            Oauth.findOne({userId: userId, password: pass, block: false})
+            Oauth.findOne({userId: userId, password: pass, block: false}, {_id: 0, __v: 0})
                 .exec(function (err, loginUser) {
                     if (!err) {
                         if (loginUser) {
@@ -345,6 +349,70 @@ export function deleteUser(req, res, next) {
             });
 
     } catch (error) {
+        res.status(400).json(error);
+    }
+}
+
+export function uploadUserAvatar(req, res, next) {
+
+    try {
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+
+            if (Object.keys(files).length > 0 && isImage(files.filetoupload.name)) {
+                let uuid = getGuid();
+                let oldpath = files.filetoupload.path;
+                let newpath = UserAvatarImageUploadLocation.path + files.filetoupload.name;
+                let dbpath = UserAvatarImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                let renameFilePath = UserAvatarImageUploadLocation.path + uuid + files.filetoupload.name;
+                let login_user = req.decoded;
+
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    } else {
+                        fs.rename(newpath, renameFilePath, function (err) {
+                            if (err) {
+                                res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                            } else {
+                                Oauth.update({userId: login_user.user.userId}, {
+                                    image_url: dbpath,
+                                }).exec(function (err, UpdateOauth) {
+                                    if (!err) {
+                                        if (UpdateOauth) {
+                                            if (UpdateOauth.nModified === 1 && UpdateOauth.n === 1) {
+                                                res.status(200)
+                                                    .json({
+                                                        data: dbpath,
+                                                        result: "updated Successfully "
+                                                    });
+                                            } else if (UpdateOauth.n === 1) {
+                                                res.status(200)
+                                                    .json({result: "already updated"});
+                                            } else {
+                                                res.status(403)
+                                                    .json({result: "not found"});
+                                            }
+                                        } else {
+                                            res.status(404)
+                                                .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                        }
+                                    } else {
+                                        res.status(400)
+                                            .json(errorJsonResponse(err, "Contact to your Developer"));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
+    }
+    catch (error) {
         res.status(400).json(error);
     }
 }

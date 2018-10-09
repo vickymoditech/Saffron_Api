@@ -18,8 +18,6 @@ router.post('/', validations.validateAuthorization, controller.addNewTeam);
 // 04. UPDATE   /api/Teams/
 router.put('/', validations.validateAuthorization, controller.updateTeam);
 
-// 05. USER AVATAR
-
 router.use(function (err, req, res, next) {
     let allErrorField = [];
     for (let i = 0; i < err.errors.length; i++) {

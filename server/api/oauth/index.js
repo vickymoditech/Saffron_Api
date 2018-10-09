@@ -23,6 +23,8 @@ router.delete('/:userId', validations.validateAuthorization, validate(validation
 //05 . UPDATE /api/oauth/
 router.put('/', validations.validateAuthorizationUser, validate(validations.updateUser), controller.updateUser);
 
+//05 .  POST /api/oauth/userAvatar
+router.post('/userAvatar', validations.validateAuthorizationUser, controller.uploadUserAvatar);
 
 router.use(function (err, req, res, next) {
     let allErrorField = [];

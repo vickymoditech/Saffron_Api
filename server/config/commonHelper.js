@@ -9,6 +9,7 @@ export const imageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/',dbp
 export const serviceImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/service/',dbpath:'images/service/'};
 export const GalleryImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/Gallery/',dbpath:'images/Gallery/'};
 export const TeamImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/Team/',dbpath:'images/Team/'};
+export const UserAvatarImageUploadLocation = {path:path.replace(/\\/g,'/') + 'images/UserAvatar/',dbpath:'images/UserAvatar/'};
 
 //error message response
 export function errorJsonResponse(dev_msg,user_msg) {

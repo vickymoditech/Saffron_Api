@@ -27,7 +27,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of Teams
 export function index(req, res) {
-    return Team.find({},{_id:0,__v:0})
+    return Team.find({}, {_id: 0, __v: 0})
         .exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
@@ -70,60 +70,57 @@ export function deleteTeam(req, res, next) {
 
 export function addNewTeam(req, res, next) {
     try {
-        if (req.headers['content-type'].toString().startsWith('multipart/form-data')) {
-            let form = new formidable.IncomingForm();
-            form.parse(req, function (err, fields, files) {
 
-                if (Object.keys(files).length > 0 && fields.name && fields.description && isImage(files.filetoupload.name)) {
-                    let uuid = getGuid();
-                    let oldpath = files.filetoupload.path;
-                    let newpath = TeamImageUploadLocation.path + files.filetoupload.name;
-                    let dbpath = TeamImageUploadLocation.dbpath + uuid + files.filetoupload.name;
-                    let renameFilePath = TeamImageUploadLocation.path + uuid + files.filetoupload.name;
-                    let name = fields.name.toLowerCase();
-                    let description = fields.description.toLowerCase();
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
 
-                    fs_extra.move(oldpath, newpath, function (err) {
-                        if (err) {
-                            res.status(500)
-                                .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
-                        } else {
-                            fs.rename(newpath, renameFilePath, function (err) {
-                                if (err) {
-                                    res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
-                                } else {
-                                    let TeamNewAdd = new Team({
-                                        id: getGuid(),
-                                        image_url: dbpath,
-                                        name: name,
-                                        description: description
-                                    });
-                                    TeamNewAdd.save()
-                                        .then(function (InsertTeam, err) {
-                                            if (!err) {
-                                                if (InsertTeam) {
-                                                    res.status(200)
-                                                        .json({data: InsertTeam, result: "Save Successfully"});
-                                                } else {
-                                                    res.status(404)
-                                                        .json(errorJsonResponse("Error in db response", "Invalid_Image"));
-                                                }
+            if (Object.keys(files).length > 0 && fields.name && fields.description && isImage(files.filetoupload.name)) {
+                let uuid = getGuid();
+                let oldpath = files.filetoupload.path;
+                let newpath = TeamImageUploadLocation.path + files.filetoupload.name;
+                let dbpath = TeamImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                let renameFilePath = TeamImageUploadLocation.path + uuid + files.filetoupload.name;
+                let name = fields.name.toLowerCase();
+                let description = fields.description.toLowerCase();
+
+                fs_extra.move(oldpath, newpath, function (err) {
+                    if (err) {
+                        res.status(500)
+                            .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                    } else {
+                        fs.rename(newpath, renameFilePath, function (err) {
+                            if (err) {
+                                res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                            } else {
+                                let TeamNewAdd = new Team({
+                                    id: getGuid(),
+                                    image_url: dbpath,
+                                    name: name,
+                                    description: description
+                                });
+                                TeamNewAdd.save()
+                                    .then(function (InsertTeam, err) {
+                                        if (!err) {
+                                            if (InsertTeam) {
+                                                res.status(200)
+                                                    .json({data: InsertTeam, result: "Save Successfully"});
                                             } else {
-                                                res.status(400)
-                                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                res.status(404)
+                                                    .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                             }
-                                        });
-                                }
-                            });
-                        }
-                    })
-                } else {
-                    res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
-                }
-            });
-        } else {
-            res.status(400).json(errorJsonResponse('Bad Request', 'Bad Request'));
-        }
+                                        } else {
+                                            res.status(400)
+                                                .json(errorJsonResponse(err, "Contact to your Developer"));
+                                        }
+                                    });
+                            }
+                        });
+                    }
+                })
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+            }
+        });
     }
     catch (Error) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
