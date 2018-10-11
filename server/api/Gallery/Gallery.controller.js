@@ -1,13 +1,3 @@
-/**
- * Using Rails-like standard naming convention for endpoints.
- * GET     /api/Gallerys              ->  index
- * POST    /api/Gallerys              ->  create
- * GET     /api/Gallerys/:id          ->  show
- * PUT     /api/Gallerys/:id          ->  upsert
- * PATCH   /api/Gallerys/:id          ->  patch
- * DELETE  /api/Gallerys/:id          ->  destroy
- */
-
 import Gallery from './Gallery.model';
 import Service from '../Service/Service.model';
 import {errorJsonResponse, GalleryImageUploadLocation, getGuid} from '../../config/commonHelper';

@@ -6,7 +6,7 @@ var ServiceSchema = new mongoose.Schema({
   id: String,
   title: String,
   image_url: String,
-  discription: String,
+  description: String,
 });
 
 //ServiceSchema.plugin(ttl, {ttl: (1000 * 60 * 5)});

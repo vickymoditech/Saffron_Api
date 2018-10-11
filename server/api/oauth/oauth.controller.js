@@ -1,10 +1,3 @@
-/**
- * Using Rails-like standard naming convention for endpoints.
- * GET     /api/oauths              ->  index
- */
-
-'use strict';
-
 import Oauth from './oauth.model';
 import moment from 'moment/moment';
 import {jwtdata, errorJsonResponse, getGuid, UserAvatarImageUploadLocation} from '../../config/commonHelper';
