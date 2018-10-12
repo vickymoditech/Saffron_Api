@@ -18,6 +18,13 @@ router.post('/', validations.validateAuthorization, controller.addNewTeam);
 // 04. UPDATE   /api/Teams/
 router.put('/', validations.validateAuthorization, controller.updateTeam);
 
+// 05. POST   /api/Teams/addTeamService
+router.post('/addTeamService', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.addTeamService);
+
+// 06. POST   /api/Teams/removeTeamService
+router.post('/removeTeamService', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamService);
+
+
 router.use(function (err, req, res, next) {
     let allErrorField = [];
     for (let i = 0; i < err.errors.length; i++) {

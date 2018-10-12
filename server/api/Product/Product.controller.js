@@ -1,7 +1,7 @@
 import Product from './Product.model';
 import Service from '../Service/Service.model';
 
-import {errorJsonResponse, GalleryImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, getGuid} from '../../config/commonHelper';
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -22,7 +22,27 @@ function handleError(res, statusCode) {
 
 // Gets a list of Products
 export function index(req, res) {
-    return Product.find({}, {__v: 0, _id: 0}).exec()
+    return Service.aggregate({"$unwind": "$id"},
+        {
+            "$lookup": {
+                "from": "products",
+                "localField": "id",
+                "foreignField": "service_id",
+                "as": "itemsObjects"
+            }
+        },
+        {
+            "$group": {
+                "_id": "$_id",
+                "id": {"$first": "$id"},
+                "image_url": {"$first": "$image_url"},
+                "title": {"$first": "$title"},
+                "description": {"$first": "$description"},
+                "displayOrder": {"$first": "$displayOrder"},
+                "products": {"$first": "$itemsObjects"}
+            }
+        },
+        {$sort: {displayOrder: 1}}).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
@@ -59,7 +79,7 @@ export function addNewProduct(req, res, next) {
                                         res.status(200)
                                             .json({
                                                 data: ProductSuccess,
-                                                result: "Registration Successfully"
+                                                result: "New Product Successfully Added"
                                             });
 
                                     } else {
@@ -152,5 +172,78 @@ export function updateProduct(req, res, next) {
     }
     catch (Error) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Request"));
+    }
+}
+
+export function deleteProduct(req, res, next) {
+    try {
+        if (req.params.productId) {
+            let productId = req.params.productId;
+            Product.remove({id: productId})
+                .exec(function (err, DeleteTeam) {
+                    if (!err) {
+                        if (DeleteTeam) {
+                            if (DeleteTeam.result.n === 1) {
+                                res.status(200)
+                                    .json({id: productId, result: 'Deleted Successfully'});
+                            } else {
+                                res.status(403)
+                                    .json({result: 'Deleted Fail'});
+                            }
+                        } else {
+                            res.status(404)
+                                .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse(err, 'Contact to your Developer'));
+                    }
+                });
+        } else {
+            res.status(500)
+                .json(errorJsonResponse('Id is required', 'Id is required'));
+        }
+
+    } catch (error) {
+        res.status(400)
+            .json(errorJsonResponse(error, 'Contact to your Developer'));
+    }
+}
+
+export function teamProduct(req, res, next) {
+    try {
+        if (req.params.productId) {
+            let productId = req.params.productId;
+            return Product.aggregate([
+                {
+                    $match: {id: productId}
+                },
+                {"$unwind": "$id"},
+                {
+                    "$lookup": {
+                        "from": "teams",
+                        "localField": "id",
+                        "foreignField": "product_id",
+                        "as": "TeamObjects"
+                    }
+                },
+                {
+                    "$group": {
+                        "_id": "$_id",
+                        "id": {"$first": "$id"},
+                        "title": {"$first": "$title"},
+                        "teams": {"$first": "$TeamObjects"}
+                    }
+                }
+            ]).exec()
+                .then(respondWithResult(res))
+                .catch(handleError(res));
+        } else {
+            res.status(500)
+                .json(errorJsonResponse("Product Id is required", "Product Id is required"));
+        }
+
+    } catch (error) {
+        res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
     }
 }

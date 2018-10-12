@@ -6,6 +6,7 @@ var TeamSchema = new mongoose.Schema({
     name: String,
     image_url: String,
     description: String,
+    product_id: [],
 });
 
 registerEvents(TeamSchema);

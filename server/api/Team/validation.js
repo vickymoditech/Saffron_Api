@@ -1,4 +1,3 @@
-
 import jwt from 'jsonwebtoken';
 import {jwtdata} from '../../config/commonHelper';
 import Joi from 'joi';
@@ -62,6 +61,13 @@ export default {
     deleteTeamId: {
         params: {
             teamId : Joi.string().required()
+        }
+    },
+
+    addRemoveTeamService: {
+        body: {
+            id: Joi.string().uuid().required(),
+            product_id: Joi.string().uuid().required()
         }
     }
 

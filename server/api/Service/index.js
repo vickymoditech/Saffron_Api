@@ -15,7 +15,7 @@ router.delete('/:serviceId', validations.validateAuthorization, validate(validat
 // 03. ADD NEW   /api/Services/
 router.post('/', validations.validateAuthorization, controller.addNewService);
 
-// 03. UPDATE   /api/Services/
+// 04. UPDATE   /api/Services/
 router.put('/', validations.validateAuthorization, controller.updateService);
 
 router.use(function (err, req, res, next) {
