@@ -2,6 +2,8 @@ import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
 import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
 import Gallery from '../Gallery/Gallery.model';
+import Product from '../Product/Product.model';
+
 
 var formidable = require('formidable');
 var fs = require('fs');
@@ -40,19 +42,31 @@ export function deleteService(req, res, next) {
                 .exec(function (err, DeleteGallery) {
                     if (!err) {
                         if (DeleteGallery) {
-
-                            Service.remove({id: serviceId})
-                                .exec(function (err, DeleteService) {
+                            Product.remove({})
+                                .exec(function (err, DeleteProduct) {
                                     if (!err) {
-                                        if (DeleteService) {
-                                            if (DeleteService.result.n === 1) {
-                                                res.status(200)
-                                                    .json({id: serviceId, result: "Deleted Successfully"});
-                                            } else {
-                                                res.status(200)
-                                                    .json({id: serviceId, result: "Fail Main Service"});
-                                            }
+                                        if (DeleteProduct) {
+                                            Service.remove({id: serviceId})
+                                                .exec(function (err, DeleteService) {
+                                                    if (!err) {
+                                                        if (DeleteService) {
+                                                            if (DeleteService.result.n === 1) {
+                                                                res.status(200)
+                                                                    .json({
+                                                                        id: serviceId,
+                                                                        result: "Deleted Successfully"
+                                                                    });
+                                                            } else {
+                                                                res.status(200)
+                                                                    .json({id: serviceId, result: "Fail Main Service"});
+                                                            }
+                                                        }
+                                                    }
+                                                });
                                         }
+                                    } else {
+                                        res.status(400)
+                                            .json(errorJsonResponse(err, "Contact to your Developer"));
                                     }
                                 });
 
@@ -80,7 +94,7 @@ export function addNewService(req, res, next) {
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 
-            if (Object.keys(files).length > 0 && fields.title && fields.description && isImage(files.filetoupload.name)) {
+            if (Object.keys(files).length > 0 && fields.title && fields.description && fields.displayOrder && isImage(files.filetoupload.name)) {
                 let uuid = getGuid();
                 let oldpath = files.filetoupload.path;
                 let newpath = serviceImageUploadLocation.path + files.filetoupload.name;
@@ -88,6 +102,7 @@ export function addNewService(req, res, next) {
                 let renameFilePath = serviceImageUploadLocation.path + uuid + files.filetoupload.name;
                 let title = fields.title.toLowerCase();
                 let description = fields.description.toLowerCase();
+                let displayOrder = fields.displayOrder;
 
                 fs_extra.move(oldpath, newpath, function (err) {
                     if (err) {
@@ -102,7 +117,8 @@ export function addNewService(req, res, next) {
                                     id: getGuid(),
                                     image_url: dbpath,
                                     title: title,
-                                    description: description
+                                    description: description,
+                                    displayOrder: displayOrder
                                 });
                                 ServiceNewAdd.save()
                                     .then(function (InsertService, err) {
@@ -138,7 +154,7 @@ export function updateService(req, res, next) {
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 
-            if (fields.title && fields.discription && fields.id) {
+            if (fields.title && fields.description && fields.id && fields.displayOrder) {
 
                 if (files.filetoupload && isImage(files.filetoupload.name)) {
                     let uuid = getGuid();
@@ -148,13 +164,15 @@ export function updateService(req, res, next) {
                     let renameFilePath = serviceImageUploadLocation.path + uuid + files.filetoupload.name;
                     let title = fields.title.toLowerCase();
                     let description = fields.description.toLowerCase();
+                    let displayOrder = fields.displayOrder;
                     let id = fields.id;
 
                     let serviceObject = {
                         id,
                         image_url: dbpath,
                         title,
-                        description
+                        description,
+                        displayOrder
                     };
 
 
@@ -170,7 +188,8 @@ export function updateService(req, res, next) {
                                     Service.update({id: id}, {
                                         image_url: dbpath,
                                         title: title,
-                                        description: description
+                                        description: description,
+                                        displayOrder: displayOrder
                                     }).exec(function (err, UpdateService) {
                                         if (!err) {
                                             if (UpdateService) {
@@ -206,16 +225,19 @@ export function updateService(req, res, next) {
                     let title = fields.title.toLowerCase();
                     let description = fields.description.toLowerCase();
                     let id = fields.id;
+                    let displayOrder = fields.displayOrder;
 
                     let serviceObject = {
                         id,
                         title,
-                        description
+                        description,
+                        displayOrder
                     };
 
                     Service.update({id: id}, {
                         title: title,
-                        description: description
+                        description: description,
+                        displayOrder: displayOrder
                     }).exec(function (err, UpdateService) {
                         if (!err) {
                             if (UpdateService) {
