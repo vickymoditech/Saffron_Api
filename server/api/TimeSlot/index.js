@@ -1,25 +1,16 @@
 var express = require('express');
-var controller = require('./Product.controller');
+var controller = require('./TimeSlot.controller');
 import validations from './validation';
 import validate from 'express-validation';
 import {errorJsonResponse} from '../../config/commonHelper';
 
 var router = express.Router();
 
-// 01. GET   /api/Products/
 router.get('/', controller.index);
 
-// 02. POST /api/Products/
-router.post('/', validations.validateAuthorization, validate(validations.addProductValidate), controller.addNewProduct);
+router.post('/', validations.validateAuthorization, validate(validations.addTimeSlot), controller.addTimeSlot);
 
-// 03. PUT /api/Products/
-router.put('/', validations.validateAuthorization, validate(validations.updateProductValidate), controller.updateProduct);
-
-// 04. DELETE /api/Products/
-router.delete('/:productId', validations.validateAuthorization, controller.deleteProduct);
-
-// 05. GET   /api/Products/teamProduct
-router.get('/teamProduct/:productId', controller.teamProduct);
+router.post('/Times', validate(validations.Times), controller.Times);
 
 router.use(function (err, req, res, next) {
     let allErrorField = [];
@@ -31,6 +22,5 @@ router.use(function (err, req, res, next) {
     }
     res.status(400).json(errorJsonResponse(allErrorField, allErrorField));
 });
-
 
 module.exports = router;
