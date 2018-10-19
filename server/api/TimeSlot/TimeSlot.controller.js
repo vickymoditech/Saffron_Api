@@ -49,6 +49,7 @@ export function addTimeSlot(req, res, next) {
                                                     .json(errorJsonResponse('TimeSlot already Available', 'TimeSlot already Available'));
                                             } else {
                                                 let TimeSlotAdd = new TimeSlot({
+                                                    id: getGuid(),
                                                     product_id: product_id,
                                                     team_id: team_id,
                                                     times: times
@@ -95,12 +96,45 @@ export function Times(req, res, next) {
         let product_id = req.body.product_id;
         let team_id = req.body.team_id;
 
+
         if (req.body) {
             return TimeSlot.find({product_id: product_id, team_id: team_id}, {__v: 0, _id: 0}).exec()
                 .then(respondWithResult(res))
                 .catch(handleError(res));
         }
 
+    } catch (err) {
+        res.status(400).json(errorJsonResponse(err.message.toString(), err.message.toString()));
+    }
+}
+
+export function deleteTimeSlot(req, res, next) {
+    try {
+        if (req.body) {
+            let product_id = req.body.product_id;
+            let team_id = req.body.team_id;
+            TimeSlot.remove({product_id: product_id, team_id: team_id})
+                .exec(function (err, DeleteTimeSlot) {
+                    if (!err) {
+                        if (DeleteTimeSlot) {
+                            if (DeleteTimeSlot.result.n === 1) {
+                                res.status(200)
+                                    .json({product_id: product_id, team_id: team_id, result: "Deleted Successfully"});
+                            } else {
+                                res.status(403)
+                                    .json({result: "Deleted Fail"});
+                            }
+
+                        } else {
+                            res.status(404)
+                                .json(errorJsonResponse("Invalid Record", "Invalid Record"));
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse(err, "Contact to your Developer"));
+                    }
+                });
+        }
     } catch (err) {
         res.status(400).json(errorJsonResponse(err.message.toString(), err.message.toString()));
     }

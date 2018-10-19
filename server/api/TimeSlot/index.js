@@ -12,6 +12,8 @@ router.post('/', validations.validateAuthorization, validate(validations.addTime
 
 router.post('/Times', validate(validations.Times), controller.Times);
 
+router.delete('/', validations.validateAuthorization, validate(validations.deleteTimeSlot), controller.deleteTimeSlot);
+
 router.use(function (err, req, res, next) {
     let allErrorField = [];
     for (let i = 0; i < err.errors.length; i++) {
