@@ -58,26 +58,25 @@ export function login(req, res) {
                 .exec(function (err, loginUser) {
                     if (!err) {
                         if (loginUser) {
-
                             let expiresIn = 60 * 60 * 24; // expires in 24 hours
                             let issued = moment(Date.now());
-                            let token = jwt.sign({user: loginUser}, jwtdata.jwtSecretKey, {
+                            let accessToken = jwt.sign({user: loginUser}, jwtdata.jwtSecretKey, {
                                 expiresIn: expiresIn
                             });
                             let expires = moment(issued)
                                 .add(expiresIn, 'seconds');
                             res.status(200)
                                 .json({
-                                    token,
+                                    accessToken,
                                     expiresIn,
                                     issued,
                                     expires
                                 });
                         } else {
-                            res.status(404).json(errorJsonResponse("Invalid_user", "Invalid_user"));
+                            res.status(404).json(errorJsonResponse("Invalid user", "Invalid user"));
                         }
                     } else {
-                        res.status(400).json(errorJsonResponse(err, "come_to_store_sorry"));
+                        res.status(400).json(errorJsonResponse(err, "sorry, come to the store."));
                     }
                 });
         }

@@ -3,10 +3,13 @@ import {registerEvents} from './Basket.events';
 
 var BasketSchema = new mongoose.Schema({
     id: String,
-    items: []
+    items: [],
+    createAt: {
+        type: Date,
+        default: Date.now(),
+        index: {expires: 60 * 1}
+    }
 });
-
-BasketSchema.plugin(ttl, {ttl: (1000 * 60 * 7)});
 
 registerEvents(BasketSchema);
 export default mongoose.model('Basket', BasketSchema);
