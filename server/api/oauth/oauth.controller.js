@@ -186,7 +186,7 @@ export function updateUser(req, res, next) {
 
         try {
 
-            if (mobile_number === old_mobile_number) {
+            if (mobile_number.toString() === old_mobile_number.toString()) {
 
                 Oauth.update({userId: old_mobile_number},
                     {
