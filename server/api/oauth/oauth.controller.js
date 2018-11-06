@@ -202,35 +202,31 @@ export function updateUser(req, res, next) {
                 ).exec(function (err, UpdateUser) {
                     if (!err) {
                         if (UpdateUser) {
-                            if (UpdateUser.nModified === 1 && UpdateUser.n === 1) {
+                            if (UpdateUser.nModified === 1 || UpdateUser.n === 1) {
 
                                 let expiresIn = 60 * 60 * 24; // expires in 24 hours
                                 let issued = moment(Date.now());
-                                let token = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
+                                let accessToken = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
                                     expiresIn: expiresIn
                                 });
                                 let expires = moment(issued)
                                     .add(expiresIn, 'seconds');
                                 res.status(200)
                                     .json({
-                                        data: userObject,
-                                        token,
+                                        accessToken,
                                         expiresIn,
                                         issued,
                                         expires,
                                         result: "Updated Successfully"
                                     });
 
-                            } else if (UpdateUser.n === 1) {
-                                res.status(200)
-                                    .json({result: "already uptodate"});
                             } else {
-                                res.status(403)
-                                    .json({result: "not found"});
+                                res.status(400)
+                                    .json(errorJsonResponse("not found", "not found"));
                             }
 
                         } else {
-                            res.status(404)
+                            res.status(400)
                                 .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                         }
                     } else {
@@ -265,35 +261,31 @@ export function updateUser(req, res, next) {
                         ).exec(function (err, UpdateUser) {
                             if (!err) {
                                 if (UpdateUser) {
-                                    if (UpdateUser.nModified === 1 && UpdateUser.n === 1) {
+                                    if (UpdateUser.nModified === 1 || UpdateUser.n === 1) {
 
                                         let expiresIn = 60 * 60 * 24; // expires in 24 hours
                                         let issued = moment(Date.now());
-                                        let token = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
+                                        let accessToken = jwt.sign({user: userObject}, jwtdata.jwtSecretKey, {
                                             expiresIn: expiresIn
                                         });
                                         let expires = moment(issued)
                                             .add(expiresIn, 'seconds');
                                         res.status(200)
                                             .json({
-                                                data: userObject,
-                                                token,
+                                                accessToken,
                                                 expiresIn,
                                                 issued,
                                                 expires,
                                                 result: "Updated Successfully"
                                             });
 
-                                    } else if (UpdateUser.n === 1) {
-                                        res.status(200)
-                                            .json({result: "Already Updated"});
                                     } else {
-                                        res.status(403)
-                                            .json({result: "Not Found"});
+                                        res.status(400)
+                                            .json(errorJsonResponse("Not Found", "Not Found"));
                                     }
 
                                 } else {
-                                    res.status(404)
+                                    res.status(400)
                                         .json(errorJsonResponse("Invalid Image", "Invalid Image"));
                                 }
                             } else {
@@ -303,14 +295,14 @@ export function updateUser(req, res, next) {
                         });
 
                     } else {
-                        res.status(403).json(errorJsonResponse("Mobile number is already register", "Mobile number is already register"));
+                        res.status(400).json(errorJsonResponse("Mobile number is already register", "Mobile number is already register"));
                     }
                 });
             }
         }
         catch
             (error) {
-            res.status(501).json(errorJsonResponse(error, "Contact to Developer"))
+            res.status(400).json(errorJsonResponse(error, "Contact to Developer"))
         }
     }
 }
