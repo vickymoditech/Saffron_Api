@@ -73,10 +73,10 @@ export function login(req, res) {
                                     expires
                                 });
                         } else {
-                            res.status(404).json(errorJsonResponse("Invalid user", "Invalid user"));
+                            res.status(400).json(errorJsonResponse("Invalid user", "Invalid user"));
                         }
                     } else {
-                        res.status(400).json(errorJsonResponse(err, "sorry, come to the store."));
+                        res.status(400).json(errorJsonResponse(err, "sorry, come to the shop."));
                     }
                 });
         }
@@ -138,7 +138,7 @@ export function register(req, res, next) {
                                         });
 
                                 } else {
-                                    res.status(404)
+                                    res.status(400)
                                         .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                 }
                             } else {
@@ -148,13 +148,13 @@ export function register(req, res, next) {
                         });
 
                 } else {
-                    res.status(403).json(errorJsonResponse("Mobile number is already register", "Mobile number is already register"));
+                    res.status(400).json(errorJsonResponse("Mobile number is already register", "Mobile number is already register"));
                 }
             });
         }
         catch
             (error) {
-            res.status(501).json(errorJsonResponse(error, "contact to developer"))
+            res.status(400).json(errorJsonResponse(error, "contact to developer"))
         }
     }
 }
@@ -318,12 +318,12 @@ export function deleteUser(req, res, next) {
                             res.status(200)
                                 .json({id: userId, result: "Deleted Successfully"});
                         } else {
-                            res.status(403)
-                                .json({result: "Deleted Fail"});
+                            res.status(400)
+                                .json(errorJsonResponse("Deleted Fail", "Deleted Fail"));
                         }
 
                     } else {
-                        res.status(404)
+                        res.status(400)
                             .json(errorJsonResponse("Invalid Post", "Invalid Post"));
                     }
                 } else {
@@ -353,33 +353,30 @@ export function uploadUserAvatar(req, res, next) {
 
                 fs_extra.move(oldpath, newpath, function (err) {
                     if (err) {
-                        res.status(500)
+                        res.status(400)
                             .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
                     } else {
                         fs.rename(newpath, renameFilePath, function (err) {
                             if (err) {
-                                res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                                res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
                             } else {
                                 Oauth.update({userId: login_user.user.userId}, {
                                     image_url: dbpath,
                                 }).exec(function (err, UpdateOauth) {
                                     if (!err) {
                                         if (UpdateOauth) {
-                                            if (UpdateOauth.nModified === 1 && UpdateOauth.n === 1) {
+                                            if (UpdateOauth.nModified === 1 || UpdateOauth.n === 1) {
                                                 res.status(200)
                                                     .json({
                                                         data: dbpath,
                                                         result: "updated Successfully "
                                                     });
-                                            } else if (UpdateOauth.n === 1) {
-                                                res.status(200)
-                                                    .json({result: "already updated"});
                                             } else {
-                                                res.status(403)
-                                                    .json({result: "not found"});
+                                                res.status(400)
+                                                    .json(errorJsonResponse("not found", "not found"));
                                             }
                                         } else {
-                                            res.status(404)
+                                            res.status(400)
                                                 .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                         }
                                     } else {
@@ -397,7 +394,7 @@ export function uploadUserAvatar(req, res, next) {
         });
     }
     catch (error) {
-        res.status(400).json(error);
+        res.status(400).json(errorJsonResponse(error.message.toString(), error.message.toString()));
     }
 }
 

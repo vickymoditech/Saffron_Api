@@ -46,11 +46,11 @@ export function deleteTeam(req, res, next) {
                                 res.status(200)
                                     .json({id: teamId, result: 'Deleted Successfully'});
                             } else {
-                                res.status(403)
+                                res.status(400)
                                     .json({result: 'Deleted Fail'});
                             }
                         } else {
-                            res.status(404)
+                            res.status(400)
                                 .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
                         }
                     } else {
@@ -59,13 +59,13 @@ export function deleteTeam(req, res, next) {
                     }
                 });
         } else {
-            res.status(500)
+            res.status(400)
                 .json(errorJsonResponse('Id is required', 'Id is required'));
         }
 
     } catch (error) {
         res.status(400)
-            .json(errorJsonResponse(error, 'Contact to your Developer'));
+            .json(errorJsonResponse(error.message.toString(), 'Contact to your Developer'));
     }
 }
 
@@ -107,7 +107,7 @@ export function addNewTeam(req, res, next) {
                                                 res.status(200)
                                                     .json({data: InsertTeam, result: "Save Successfully"});
                                             } else {
-                                                res.status(404)
+                                                res.status(400)
                                                     .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                             }
                                         } else {
@@ -124,8 +124,8 @@ export function addNewTeam(req, res, next) {
             }
         });
     }
-    catch (Error) {
-        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    catch (error) {
+        res.status(400).json(errorJsonResponse(error.message.toString(), "Invalid Image"));
     }
 }
 
@@ -155,13 +155,13 @@ export function updateTeam(req, res, next) {
 
                     fs_extra.move(oldpath, newpath, function (err) {
                         if (err) {
-                            res.status(500)
+                            res.status(400)
                                 .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
                         }
                         else {
                             fs.rename(newpath, renameFilePath, function (err) {
                                 if (err) {
-                                    res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                                    res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
                                 } else {
                                     Team.update({id: id}, {
                                         image_url: dbpath,
@@ -170,22 +170,19 @@ export function updateTeam(req, res, next) {
                                     }).exec(function (err, UpdateTeam) {
                                         if (!err) {
                                             if (UpdateTeam) {
-                                                if (UpdateTeam.nModified === 1 && UpdateTeam.n === 1) {
+                                                if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
                                                     res.status(200)
                                                         .json({
                                                             data: TeamObject,
                                                             result: "updated Successfully "
                                                         });
-                                                } else if (UpdateTeam.n === 1) {
-                                                    res.status(200)
-                                                        .json({result: "already updated"});
                                                 } else {
-                                                    res.status(403)
-                                                        .json({result: "not found"});
+                                                    res.status(400)
+                                                        .json(errorJsonResponse("not found", "not found"));
                                                 }
 
                                             } else {
-                                                res.status(404)
+                                                res.status(400)
                                                     .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                             }
                                         } else {

@@ -26,13 +26,13 @@ router.post('/removeTeamService', validations.validateAuthorization, validate(va
 
 
 router.use(function (err, req, res, next) {
-    let allErrorField = [];
+    let arrayMessages = [];
+    let allErrorField ;
     for (let i = 0; i < err.errors.length; i++) {
-        let Single_Object = {
-            Error: err.errors[i].messages.toString().replace(/"/g, '')
-        };
-        allErrorField.push(Single_Object);
+        let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
+        arrayMessages.push(Single_error);
     }
+    allErrorField = arrayMessages.join(",");
     res.status(400).json(errorJsonResponse(allErrorField, allErrorField));
 });
 
