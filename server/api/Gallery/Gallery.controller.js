@@ -25,12 +25,20 @@ function handleError(res, statusCode) {
     };
 }
 
-// Gets a list of Gallerys
+// Gets a list of Gallery
 export function index(req, res) {
     return Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).limit(9).exec()
         .then(respondWithResult(res))
         .catch(handleError(res));
 }
+
+// Gets all the Gallery
+export function allGallery(req, res) {
+    return Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec()
+        .then(respondWithResult(res))
+        .catch(handleError(res));
+}
+
 
 export function deleteGallery(req, res) {
     if (req.params.galleryId) {

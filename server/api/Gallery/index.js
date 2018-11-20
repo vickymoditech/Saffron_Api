@@ -19,9 +19,12 @@ router.post('/', validations.validateAuthorization, controller.addNewGallery);
 // 04. UPDATE   /api/Gallery/
 router.put('/', validations.validateAuthorization, controller.updateGallery);
 
+// 05. GET /api/Gallery/All/:PageNo
+router.get('/All', controller.allGallery);
+
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);
