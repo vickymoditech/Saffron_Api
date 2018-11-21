@@ -6,6 +6,7 @@
 
 import express from 'express';
 import mongoose from 'mongoose';
+
 mongoose.Promise = require('bluebird');
 import config from './config/environment';
 import http from 'http';
@@ -16,7 +17,7 @@ import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
 
 mongoose.connect(config.mongo.uri, {useMongoClient: true});
-mongoose.connection.on('error', function(err) {
+mongoose.connection.on('error', function (err) {
     console.error(`MongoDB connection error: ${err}`);
     process.exit(-1); // eslint-disable-line no-process-exit
 });
@@ -27,15 +28,27 @@ seedDatabaseIfNeeded();
 var app = express();
 console.log(__dirname);
 app.use(cors());
-app.use('/images',express.static(__dirname+'/images'));
+app.use('/images', express.static(__dirname + '/images'));
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+io.on('connection', (socket) => {
+    socket.on('test', (data) => {
+        // we tell the client to execute 'new message'
+        console.log("test here", data);
+        socket.broadcast.emit("new test", {
+            message: data
+        });
+    });
+});
+
 
 expressConfig(app);
 registerRoutes(app);
 
 // Start server
 function startServer() {
-    app.angularFullstack = server.listen(config.port, config.ip, function() {
+    app.angularFullstack = server.listen(config.port, config.ip, function () {
         console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     });
 }
