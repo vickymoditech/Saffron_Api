@@ -43,7 +43,7 @@ export function index(req, res) {
             }
         },
         {$sort: {displayOrder: 1}}).exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
@@ -83,7 +83,7 @@ export function addNewProduct(req, res, next) {
                                             });
 
                                     } else {
-                                        res.status(404)
+                                        res.status(400)
                                             .json(errorJsonResponse("Error in db response", "Error in db response"));
                                     }
                                 } else {
@@ -93,13 +93,13 @@ export function addNewProduct(req, res, next) {
                             });
                     }
                     else {
-                        res.status(403).json(errorJsonResponse("Service is not found", "Service is not found"));
+                        res.status(400).json(errorJsonResponse("Service is not found", "Service is not found"));
                     }
                 });
             }
             catch
                 (error) {
-                res.status(501).json(errorJsonResponse(error, "contact to developer"))
+                res.status(400).json(errorJsonResponse(error, "contact to developer"))
             }
         }
     }
@@ -135,22 +135,19 @@ export function updateProduct(req, res, next) {
                         }).exec(function (err, UpdateProduct) {
                             if (!err) {
                                 if (UpdateProduct) {
-                                    if (UpdateProduct.nModified === 1 && UpdateProduct.n === 1) {
+                                    if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
                                         res.status(200)
                                             .json({
                                                 data: response,
                                                 result: "updated Successfully"
                                             });
 
-                                    } else if (UpdateProduct.n === 1) {
-                                        res.status(200)
-                                            .json({result: "already updated"});
                                     } else {
-                                        res.status(403)
-                                            .json({result: "Record not found"});
+                                        res.status(400)
+                                            .json(errorJsonResponse("Record not found", "Record not found"));
                                     }
                                 } else {
-                                    res.status(404)
+                                    res.status(400)
                                         .json(errorJsonResponse("Fail Update", "Fail Update"));
                                 }
                             } else {
@@ -160,13 +157,13 @@ export function updateProduct(req, res, next) {
                         });
                     }
                     else {
-                        res.status(403).json(errorJsonResponse("Service is not found", "Service is not found"));
+                        res.status(400).json(errorJsonResponse("Service is not found", "Service is not found"));
                     }
                 });
             }
             catch
                 (error) {
-                res.status(501).json(errorJsonResponse(error, "contact to developer"))
+                res.status(400).json(errorJsonResponse(error, "contact to developer"))
             }
         }
     }
@@ -187,11 +184,11 @@ export function deleteProduct(req, res, next) {
                                 res.status(200)
                                     .json({id: productId, result: 'Deleted Successfully'});
                             } else {
-                                res.status(403)
-                                    .json({result: 'Deleted Fail'});
+                                res.status(400)
+                                    .json(errorJsonResponse('Deleted Fail', 'Deleted Fail'));
                             }
                         } else {
-                            res.status(404)
+                            res.status(400)
                                 .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
                         }
                     } else {
@@ -200,7 +197,7 @@ export function deleteProduct(req, res, next) {
                     }
                 });
         } else {
-            res.status(500)
+            res.status(400)
                 .json(errorJsonResponse('Id is required', 'Id is required'));
         }
 
@@ -236,10 +233,10 @@ export function teamProduct(req, res, next) {
                     }
                 }
             ]).exec()
-                .then(respondWithResult(res))
+                .then(respondWithResult(res, 200))
                 .catch(handleError(res));
         } else {
-            res.status(500)
+            res.status(400)
                 .json(errorJsonResponse("Product Id is required", "Product Id is required"));
         }
 

@@ -21,7 +21,7 @@ function handleError(res, statusCode) {
 // Gets a list of Baskets
 export function index(req, res) {
     return Basket.find().exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
@@ -29,7 +29,7 @@ export function insert(req, res, next) {
 
     let BasketAdd = new Basket({
         id: getGuid(),
-        items: [{id: 0},{ id: 1}],
+        items: [{id: 0}, {id: 1}],
         createAt: Date.now()
     });
     BasketAdd.save()
@@ -42,7 +42,7 @@ export function insert(req, res, next) {
                             result: "Save Successfully"
                         });
                 } else {
-                    res.status(404)
+                    res.status(400)
                         .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                 }
             } else {

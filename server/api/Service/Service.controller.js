@@ -30,7 +30,7 @@ function handleError(res, statusCode) {
 // Gets a list of Services
 export function index(req, res) {
     return Service.find({}, {_id: 0, __v: 0}).exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
@@ -57,8 +57,8 @@ export function deleteService(req, res, next) {
                                                                         result: "Deleted Successfully"
                                                                     });
                                                             } else {
-                                                                res.status(200)
-                                                                    .json({id: serviceId, result: "Fail Main Service"});
+                                                                res.status(400)
+                                                                    .json(errorJsonResponse("service not found", "service not found"));
                                                             }
                                                         }
                                                     }
@@ -71,7 +71,7 @@ export function deleteService(req, res, next) {
                                 });
 
                         } else {
-                            res.status(404)
+                            res.status(400)
                                 .json(errorJsonResponse("Invalid Service", "Invalid Service"));
                         }
                     } else {
@@ -80,7 +80,7 @@ export function deleteService(req, res, next) {
                     }
                 });
         } else {
-            res.status(500)
+            res.status(400)
                 .json(errorJsonResponse("Id is required", "Id is required"));
         }
 
@@ -106,12 +106,12 @@ export function addNewService(req, res, next) {
 
                 fs_extra.move(oldpath, newpath, function (err) {
                     if (err) {
-                        res.status(500)
+                        res.status(400)
                             .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
                     } else {
                         fs.rename(newpath, renameFilePath, function (err) {
                             if (err) {
-                                res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                                res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
                             } else {
                                 let ServiceNewAdd = new Service({
                                     id: getGuid(),
@@ -127,7 +127,7 @@ export function addNewService(req, res, next) {
                                                 res.status(200)
                                                     .json({data: InsertService, result: "Save Successfully"});
                                             } else {
-                                                res.status(404)
+                                                res.status(400)
                                                     .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                             }
                                         } else {
@@ -178,12 +178,12 @@ export function updateService(req, res, next) {
 
                     fs_extra.move(oldpath, newpath, function (err) {
                         if (err) {
-                            res.status(500)
+                            res.status(400)
                                 .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
                         } else {
                             fs.rename(newpath, renameFilePath, function (err) {
                                 if (err) {
-                                    res.status(500).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                                    res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
                                 } else {
                                     Service.update({id: id}, {
                                         image_url: dbpath,
@@ -193,22 +193,19 @@ export function updateService(req, res, next) {
                                     }).exec(function (err, UpdateService) {
                                         if (!err) {
                                             if (UpdateService) {
-                                                if (UpdateService.nModified === 1 && UpdateService.n === 1) {
+                                                if (UpdateService.nModified === 1 || UpdateService.n === 1) {
                                                     res.status(200)
                                                         .json({
                                                             data: serviceObject,
                                                             result: "updated Successfully "
                                                         });
-                                                } else if (UpdateService.n === 1) {
-                                                    res.status(200)
-                                                        .json({result: "already updated"});
                                                 } else {
-                                                    res.status(403)
-                                                        .json({result: "not found"});
+                                                    res.status(400)
+                                                        .json(errorJsonResponse("not found", "not found"));
                                                 }
 
                                             } else {
-                                                res.status(404)
+                                                res.status(400)
                                                     .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                             }
                                         } else {
@@ -241,18 +238,15 @@ export function updateService(req, res, next) {
                     }).exec(function (err, UpdateService) {
                         if (!err) {
                             if (UpdateService) {
-                                if (UpdateService.nModified === 1 && UpdateService.n === 1) {
+                                if (UpdateService.nModified === 1 || UpdateService.n === 1) {
                                     res.status(200)
                                         .json({
                                             data: serviceObject,
                                             result: "updated Successfully "
                                         });
-                                } else if (UpdateService.n === 1) {
-                                    res.status(200)
-                                        .json({result: "already updated"});
                                 } else {
                                     res.status(403)
-                                        .json({result: "not found"});
+                                        .json(errorJsonResponse("not found", "not found"));
                                 }
 
                             } else {

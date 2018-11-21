@@ -23,7 +23,7 @@ function handleError(res, statusCode) {
 // Gets a list of TimeSlots
 export function index(req, res) {
     return TimeSlot.find({}, {__v: 0, _id: 0}).exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
@@ -64,7 +64,7 @@ export function addTimeSlot(req, res, next) {
                                                                         result: "Save Successfully"
                                                                     });
                                                             } else {
-                                                                res.status(404)
+                                                                res.status(400)
                                                                     .json(errorJsonResponse("Error in db response", "Invalid_Image"));
                                                             }
                                                         } else {
@@ -99,7 +99,7 @@ export function Times(req, res, next) {
 
         if (req.body) {
             return TimeSlot.find({product_id: product_id, team_id: team_id}, {__v: 0, _id: 0}).exec()
-                .then(respondWithResult(res))
+                .then(respondWithResult(res, 200))
                 .catch(handleError(res));
         }
 
@@ -121,12 +121,12 @@ export function deleteTimeSlot(req, res, next) {
                                 res.status(200)
                                     .json({product_id: product_id, team_id: team_id, result: "Deleted Successfully"});
                             } else {
-                                res.status(403)
-                                    .json({result: "Deleted Fail"});
+                                res.status(400)
+                                    .json(errorJsonResponse("Deleted Fail", "Deleted Fail"));
                             }
 
                         } else {
-                            res.status(404)
+                            res.status(400)
                                 .json(errorJsonResponse("Invalid Record", "Invalid Record"));
                         }
                     } else {

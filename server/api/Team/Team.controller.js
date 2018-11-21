@@ -30,7 +30,7 @@ function handleError(res, statusCode) {
 export function index(req, res) {
     return Team.find({}, {_id: 0, __v: 0})
         .exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
@@ -212,22 +212,19 @@ export function updateTeam(req, res, next) {
                     }).exec(function (err, UpdateTeam) {
                         if (!err) {
                             if (UpdateTeam) {
-                                if (UpdateTeam.nModified === 1 && UpdateTeam.n === 1) {
+                                if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
                                     res.status(200)
                                         .json({
                                             data: TeamObject,
                                             result: "updated Successfully "
                                         });
-                                } else if (UpdateTeam.n === 1) {
-                                    res.status(200)
-                                        .json({result: "already updated"});
                                 } else {
-                                    res.status(403)
-                                        .json({result: "not found"});
+                                    res.status(400)
+                                        .json(errorJsonResponse("not found", "not found"));
                                 }
 
                             } else {
-                                res.status(404)
+                                res.status(400)
                                     .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                             }
                         } else {
@@ -235,7 +232,6 @@ export function updateTeam(req, res, next) {
                                 .json(errorJsonResponse(err, "Contact to your Developer"));
                         }
                     });
-
                 }
             } else {
                 res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
@@ -268,22 +264,19 @@ export function addTeamService(req, res, next) {
                         }).exec(function (err, UpdateTeam) {
                             if (!err) {
                                 if (UpdateTeam) {
-                                    if (UpdateTeam.nModified === 1 && UpdateTeam.n === 1) {
+                                    if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
                                         res.status(200)
                                             .json({
                                                 data: TeamObject,
                                                 result: "Successfully Add new service"
                                             });
-                                    } else if (UpdateTeam.n === 1) {
-                                        res.status(200)
-                                            .json({result: "already updated"});
                                     } else {
-                                        res.status(403)
-                                            .json({result: "not found Team Member"});
+                                        res.status(400)
+                                            .json(errorJsonResponse("not found Team Member", "not found Team Member"));
                                     }
 
                                 } else {
-                                    res.status(404)
+                                    res.status(400)
                                         .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                 }
                             } else {
@@ -293,13 +286,13 @@ export function addTeamService(req, res, next) {
                         });
                     }
                     else {
-                        res.status(403).json(errorJsonResponse("Product is not found", "Product is not found"));
+                        res.status(400).json(errorJsonResponse("Product is not found", "Product is not found"));
                     }
                 });
             }
             catch
                 (error) {
-                res.status(501).json(errorJsonResponse(error, "contact to developer"))
+                res.status(400).json(errorJsonResponse(error, "contact to developer"))
             }
         }
     }
@@ -329,18 +322,15 @@ export function removeTeamService(req, res, next) {
                         }).exec(function (err, UpdateTeam) {
                             if (!err) {
                                 if (UpdateTeam) {
-                                    if (UpdateTeam.nModified === 1 && UpdateTeam.n === 1) {
+                                    if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
                                         res.status(200)
                                             .json({
                                                 data: TeamObject,
                                                 result: "Successfully Remove Product"
                                             });
-                                    } else if (UpdateTeam.n === 1) {
-                                        res.status(200)
-                                            .json({result: "already updated"});
                                     } else {
                                         res.status(403)
-                                            .json({result: "not found Team Member"});
+                                            .json(errorJsonResponse("not found Team Member", "not found Team Member"));
                                     }
 
                                 } else {

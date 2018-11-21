@@ -20,6 +20,6 @@ function handleError(res, statusCode) {
 // Gets a list of Bookings
 export function index(req, res) {
     return Booking.find({}, {_id: 0, __v: 0}).exec()
-        .then(respondWithResult(res))
+        .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
