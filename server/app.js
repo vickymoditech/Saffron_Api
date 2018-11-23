@@ -15,6 +15,7 @@ import cors from 'cors';
 import expressConfig from './config/express';
 import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
+import {socetOpen} from '../server/api/Socket';
 
 mongoose.connect(config.mongo.uri, {useMongoClient: true});
 mongoose.connection.on('error', function (err) {
@@ -30,17 +31,20 @@ console.log(__dirname);
 app.use(cors());
 app.use('/images', express.static(__dirname + '/images'));
 var server = http.createServer(app);
-var io = require('socket.io')(server);
 
-io.on('connection', (socket) => {
-    socket.on('test', (data) => {
-        // we tell the client to execute 'new message'
-        console.log("test here", data);
-        socket.broadcast.emit("new test", {
-            message: data
-        });
-    });
-});
+socetOpen(server);
+
+// var io = require('socket.io')(server);
+//
+// io.on('connection', (socket) => {
+//     socket.on('test', (data) => {
+//         // we tell the client to execute 'new message'
+//         console.log("test here", data);
+//         socket.broadcast.emit("new test", {
+//             message: data
+//         });
+//     });
+// });
 
 
 expressConfig(app);
