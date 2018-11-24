@@ -109,7 +109,8 @@ export default {
             mobile_number: Joi.string().regex(/^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/).required(),
             password: Joi.string().required(),
             confirm_password: Joi.string().required().valid(Joi.ref('password')),
-            role: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required()
+            role: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            email_id: Joi.string().email({minDomainAtoms: 2})
         }
     },
 

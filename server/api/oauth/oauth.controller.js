@@ -91,6 +91,8 @@ export function register(req, res, next) {
         let mobile_number = req.body.mobile_number;
         let password = req.body.password;
         let role = req.body.role;
+        let email_id = req.body.email_id;
+
 
         try {
 
@@ -109,7 +111,7 @@ export function register(req, res, next) {
                         first_name: first_name,
                         last_name: last_name,
                         contact_no: mobile_number,
-                        email_id: '',
+                        email_id: email_id,
                         userId: mobile_number,
                         password: password,
                         role: role,
@@ -122,7 +124,7 @@ export function register(req, res, next) {
 
                                     let expiresIn = 60 * 60 * 24; // expires in 24 hours
                                     let issued = moment(Date.now());
-                                    let token = jwt.sign({user: RegistrationSuccess}, jwtdata.jwtSecretKey, {
+                                    let accessToken = jwt.sign({user: RegistrationSuccess}, jwtdata.jwtSecretKey, {
                                         expiresIn: expiresIn
                                     });
                                     let expires = moment(issued)
@@ -130,7 +132,7 @@ export function register(req, res, next) {
                                     res.status(200)
                                         .json({
                                             data: RegistrationSuccess,
-                                            token,
+                                            accessToken,
                                             expiresIn,
                                             issued,
                                             expires,
