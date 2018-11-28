@@ -400,4 +400,48 @@ export function uploadUserAvatar(req, res, next) {
     }
 }
 
+export function changeUserBlockStatus(req, res, next) {
+    if (req.body) {
 
+        let requestObject = {
+            contact_no: req.body.mobile_number,
+            block: req.body.block,
+        };
+
+        try {
+            Oauth.update({userId: requestObject.contact_no},
+                {
+                    block: requestObject.block
+                }
+            ).exec(function (err, UpdateUser) {
+                if (!err) {
+                    if (UpdateUser) {
+                        if (UpdateUser.nModified === 1 || UpdateUser.n === 1) {
+
+                            res.status(200)
+                                .json({
+                                    data: requestObject,
+                                    result: "Updated Successfully"
+                                });
+
+                        } else {
+                            res.status(400)
+                                .json(errorJsonResponse("not found", "not found"));
+                        }
+
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse("Result Null", "Result Null"));
+                    }
+                } else {
+                    res.status(400)
+                        .json(errorJsonResponse(err, "Sorry retry again"));
+                }
+            });
+        }
+        catch
+            (error) {
+            res.status(400).json(errorJsonResponse(error.message.toString(), "Contact to your Developer"))
+        }
+    }
+}

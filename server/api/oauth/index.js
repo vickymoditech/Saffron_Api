@@ -26,9 +26,12 @@ router.put('/', validations.validateAuthorizationUser, validate(validations.upda
 //05 .  POST /api/oauth/userAvatar
 router.post('/userAvatar', validations.validateAuthorizationUser, controller.uploadUserAvatar);
 
+router.post('/changeUserBlockStatus', validations.validateAuthorization, controller.changeUserBlockStatus);
+
+
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);
