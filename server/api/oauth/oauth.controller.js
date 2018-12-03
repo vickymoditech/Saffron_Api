@@ -32,6 +32,14 @@ export function index(req, res) {
         .catch(handleError(res));
 }
 
+export function index_contactNo(req, res) {
+    let contactNo = '^' + req.params.contactNo + '.*';
+    return Oauth.find({userId: {$regex: contactNo}}, {_id: 0, __v: 0}).exec()
+        .then(respondWithResult(res, 200))
+        .catch(handleError(res));
+}
+
+
 //Login Valid User
 export function login(req, res) {
     if (req.body) {

@@ -11,6 +11,8 @@ var router = express.Router();
 // 01. GET   /api/oauth/
 router.get('/', validations.validateAuthorization, controller.index);
 
+router.get('/:contactNo', validations.validateAuthorization, controller.index_contactNo);
+
 // 02. POST   /api/oauth/login
 router.post('/login', controller.login);
 
