@@ -187,6 +187,7 @@ export function updateUser(req, res, next) {
             contact_no: req.body.mobile_number,
             email_id: req.decoded.user.email_id,
             userId: req.body.mobile_number,
+            image_url: req.body.image_url,
             password: req.body.password,
             role: role,
             block: req.body.block,
