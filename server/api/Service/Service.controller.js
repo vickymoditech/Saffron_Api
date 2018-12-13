@@ -140,7 +140,23 @@ export function addNewService(req, res, next) {
                     }
                 })
             } else {
-                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+                let errorMessage = "";
+                if (Object.keys(files).length <= 0) {
+                    errorMessage += "Service image is required.";
+                } else if (!fields.title) {
+                    errorMessage += "Service title is required.";
+                } else if (!fields.description) {
+                    errorMessage += "Service description is required.";
+                } else if (!fields.displayOrder) {
+                    errorMessage += "Service displayOrder is required.";
+                }
+                else {
+                    if (!isImage(files.filetoupload.name)) {
+                        errorMessage += "only image is allowed.";
+                    }
+                }
+
+                res.status(400).json(errorJsonResponse(errorMessage, errorMessage));
             }
         });
     }

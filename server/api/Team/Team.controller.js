@@ -120,7 +120,21 @@ export function addNewTeam(req, res, next) {
                     }
                 })
             } else {
-                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
+
+                let errorMessage = "";
+                if (Object.keys(files).length <= 0) {
+                    errorMessage += "Team image is required.";
+                } else if (!fields.name) {
+                    errorMessage += "Team name is required.";
+                } else if (!fields.description) {
+                    errorMessage += "Team description is required.";
+                } else {
+                    if (!isImage(files.filetoupload.name)) {
+                        errorMessage += "only image is allowed.";
+                    }
+                }
+                res.status(400).json(errorJsonResponse(errorMessage, errorMessage));
+
             }
         });
     }
