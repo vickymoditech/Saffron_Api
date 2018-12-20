@@ -20,7 +20,7 @@ router.post('/', validations.validateAuthorization, controller.addNewGallery);
 router.put('/', validations.validateAuthorization, controller.updateGallery);
 
 // 05. GET /api/Gallery/All/:PageNo
-router.get('/All', controller.allGallery);
+router.get('/All/:serviceId', controller.allGallery);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];

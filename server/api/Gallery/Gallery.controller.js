@@ -34,9 +34,11 @@ export function index(req, res) {
 
 // Gets all the Gallery
 export function allGallery(req, res) {
-    return Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+    if (req.params.serviceId) {
+        return Gallery.find({service_id: req.params.serviceId}, {_id: 0, __v: 0}).sort({date: -1}).exec()
+            .then(respondWithResult(res, 200))
+            .catch(handleError(res));
+    }
 }
 
 
