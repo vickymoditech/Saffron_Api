@@ -1,7 +1,11 @@
 import Product from './Product.model';
 import Service from '../Service/Service.model';
+import {errorJsonResponse, ProductImageUploadLocation, getGuid} from '../../config/commonHelper';
 
-import {errorJsonResponse, getGuid} from '../../config/commonHelper';
+var formidable = require('formidable');
+var fs = require('fs');
+var fs_extra = require('fs-extra');
+const isImage = require('is-image');
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
@@ -20,7 +24,7 @@ function handleError(res, statusCode) {
     };
 }
 
-// Gets a list of Products
+// Home Product Page
 export function index(req, res) {
     return Service.aggregate({"$unwind": "$id"},
         {
@@ -34,74 +38,123 @@ export function index(req, res) {
         {
             "$group": {
                 "_id": "$_id",
-                "id": {"$first": "$id"},
+                "service_id": {"$first": "$id"},
                 "image_url": {"$first": "$image_url"},
                 "title": {"$first": "$title"},
                 "description": {"$first": "$description"},
-                "displayOrder": {"$first": "$displayOrder"},
+                "date": {"$first": "$date"},
                 "products": {"$first": "$itemsObjects"}
             }
         },
-        {$sort: {displayOrder: 1}}).exec()
+        {$sort: {date: 1}}).exec()
         .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
+// Gets a list of Products
+export function allProduct(req, res) {
+    return Product.aggregate({"$unwind": "$id"},
+        {
+            "$lookup": {
+                "from": "services",
+                "localField": "service_id",
+                "foreignField": "id",
+                "as": "itemsObjects"
+            }
+        }, {
+            $unwind: "$itemsObjects"
+        },
+        {
+            "$group": {
+                "_id": "$_id",
+                "id": {"$first": "$id"},
+                "image_url": {"$first": "$image_url"},
+                "title": {"$first": "$title"},
+                "description": {"$first": "$description"},
+                "date": {"$first": "$date"},
+                "price": {"$first": "$price"},
+                "offerPrice": {"$first": "$offerPrice"},
+                "service_id": {"$first": "$service_id"},
+                "service_title": {"$first": "$itemsObjects.title"}
+            }
+        },
+        {$sort: {date: 1}}).exec()
+        .then(respondWithResult(res, 200))
+        .catch(handleError(res));
+}
+
+
 export function addNewProduct(req, res, next) {
     try {
-        if (req.body) {
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && fields.price && fields.offerPrice && isImage(files.filetoupload.name)) {
+                let uuid = getGuid();
+                let oldpath = files.filetoupload.path;
+                let newpath = ProductImageUploadLocation.path + files.filetoupload.name;
+                let dbpath = ProductImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                let renameFilePath = ProductImageUploadLocation.path + uuid + files.filetoupload.name;
+                let service_id = fields.service_id;
+                let title = fields.title.toLowerCase();
+                let description = fields.description.toLowerCase();
+                let sex = fields.sex.toLowerCase();
+                let price = fields.price;
+                let offerPrice = fields.offerPrice;
 
-            let service_id = req.body.service_id;
-            let price = req.body.price;
-            let offerPrice = req.body.offerPrice;
-            let title = req.body.title;
-            let description = req.body.description;
-            let sex = req.body.sex;
-
-            try {
-                Service.find({id: service_id}).exec(function (err, findService) {
-                    if (findService.length > 0) {
-                        let product = new Product({
-                            id: getGuid(),
-                            service_id: service_id,
-                            price: price,
-                            offerPrice: offerPrice,
-                            title: title,
-                            description: description,
-                            date: new Date().toISOString(),
-                            sex: sex
-                        });
-                        product.save()
-                            .then(function (ProductSuccess, err) {
-                                if (!err) {
-                                    if (ProductSuccess) {
-
-                                        res.status(200)
-                                            .json({
-                                                data: ProductSuccess,
-                                                result: "New Product Successfully Added"
-                                            });
-
+                Service.findOne({id: service_id}).exec(function (err, findService) {
+                    // find the service.
+                    if (findService) {
+                        fs_extra.move(oldpath, newpath, function (err) {
+                            if (err) {
+                                res.status(400)
+                                    .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                            } else {
+                                fs.rename(newpath, renameFilePath, function (err) {
+                                    if (err) {
+                                        res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
                                     } else {
-                                        res.status(400)
-                                            .json(errorJsonResponse("Error in db response", "Error in db response"));
+                                        let ProductAdd = new Product({
+                                            id: getGuid(),
+                                            service_id: service_id,
+                                            price: price,
+                                            offerPrice: offerPrice,
+                                            image_url: dbpath,
+                                            title: title,
+                                            description: description,
+                                            date: new Date().toISOString(),
+                                            sex: sex
+                                        });
+                                        ProductAdd.save()
+                                            .then(function (InsertService, err) {
+                                                if (!err) {
+                                                    if (InsertService) {
+                                                        res.status(200)
+                                                            .json({
+                                                                data: InsertService,
+                                                                result: "Save Successfully"
+                                                            });
+                                                    } else {
+                                                        res.status(400)
+                                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                                    }
+                                                } else {
+                                                    res.status(400)
+                                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                }
+                                            });
                                     }
-                                } else {
-                                    res.status(400)
-                                        .json(errorJsonResponse(err, "Contact to your Developer"));
-                                }
-                            });
-                    }
-                    else {
-                        res.status(400).json(errorJsonResponse("Service is not found", "Service is not found"));
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse("Service Not Found ", "Service Not Found"));
                     }
                 });
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
             }
-            catch
-                (error) {
-                res.status(400).json(errorJsonResponse(error, "contact to developer"))
-            }
-        }
+        });
     }
     catch (Error) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Request"));

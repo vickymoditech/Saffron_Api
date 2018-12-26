@@ -38,14 +38,17 @@ export function deleteService(req, res, next) {
     try {
         if (req.params.serviceId) {
             let serviceId = req.params.serviceId;
+            // delete all Gallery
             Gallery.remove({service_id: serviceId})
                 .exec(function (err, DeleteGallery) {
                     if (!err) {
                         if (DeleteGallery) {
+                            // delete all Product
                             Product.remove({})
                                 .exec(function (err, DeleteProduct) {
                                     if (!err) {
                                         if (DeleteProduct) {
+                                            // Delete Service
                                             Service.remove({id: serviceId})
                                                 .exec(function (err, DeleteService) {
                                                     if (!err) {
@@ -118,7 +121,8 @@ export function addNewService(req, res, next) {
                                     image_url: dbpath,
                                     title: title,
                                     description: description,
-                                    displayOrder: displayOrder
+                                    displayOrder: displayOrder,
+                                    date: new Date().toISOString()
                                 });
                                 ServiceNewAdd.save()
                                     .then(function (InsertService, err) {

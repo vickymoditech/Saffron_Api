@@ -9,8 +9,11 @@ var router = express.Router();
 // 01. GET   /api/Products/
 router.get('/', controller.index);
 
+// 02. GET /api/Products/allProduct/
+router.get('/allProduct', controller.allProduct);
+
 // 02. POST /api/Products/
-router.post('/', validations.validateAuthorization, validate(validations.addProductValidate), controller.addNewProduct);
+router.post('/', validations.validateAuthorization, controller.addNewProduct);
 
 // 03. PUT /api/Products/
 router.put('/', validations.validateAuthorization, validate(validations.updateProductValidate), controller.updateProduct);
@@ -23,7 +26,7 @@ router.get('/teamProduct/:productId', controller.teamProduct);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);

@@ -6,6 +6,7 @@ let ProductSchema = new mongoose.Schema({
     service_id: String,
     price: Number,
     offerPrice: Number,
+    image_url: String,
     title: String,
     description: String,
     date: String,
