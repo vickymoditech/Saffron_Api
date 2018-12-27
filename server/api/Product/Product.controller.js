@@ -75,6 +75,7 @@ export function allProduct(req, res) {
                 "price": {"$first": "$price"},
                 "offerPrice": {"$first": "$offerPrice"},
                 "service_id": {"$first": "$service_id"},
+                "sex": {"$first": "$sex"},
                 "service_title": {"$first": "$itemsObjects.title"}
             }
         },
@@ -87,8 +88,9 @@ export function allProduct(req, res) {
 export function addNewProduct(req, res, next) {
     try {
         let form = new formidable.IncomingForm();
+        let reg = /^\d+$/;
         form.parse(req, function (err, fields, files) {
-            if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && fields.price && fields.offerPrice && isImage(files.filetoupload.name)) {
+            if (Object.keys(files).length > 0 && fields.title && fields.description && fields.service_id && fields.sex && fields.price && fields.price.match(reg) && fields.offerPrice && fields.offerPrice.match(reg) && isImage(files.filetoupload.name)) {
                 let uuid = getGuid();
                 let oldpath = files.filetoupload.path;
                 let newpath = ProductImageUploadLocation.path + files.filetoupload.name;
