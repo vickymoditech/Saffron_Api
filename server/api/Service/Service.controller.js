@@ -14,6 +14,9 @@ function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
     return function (entity) {
         if (entity) {
+            // res.writeHead(200, {'Content-Type': 'text/plain'});
+            // res.end('Hello World\n');
+            // return res;
             return res.status(statusCode).json(entity);
         }
         return null;

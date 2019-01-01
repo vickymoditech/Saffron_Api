@@ -9,13 +9,21 @@ import mongoose from 'mongoose';
 
 mongoose.Promise = require('bluebird');
 import config from './config/environment';
-import http from 'http';
+//import http from 'http';
 import cors from 'cors';
 
 import expressConfig from './config/express';
 import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
 import {socetOpen} from '../server/api/Socket';
+
+//const http2 = require('http2');
+let https = require('https');
+const fs = require('fs');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+
 
 mongoose.connect(config.mongo.uri, {useMongoClient: true});
 mongoose.connection.on('error', function (err) {
@@ -26,11 +34,25 @@ mongoose.connection.on('error', function (err) {
 seedDatabaseIfNeeded();
 
 // Setup server
-var app = express();
+let app = express();
 console.log(__dirname);
 app.use(cors());
 app.use('/images', express.static(__dirname + '/images'));
-var server = http.createServer(app);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
+var privateKey = fs.readFileSync('server-key.pem').toString();
+var certificate = fs.readFileSync('server-crt.pem').toString();
+var ca = fs.readFileSync('ca-crt.pem').toString();
+var credentials = {
+    key: privateKey, cert: certificate
+    //requestCert: false,
+    //rejectUnauthorized: true
+};
+
+let server = https.createServer(credentials, app);
+//server.setSecure(credentials);
 
 socetOpen(server);
 
