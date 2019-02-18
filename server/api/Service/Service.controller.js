@@ -1,8 +1,8 @@
-import {applyPatch} from 'fast-json-patch';
 import Service from './Service.model';
 import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
 import Gallery from '../Gallery/Gallery.model';
 import Product from '../Product/Product.model';
+import {socketPublishMessage} from '../Socket/index';
 
 
 var formidable = require('formidable');
@@ -291,5 +291,23 @@ export function updateService(req, res, next) {
     }
     catch (Error) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
+    }
+}
+
+export function testingPublishSocket(req, res, next) {
+    try {
+
+        let requestObj = {
+            message: req.body.message,
+            data: req.body.data,
+        };
+
+        socketPublishMessage(requestObj.message, {data: requestObj.data}).then((response) => {
+            res.status(200).json({result: response});
+        });
+    } catch (error) {
+        console.log(error);
+        console.log(error.message.toString());
+        res.status(403).json({result: error.message.toString()});
     }
 }

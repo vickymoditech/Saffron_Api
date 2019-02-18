@@ -15,7 +15,7 @@ import cors from 'cors';
 import expressConfig from './config/express';
 import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
-import {socetOpen} from '../server/api/Socket';
+import {socketOpen} from '../server/api/Socket';
 
 //const http2 = require('http2');
 let https = require('https');
@@ -54,21 +54,8 @@ var credentials = {
 let server = https.createServer(credentials, app);
 //server.setSecure(credentials);
 
-socetOpen(server);
-
-// var io = require('socket.io')(server);
-//
-// io.on('connection', (socket) => {
-//     socket.on('test', (data) => {
-//         // we tell the client to execute 'new message'
-//         console.log("test here", data);
-//         socket.broadcast.emit("new test", {
-//             message: data
-//         });
-//     });
-// });
-
-
+socketOpen(server);
+console.log("socket connection successfully created");
 expressConfig(app);
 registerRoutes(app);
 

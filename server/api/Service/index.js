@@ -18,9 +18,13 @@ router.post('/', validations.validateAuthorization, controller.addNewService);
 // 04. UPDATE   /api/Services/
 router.put('/', validations.validateAuthorization, controller.updateService);
 
+//05. Testing /api/Services/testingSocket
+router.post('/testingSocket', controller.testingPublishSocket);
+
+
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);

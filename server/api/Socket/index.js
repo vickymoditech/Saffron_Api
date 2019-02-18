@@ -1,14 +1,35 @@
+let io = null;
 
-export function socetOpen(server) {
-    let io = require('socket.io')(server);
 
-    io.on('connection', (socket) => {
+// Message Receive functionality.
+export function socketOpen(server) {
+    io = require('socket.io')(server);
+
+    io.sockets.on('connection', (socket) => {
+
         socket.on('test', (data) => {
-            // we tell the client to execute 'new message'
-            console.log("test here", data);
-            socket.broadcast.emit("new test", {
-                message: data
-            });
+            //todo create one callback function
+            console.log("test", data);
+            // socket.broadcast.emit("new test", {
+            //     message: data
+            // });
+
         });
+
+
     });
 }
+
+
+// Publish Message To socket.
+export async function socketPublishMessage(publishMessage, publishData) {
+    try {
+        io.sockets.emit(publishMessage, publishData);
+        return "success";
+    }
+    catch (error) {
+        return error.message.toString();
+    }
+}
+
+
