@@ -1,5 +1,6 @@
 import Product from './Product.model';
 import Service from '../Service/Service.model';
+
 import {errorJsonResponse, ProductImageUploadLocation, getGuid} from '../../config/commonHelper';
 
 var formidable = require('formidable');
@@ -262,7 +263,7 @@ export function deleteProduct(req, res, next) {
     }
 }
 
-export function teamProduct(req, res, next) {
+export function teamMember(req, res, next) {
     try {
         if (req.params.productId) {
             let productId = req.params.productId;
@@ -284,7 +285,7 @@ export function teamProduct(req, res, next) {
                         "_id": "$_id",
                         "id": {"$first": "$id"},
                         "title": {"$first": "$title"},
-                        "teams": {"$first": "$TeamObjects"}
+                        "teamsMember": {"$first": "$TeamObjects"}
                     }
                 }
             ]).exec()
@@ -299,3 +300,4 @@ export function teamProduct(req, res, next) {
         res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
     }
 }
+

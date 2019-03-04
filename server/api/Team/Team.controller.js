@@ -372,3 +372,31 @@ export function removeTeamService(req, res, next) {
         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Request"));
     }
 }
+
+export function teamMemberProductsList(req, res, next) {
+    try {
+        if (req.params.teamMemberId) {
+            let teamMemberId = req.params.teamMemberId;
+
+            Team.findOne({id: teamMemberId}).exec(function (err, team) {
+                if (!err) {
+                    return Product.find({
+                        id: {
+                            $in: team.product_id
+                        }
+                    }).exec(function (err, product) {
+                        res.status(200).json(product);
+                    })
+                } else {
+                    res.status(400)
+                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                }
+            });
+        } else {
+            res.status(400)
+                .json(errorJsonResponse("Team Member Id is required", "Team Member Id is required"));
+        }
+    } catch (error) {
+        res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
+    }
+}

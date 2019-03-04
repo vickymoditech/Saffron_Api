@@ -24,10 +24,12 @@ router.post('/addTeamService', validations.validateAuthorization, validate(valid
 // 06. POST   /api/Teams/removeTeamService
 router.post('/removeTeamService', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamService);
 
+//07. Get /api/Teams/teamMemberProductsList
+router.get('/teamMemberProductsList/:teamMemberId', validations.validateAuthorization, controller.teamMemberProductsList);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);

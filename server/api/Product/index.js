@@ -21,8 +21,8 @@ router.put('/', validations.validateAuthorization, validate(validations.updatePr
 // 04. DELETE /api/Products/
 router.delete('/:productId', validations.validateAuthorization, controller.deleteProduct);
 
-// 05. GET   /api/Products/teamProduct
-router.get('/teamProduct/:productId', controller.teamProduct);
+// 05. GET   /api/Products/teamMember
+router.get('/teamMember/:productId', controller.teamMember);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
