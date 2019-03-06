@@ -16,7 +16,7 @@ router.get('/allProduct', controller.allProduct);
 router.post('/', validations.validateAuthorization, controller.addNewProduct);
 
 // 03. PUT /api/Products/
-router.put('/', validations.validateAuthorization, validate(validations.updateProductValidate), controller.updateProduct);
+router.put('/', validations.validateAuthorization, controller.updateProduct);
 
 // 04. DELETE /api/Products/
 router.delete('/:productId', validations.validateAuthorization, controller.deleteProduct);

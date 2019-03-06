@@ -19,10 +19,10 @@ router.post('/', validations.validateAuthorization, controller.addNewTeam);
 router.put('/', validations.validateAuthorization, controller.updateTeam);
 
 // 05. POST   /api/Teams/addTeamService
-router.post('/addTeamService', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.addTeamService);
+router.post('/addTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.addTeamProduct);
 
 // 06. POST   /api/Teams/removeTeamService
-router.post('/removeTeamService', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamService);
+router.post('/removeTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamProduct);
 
 //07. Get /api/Teams/teamMemberProductsList
 router.get('/teamMemberProductsList/:teamMemberId', validations.validateAuthorization, controller.teamMemberProductsList);

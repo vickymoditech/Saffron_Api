@@ -164,67 +164,216 @@ export function addNewProduct(req, res, next) {
     }
 }
 
+// export function updateProduct(req, res, next) {
+//     try {
+//         if (req.body) {
+//
+//             let response = {
+//                 id: req.body.id,
+//                 service_id: req.body.service_id,
+//                 price: req.body.price,
+//                 offerPrice: req.body.offerPrice,
+//                 title: req.body.title,
+//                 description: req.body.description,
+//                 sex: req.body.sex,
+//             };
+//
+//             try {
+//                 Service.find({id: response.service_id}).exec(function (err, findService) {
+//                     if (findService.length > 0) {
+//                         Product.update({id: response.id}, {
+//                             service_id: response.service_id,
+//                             price: response.price,
+//                             offerPrice: response.offerPrice,
+//                             title: response.title,
+//                             description: response.description,
+//                             sex: response.sex
+//                         }).exec(function (err, UpdateProduct) {
+//                             if (!err) {
+//                                 if (UpdateProduct) {
+//                                     if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
+//                                         res.status(200)
+//                                             .json({
+//                                                 data: response,
+//                                                 result: "updated Successfully"
+//                                             });
+//
+//                                     } else {
+//                                         res.status(400)
+//                                             .json(errorJsonResponse("Record not found", "Record not found"));
+//                                     }
+//                                 } else {
+//                                     res.status(400)
+//                                         .json(errorJsonResponse("Fail Update", "Fail Update"));
+//                                 }
+//                             } else {
+//                                 res.status(400)
+//                                     .json(errorJsonResponse(err, "Contact to your Developer"));
+//                             }
+//                         });
+//                     }
+//                     else {
+//                         res.status(400).json(errorJsonResponse("Service is not found", "Service is not found"));
+//                     }
+//                 });
+//             }
+//             catch
+//                 (error) {
+//                 res.status(400).json(errorJsonResponse(error, "contact to developer"))
+//             }
+//         }
+//     }
+//     catch (Error) {
+//         res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Request"));
+//     }
+// }
+
 export function updateProduct(req, res, next) {
     try {
-        if (req.body) {
+        var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
 
-            let response = {
-                id: req.body.id,
-                service_id: req.body.service_id,
-                price: req.body.price,
-                offerPrice: req.body.offerPrice,
-                title: req.body.title,
-                description: req.body.description,
-                sex: req.body.sex,
-            };
+            if (fields.title && fields.description && fields.service_id && fields.sex && fields.id && fields.offerPrice && fields.price) {
 
-            try {
-                Service.find({id: response.service_id}).exec(function (err, findService) {
-                    if (findService.length > 0) {
-                        Product.update({id: response.id}, {
-                            service_id: response.service_id,
-                            price: response.price,
-                            offerPrice: response.offerPrice,
-                            title: response.title,
-                            description: response.description,
-                            sex: response.sex
-                        }).exec(function (err, UpdateProduct) {
-                            if (!err) {
-                                if (UpdateProduct) {
-                                    if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
-                                        res.status(200)
-                                            .json({
-                                                data: response,
-                                                result: "updated Successfully"
+                let service_id = fields.service_id;
+                let id = fields.id;
+                let title = fields.title.toLowerCase();
+                let description = fields.description.toLowerCase();
+                let sex = fields.sex.toLowerCase();
+                let price = fields.price;
+                let offerPrice = fields.offerPrice;
+
+                if (files.filetoupload && isImage(files.filetoupload.name)) {
+                    let uuid = getGuid();
+                    let oldpath = files.filetoupload.path;
+                    let newpath = ProductImageUploadLocation.path + files.filetoupload.name;
+                    let dbpath = ProductImageUploadLocation.dbpath + uuid + files.filetoupload.name;
+                    let renameFilePath = ProductImageUploadLocation.path + uuid + files.filetoupload.name;
+
+                    let response = {
+                        id,
+                        service_id,
+                        image_url: dbpath,
+                        title,
+                        description,
+                        price,
+                        offerPrice,
+                        sex
+                    };
+
+                    Service.findOne({id: service_id}).exec(function (err, findService) {
+                        if (findService) {
+                            fs_extra.move(oldpath, newpath, function (err) {
+                                if (err) {
+                                    res.status(400)
+                                        .json(errorJsonResponse(err.toString(), "Same Name Image Already Available On Server"));
+                                } else {
+                                    fs.rename(newpath, renameFilePath, function (err) {
+                                        if (err) {
+                                            res.status(400).json(errorJsonResponse(err.toString(), "Fail to Rename file"));
+                                        } else {
+
+                                            Product.update({id: id}, {
+                                                image_url: dbpath,
+                                                service_id: response.service_id,
+                                                price: response.price,
+                                                offerPrice: response.offerPrice,
+                                                title: response.title,
+                                                description: response.description,
+                                                sex: response.sex
+                                            }).exec(function (err, UpdateProduct) {
+                                                if (!err) {
+                                                    if (UpdateProduct) {
+                                                        if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
+
+                                                            res.status(200)
+                                                                .json({
+                                                                    data: response,
+                                                                    result: "updated Successfully "
+                                                                });
+
+                                                        } else {
+                                                            res.status(400)
+                                                                .json(errorJsonResponse("Record not found", "Record not found"));
+                                                        }
+
+                                                    } else {
+                                                        res.status(400)
+                                                            .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
+                                                    }
+                                                } else {
+                                                    res.status(400)
+                                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                }
                                             });
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(400)
+                                .json(errorJsonResponse("Service Not Found ", "Service Not Found"));
+                        }
+                    });
 
+                } else {
+
+                    let response = {
+                        id,
+                        service_id,
+                        title,
+                        description,
+                        price,
+                        offerPrice,
+                        sex
+                    };
+
+
+                    Service.findOne({id: service_id}).exec(function (err, findService) {
+                        if (findService) {
+                            Product.update({id: id}, {
+                                service_id: response.service_id,
+                                price: response.price,
+                                offerPrice: response.offerPrice,
+                                title: response.title,
+                                description: response.description,
+                                sex: response.sex
+                            }).exec(function (err, UpdateProduct) {
+                                if (!err) {
+                                    if (UpdateProduct) {
+                                        if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
+                                            res.status(200)
+                                                .json({
+                                                    data: response,
+                                                    result: "updated Successfully "
+                                                });
+
+                                        } else {
+                                            res.status(400)
+                                                .json(errorJsonResponse("Record not found", "Record not found"));
+                                        }
                                     } else {
                                         res.status(400)
-                                            .json(errorJsonResponse("Record not found", "Record not found"));
+                                            .json(errorJsonResponse("Invalid_Image", "Invalid_Image"));
                                     }
                                 } else {
                                     res.status(400)
-                                        .json(errorJsonResponse("Fail Update", "Fail Update"));
+                                        .json(errorJsonResponse(err, "Contact to your Developer"));
                                 }
-                            } else {
-                                res.status(400)
-                                    .json(errorJsonResponse(err, "Contact to your Developer"));
-                            }
-                        });
-                    }
-                    else {
-                        res.status(400).json(errorJsonResponse("Service is not found", "Service is not found"));
-                    }
-                });
+                            });
+                        } else {
+                            res.status(400)
+                                .json(errorJsonResponse("Service Not Found ", "Service Not Found"));
+                        }
+                    });
+                }
+            } else {
+                res.status(400).json(errorJsonResponse("Invalid Request", "Invalid Request"));
             }
-            catch
-                (error) {
-                res.status(400).json(errorJsonResponse(error, "contact to developer"))
-            }
-        }
+        });
     }
     catch (Error) {
-        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Request"));
+        res.status(400).json(errorJsonResponse(Error.toString(), "Invalid Image"));
     }
 }
 

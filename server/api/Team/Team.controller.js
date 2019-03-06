@@ -257,7 +257,7 @@ export function updateTeam(req, res, next) {
     }
 }
 
-export function addTeamService(req, res, next) {
+export function addTeamProduct(req, res, next) {
     try {
         if (req.body) {
 
@@ -282,7 +282,7 @@ export function addTeamService(req, res, next) {
                                         res.status(200)
                                             .json({
                                                 data: TeamObject,
-                                                result: "Successfully Add new service"
+                                                result: "Successfully Add new product"
                                             });
                                     } else {
                                         res.status(400)
@@ -315,7 +315,7 @@ export function addTeamService(req, res, next) {
     }
 }
 
-export function removeTeamService(req, res, next) {
+export function removeTeamProduct(req, res, next) {
     try {
         if (req.body) {
 
@@ -358,7 +358,7 @@ export function removeTeamService(req, res, next) {
                         });
                     }
                     else {
-                        res.status(403).json(errorJsonResponse("Service is not found", "Service is not found"));
+                        res.status(403).json(errorJsonResponse("Product is not found", "Product is not found"));
                     }
                 });
             }
