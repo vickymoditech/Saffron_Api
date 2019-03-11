@@ -177,6 +177,7 @@ export function updateUser(req, res, next) {
         let mobile_number = req.body.mobile_number;
         let password = req.body.password;
         let role = req.decoded.user.role;
+        let emailAddress = req.body.emailAddress;
         let block = req.body.block;
         let old_mobile_number = req.decoded.user.contact_no;
 
@@ -185,7 +186,7 @@ export function updateUser(req, res, next) {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             contact_no: req.body.mobile_number,
-            email_id: req.decoded.user.email_id,
+            email_id: emailAddress,
             userId: req.body.mobile_number,
             image_url: req.body.image_url,
             password: req.body.password,
@@ -204,7 +205,7 @@ export function updateUser(req, res, next) {
                         first_name: first_name,
                         last_name: last_name,
                         contact_no: mobile_number,
-                        email_id: '',
+                        email_id: emailAddress,
                         userId: mobile_number,
                         password: password,
                         role: role,

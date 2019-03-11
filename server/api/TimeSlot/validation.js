@@ -60,17 +60,16 @@ export default {
     // POST /api/oauth/login
     addTimeSlot: {
         body: {
-            product_id: Joi.string().required(),
-            team_id: Joi.string().required(),
-            times: Joi.array().required(),
+            start_time: Joi.string().required(),
+            end_time: Joi.string().required(),
         }
     },
 
-    Times: {
+    editTimeSlot: {
         body: {
-            product_id: Joi.string().required(),
-            team_id: Joi.string().required(),
-            date: Joi.date().iso().required(),
+            id: Joi.string().uuid().required(),
+            start_time: Joi.string().required(),
+            end_time: Joi.string().required(),
         }
     },
 

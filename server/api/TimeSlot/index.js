@@ -10,9 +10,9 @@ router.get('/', controller.index);
 
 router.post('/', validations.validateAuthorization, validate(validations.addTimeSlot), controller.addTimeSlot);
 
-router.post('/Times', validate(validations.Times), controller.Times);
+router.put('/', validate(validations.editTimeSlot), controller.editTimeSlot);
 
-router.delete('/', validations.validateAuthorization, validate(validations.deleteTimeSlot), controller.deleteTimeSlot);
+router.delete('/:timeSlot_id', validations.validateAuthorization, controller.deleteTimeSlot);
 
 router.use(function (err, req, res, next) {
     let allErrorField = [];

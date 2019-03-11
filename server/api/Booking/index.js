@@ -1,5 +1,6 @@
 import validations from './validation';
 import validate from 'express-validation';
+import {errorJsonResponse} from '../../config/commonHelper';
 
 var express = require('express');
 var controller = require('./Booking.controller');

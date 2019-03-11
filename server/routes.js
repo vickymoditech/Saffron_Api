@@ -11,8 +11,6 @@ export default function(app) {
     // Insert routes below
     app.use('/api/Videos', require('./api/Video'));
     app.use('/api/SliderImages', require('./api/SliderImages'));
-    app.use('/api/Baskets', require('./api/Basket'));
-    app.use('/api/BookingProducts', require('./api/BookingProduct'));
     app.use('/api/Bookings', require('./api/Booking'));
     app.use('/api/TimeSlots', require('./api/TimeSlot'));
     app.use('/api/Products', require('./api/Product'));

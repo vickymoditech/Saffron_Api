@@ -7,7 +7,7 @@ var GallerySchema = new mongoose.Schema({
     image_url: String,
     title: String,
     description: String,
-    date: String,
+    date: Date,
     sex: String
 });
 

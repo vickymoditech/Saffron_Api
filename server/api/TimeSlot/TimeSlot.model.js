@@ -3,9 +3,8 @@ import {registerEvents} from './TimeSlot.events';
 
 var TimeSlotSchema = new mongoose.Schema({
     id: String,
-    product_id: String,
-    team_id: String,
-    times: []
+    start_time: String,
+    end_time: String,
 });
 
 registerEvents(TimeSlotSchema);

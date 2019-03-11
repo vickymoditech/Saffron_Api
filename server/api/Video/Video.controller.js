@@ -1,6 +1,6 @@
 import Video from './Video.model';
 import Service from '../Service/Service.model';
-import {errorJsonResponse, GalleryImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, getGuid} from '../../config/commonHelper';
 
 function respondWithResult(res, statusCode) {
     statusCode = statusCode || 200;
