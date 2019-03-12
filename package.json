@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "main": "server/index.js",
   "dependencies": {
+    "async-waterfall": "^0.1.5",
     "babel-core": "^6.18.2",
     "babel-plugin-angular2-annotations": "^5.1.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
@@ -35,7 +36,7 @@
     "is-image": "^2.0.0",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.2.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "lodash-es": "^4.17.4",
     "lusca": "^1.4.1",
     "method-override": "^2.3.10",

@@ -1,8 +1,11 @@
 import Product from './Product.model';
 import Service from '../Service/Service.model';
-
+import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
+import _ from 'lodash';
 import {errorJsonResponse, ProductImageUploadLocation, getGuid} from '../../config/commonHelper';
 
+var waterfall = require('async-waterfall');
+var async = require('async');
 var formidable = require('formidable');
 var fs = require('fs');
 var fs_extra = require('fs-extra');
@@ -26,7 +29,7 @@ function handleError(res, statusCode) {
 }
 
 // Home Product Page
-export function index(req, res) {
+export async function index(req, res) {
     return Service.aggregate({"$unwind": "$id"},
         {
             "$lookup": {
@@ -47,10 +50,26 @@ export function index(req, res) {
                 "products": {"$first": "$itemsObjects"}
             }
         },
-        {$sort: {date: 1}}).exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+        {$sort: {date: 1}}).exec(async (error, AllProductList) => {
+
+        let i = 0;
+        let result = await Promise.all(AllProductList.map(async (Service) => {
+            i++;
+            return await Promise.all(Service.products.map(async (Product) => {
+                i++;
+                Product.teamMember = [];
+                let TeamMember = await TeamMemberProduct.find({product_id: Product.id}).exec();
+                return await Promise.all(TeamMember.map(async (team) => {
+                    i++;
+                    Product.teamMember.push(team.teamMember_id);
+                    return i;
+                }));
+            }));
+        }));
+        res.status(200).json(AllProductList);
+    });
 }
+
 
 // Gets a list of Products
 export function allProduct(req, res) {
@@ -84,7 +103,6 @@ export function allProduct(req, res) {
         .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
-
 
 export function addNewProduct(req, res, next) {
     try {
@@ -317,26 +335,32 @@ export function deleteProduct(req, res, next) {
     try {
         if (req.params.productId) {
             let productId = req.params.productId;
-            Product.remove({id: productId})
-                .exec(function (err, DeleteTeam) {
-                    if (!err) {
-                        if (DeleteTeam) {
-                            if (DeleteTeam.result.n === 1) {
-                                res.status(200)
-                                    .json({id: productId, result: 'Deleted Successfully'});
+
+            //Remove All the product from TeamMember
+            TeamMemberProduct.remove({product_id: productId}).exec((err, DeleteTeamMember) => {
+                if (DeleteTeamMember) {
+                    Product.remove({id: productId})
+                        .exec(function (err, DeleteTeam) {
+                            if (!err) {
+                                if (DeleteTeam) {
+                                    if (DeleteTeam.result.n === 1) {
+                                        res.status(200)
+                                            .json({id: productId, result: 'Deleted Successfully'});
+                                    } else {
+                                        res.status(400)
+                                            .json(errorJsonResponse('Deleted Fail', 'Deleted Fail'));
+                                    }
+                                } else {
+                                    res.status(400)
+                                        .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
+                                }
                             } else {
                                 res.status(400)
-                                    .json(errorJsonResponse('Deleted Fail', 'Deleted Fail'));
+                                    .json(errorJsonResponse(err, 'Contact to your Developer'));
                             }
-                        } else {
-                            res.status(400)
-                                .json(errorJsonResponse('Invalid Post', 'Invalid Post'));
-                        }
-                    } else {
-                        res.status(400)
-                            .json(errorJsonResponse(err, 'Contact to your Developer'));
-                    }
-                });
+                        });
+                }
+            });
         } else {
             res.status(400)
                 .json(errorJsonResponse('Id is required', 'Id is required'));

@@ -2,6 +2,9 @@ import Service from './Service.model';
 import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
 import Gallery from '../Gallery/Gallery.model';
 import Product from '../Product/Product.model';
+import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
+import Video from '../Video/Video.model';
+
 import {socketPublishMessage} from '../Socket/index';
 
 
@@ -46,36 +49,54 @@ export function deleteService(req, res, next) {
                 .exec(function (err, DeleteGallery) {
                     if (!err) {
                         if (DeleteGallery) {
-                            // delete all Product
-                            Product.remove({})
-                                .exec(function (err, DeleteProduct) {
-                                    if (!err) {
-                                        if (DeleteProduct) {
-                                            // Delete Service
-                                            Service.remove({id: serviceId})
-                                                .exec(function (err, DeleteService) {
-                                                    if (!err) {
-                                                        if (DeleteService) {
-                                                            if (DeleteService.result.n === 1) {
-                                                                res.status(200)
-                                                                    .json({
-                                                                        id: serviceId,
-                                                                        result: "Deleted Successfully"
-                                                                    });
-                                                            } else {
-                                                                res.status(400)
-                                                                    .json(errorJsonResponse("service not found", "service not found"));
-                                                            }
-                                                        }
-                                                    }
-                                                });
-                                        }
-                                    } else {
-                                        res.status(400)
-                                            .json(errorJsonResponse(err, "Contact to your Developer"));
-                                    }
+
+                            //delete all TeamMemberProduct
+                            Product.find({service_id: serviceId}).exec((err, listProductItems) => {
+
+                                let productList = [];
+                                listProductItems.forEach((product) => {
+                                    productList.push(product.id);
                                 });
 
+                                //delete video
+                                Video.remove({serviceId: serviceId}).exec((err, deleteVideo) => {
+                                    if (deleteVideo) {
+                                        TeamMemberProduct.remove({product_id: {$in: productList}}).exec((err, deleteTeamMemberProduct) => {
+                                            // delete all Product
+                                            if (deleteTeamMemberProduct) {
+                                                Product.remove({service_id: serviceId})
+                                                    .exec(function (err, DeleteProduct) {
+                                                        if (!err) {
+                                                            if (DeleteProduct) {
+                                                                // Delete Service
+                                                                Service.remove({id: serviceId})
+                                                                    .exec(function (err, DeleteService) {
+                                                                        if (!err) {
+                                                                            if (DeleteService) {
+                                                                                if (DeleteService.result.n === 1) {
+                                                                                    res.status(200)
+                                                                                        .json({
+                                                                                            id: serviceId,
+                                                                                            result: "Deleted Successfully"
+                                                                                        });
+                                                                                } else {
+                                                                                    res.status(400)
+                                                                                        .json(errorJsonResponse("service not found", "service not found"));
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    });
+                                                            }
+                                                        } else {
+                                                            res.status(400)
+                                                                .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                        }
+                                                    });
+                                            }
+                                        });
+                                    }
+                                });
+                            });
                         } else {
                             res.status(400)
                                 .json(errorJsonResponse("Invalid Service", "Invalid Service"));

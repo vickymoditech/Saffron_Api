@@ -36,3 +36,7 @@ add --auth in command field.
 ###Mongoose Connection string change
 - uri: 'mongodb://{userName}:{password}@{host}:{port}/{DBname}?authSource={dbname}'
 - uri: 'mongodb://gygadmin:gyg123@dev.driveby.guzmanygomez.com:27017/UberEatsMenu_dev?authSource=admin'
+
+git checkout -b Developer origin/feature/Developer
+git pull origin feature/Developer
+sudo npm run-script build

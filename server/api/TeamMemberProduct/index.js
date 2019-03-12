@@ -1,22 +1,20 @@
 var express = require('express');
-var controller = require('./Team.controller');
+var controller = require('./TeamMemberProduct.controller');
 import validations from './validation';
 import validate from 'express-validation';
 import {errorJsonResponse} from '../../config/commonHelper';
 
+
 var router = express.Router();
 
-// 01. GET   /api/Teams/
-router.get('/', controller.index);
+// 01. POST   /api/Teams/addTeamService
+router.post('/addTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.addTeamProduct);
 
-// 02. DELETE   /api/Teams/:ID
-router.delete('/:teamId', validations.validateAuthorization, validate(validations.deleteTeamId), controller.deleteTeam);
+// 02. POST   /api/Teams/removeTeamService
+router.post('/removeTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamProduct);
 
-// 03. ADD NEW   /api/Teams/
-router.post('/', validations.validateAuthorization, controller.addNewTeam);
-
-// 04. UPDATE   /api/Teams/
-router.put('/', validations.validateAuthorization, controller.updateTeam);
+// 03. Get /api/Teams/teamMemberProductsList
+router.get('/:teamMemberId', validations.validateAuthorization, controller.teamMemberProductsList);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];

@@ -3,8 +3,8 @@ import {registerEvents} from './Booking.events';
 
 var BookingSchema = new mongoose.Schema({
     id: String,
-    customerId: String,
-    basket: [],
+    customerId: Number,
+    basket: mongoose.Schema.Types.ObjectId,
     total: Number,
     bookingDate: Date,
     status: String,
