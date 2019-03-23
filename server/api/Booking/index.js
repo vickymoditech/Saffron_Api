@@ -7,11 +7,12 @@ var controller = require('./Booking.controller');
 
 var router = express.Router();
 
-router.get('/', validations.validateAuthorization, controller.index);
+//New Booking
+router.post('/', validations.validateAuthorizationUser, validate(validations.newBookingOrder), controller.index);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
-    let allErrorField ;
+    let allErrorField;
     for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString().replace(/"/g, '');
         arrayMessages.push(Single_error);

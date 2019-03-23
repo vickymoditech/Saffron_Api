@@ -3,12 +3,14 @@ import {registerEvents} from './Booking.events';
 
 var BookingSchema = new mongoose.Schema({
     id: String,
-    customerId: Number,
-    basket: mongoose.Schema.Types.ObjectId,
+    customer_id: Number,
+    basket: mongoose.Schema.Types.Mixed,
     total: Number,
-    bookingDate: Date,
+    bookingDateTime: Date,
+    bookingStartTime: Date,
+    bookingEndTime: Date,
     status: String,
-    startDate: Date
+    statusDateTime: Date
 });
 
 registerEvents(BookingSchema);

@@ -50,10 +50,10 @@ export async function index(req, res) {
                 "products": {"$first": "$itemsObjects"}
             }
         },
-        {$sort: {date: 1}}).exec(async (error, AllProductList) => {
+        {$sort: {date: 1}}).exec(async (error, bookingProductList) => {
 
         let i = 0;
-        let result = await Promise.all(AllProductList.map(async (Service) => {
+        let result = await Promise.all(bookingProductList.map(async (Service) => {
             i++;
             return await Promise.all(Service.products.map(async (Product) => {
                 i++;
@@ -66,10 +66,14 @@ export async function index(req, res) {
                 }));
             }));
         }));
-        res.status(200).json(AllProductList);
+
+        let response = {
+            bookingProduct: bookingProductList
+        };
+
+        res.status(200).json(response);
     });
 }
-
 
 // Gets a list of Products
 export function allProduct(req, res) {
@@ -410,3 +414,14 @@ export function teamMember(req, res, next) {
     }
 }
 
+function bookingOrder() {
+    try {
+
+    } catch (Error) {
+
+    }
+}
+
+function preBookingOrder() {
+    return null;
+}

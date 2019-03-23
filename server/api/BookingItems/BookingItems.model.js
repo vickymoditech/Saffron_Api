@@ -2,9 +2,11 @@ import mongoose from 'mongoose';
 import {registerEvents} from './BookingItems.events';
 
 var BookingItemsSchema = new mongoose.Schema({
-  name: String,
-  info: String,
-  active: Boolean
+    id: String,
+    booking_id: String,
+    product_id: String,
+    team_id: String,
+    active: Boolean
 });
 
 registerEvents(BookingItemsSchema);
