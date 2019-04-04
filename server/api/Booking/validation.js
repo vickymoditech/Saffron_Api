@@ -105,8 +105,14 @@ export default {
 
     newBookingOrder: {
         body: {
-            startTime: Joi.number().required(),
-            endTime: Joi.number().required()
+            startTime: Joi.object({
+                hours: Joi.number().required(),
+                minutes: Joi.number().required(),
+            }).required(),
+            endTime: Joi.object({
+                hours: Joi.number().required(),
+                minutes: Joi.number().required(),
+            }).required(),
         }
     }
 };

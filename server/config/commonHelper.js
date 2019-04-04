@@ -1,5 +1,7 @@
 const uuidv1 = require('uuid/v1');
+const NodeCache = require("node-cache");
 
+const myCache = new NodeCache();
 //Change the SecretKey
 export const jwtdata = {jwtSecretKey: '12334'};
 
@@ -24,3 +26,14 @@ export function getGuid() {
     return uuidv1();
 }
 
+export function setCache(key, value) {
+    myCache.set(key, value, 10000);
+}
+
+export function getCache(key) {
+    let value = myCache.get(key);
+    if (value === undefined) {
+        return null;
+    }
+    return value;
+}

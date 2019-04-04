@@ -1,6 +1,10 @@
 import Booking from './Booking.model';
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
-import {jwtdata, errorJsonResponse, getGuid} from '../../config/commonHelper';
+import Product from '../Product/Product.model';
+import BookingItems from '../BookingItems/BookingItems.model';
+import Team from '../Team/Team.model';
+
+import {jwtdata, errorJsonResponse, getGuid, setCache, getCache} from '../../config/commonHelper';
 
 let moment = require('moment-timezone');
 var _ = require('lodash');
@@ -25,20 +29,25 @@ function handleError(res, statusCode) {
 // New Booking
 export async function index(req, res) {
     try {
-        let startTime = req.body.startTime;
-        let endTime = req.body.endTime;
+        let startTimeHours = req.body.startTime.hours;
+        let startTimeMinutes = req.body.startTime.minutes;
+        let endTimeHours = req.body.endTime.hours;
+        let endTimeMinutes = req.body.endTime.minutes;
         let bookingProduct = req.body.bookingProduct;
         let totalTime = 0;
         let allProductFound = true;
         let userId = req.decoded.user.userId;
+        let fullName = req.decoded.user.first_name + " " + req.decoded.user.last_name;
         let bookingStartDateTime = "";
         let bookingEndDateTime = "";
         let currentDate = new Date();
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
         let date = currentDate.getDate();
-        let NormalStartDateTime = new Date(year, month, date, startTime, 0, 0);
-        let NormalEndDateTime = new Date(year, month, date, endTime, 0, 0);
+        let NormalStartDateTime = new Date(year, month, date, startTimeHours, startTimeMinutes, 0);
+        let NormalEndDateTime = new Date(year, month, date, endTimeHours, endTimeMinutes, 0);
+        let totalPrice = 0;
+        let not_accesptable = false;
 
         //Calculate the total time
         await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
@@ -46,6 +55,17 @@ export async function index(req, res) {
                 product_id: singleBookingProduct.product_id,
                 teamMember_id: singleBookingProduct.teamMember_id
             }).exec();
+
+            let ProductItem = await Product.findOne({
+                id: singleBookingProduct.product_id
+            }).exec();
+
+            if (ProductItem) {
+                totalPrice += ProductItem.price;
+
+            } else {
+                console.log("price is not found");
+            }
 
             if (TeamMemberProductSingle) {
                 totalTime += TeamMemberProductSingle.approxTime;
@@ -62,7 +82,7 @@ export async function index(req, res) {
             let _LastBooking = await Booking.findOne({
                 bookingEndTime: {
                     $gte: NormalStartDateTime.toUTCString(),
-                    $lt: NormalEndDateTime.toUTCString()
+                    $lte: NormalEndDateTime.toUTCString()
                 }
             }).sort({bookingEndTime: -1}).limit(1).exec();
 
@@ -72,8 +92,17 @@ export async function index(req, res) {
                 let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
                 let addMinute = new Date(lastBookingDateTimeCalculation);
                 addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+
+                //arrivalTime
                 bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
+                // order finish time.
                 bookingEndDateTime = addMinute.toUTCString();
+
+                const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
+                const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+                if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
+                    not_accesptable = true;
+                }
 
             } else {
                 //first order set stating time and add minutes and generate end time
@@ -83,49 +112,138 @@ export async function index(req, res) {
                 bookingEndDateTime = addMinute.toUTCString();
             }
 
-            let BookingAdd = new Booking({
-                id: getGuid(),
-                customer_id: userId,
-                basket: {},
-                total: 0,
-                bookingDateTime: new Date().toUTCString(),
-                bookingStartTime: bookingStartDateTime,
-                bookingEndTime: bookingEndDateTime,
-                status: "New Order create",
-                statusDateTime: new Date().toUTCString()
-            });
-            BookingAdd.save()
-                .then(function (InsertBooking, err) {
-                    if (!err) {
-                        if (InsertBooking) {
-                            let responseObject = {
-                                id: "bc9b95b0-4d56-11e9-840d-4bab3abe270f",
-                                customer_id: InsertBooking.customer_id,
-                                total: InsertBooking.total,
-                                bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
-                                arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
-                                bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
-                                status: "New Order create",
-                                statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
-                                _id: InsertBooking._id
-                            };
+            if (!not_accesptable) {
+                let BasketResponseGenerator = await BasketGenerator(bookingProduct);
 
-                            res.status(200).json({
-                                total: totalTime,
-                                orderPlace: responseObject
-                            });
+                let BookingAdd = new Booking({
+                    id: getGuid(),
+                    customer_id: userId,
+                    basket: BasketResponseGenerator,
+                    total: totalPrice,
+                    bookingDateTime: new Date().toUTCString(),
+                    bookingStartTime: bookingStartDateTime,
+                    bookingEndTime: bookingEndDateTime,
+                    status: "New Order create",
+                    statusDateTime: new Date().toUTCString()
+                });
+                BookingAdd.save()
+                    .then(async function (InsertBooking, err) {
+                        if (!err) {
+                            if (InsertBooking) {
+                                let responseObject = {
+                                    id: InsertBooking.id,
+                                    customerId: InsertBooking.customer_id,
+                                    customerName: fullName,
+                                    productList: BasketResponseGenerator,
+                                    total: InsertBooking.total,
+                                    bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
+                                    arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
+                                    bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
+                                    status: InsertBooking.status,
+                                    statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
+                                    _id: InsertBooking._id
+                                };
 
+                                //ProductItemStore into BookingItem Collection.
+                                await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+                                    let BookingItemsAdd = new BookingItems({
+                                        id: getGuid(),
+                                        booking_id: InsertBooking.id,
+                                        product_id: singleBookingProduct.product_id,
+                                        team_id: singleBookingProduct.teamMember_id,
+                                        active: true,
+                                    });
+                                    BookingItemsAdd.save()
+                                        .then(async function (InsertBookingItems, err) {
+                                            if (!err) {
+                                                if (!InsertBookingItems) {
+                                                    res.status(400)
+                                                        .json(errorJsonResponse("Error in db BookingItems response", "Error in db BookingItems response"));
+                                                }
+                                            } else {
+                                                res.status(400)
+                                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                                            }
+                                        });
+                                }));
+
+                                res.status(200).json({
+                                    total: totalTime,
+                                    orderPlace: responseObject
+                                });
+
+                            } else {
+                                res.status(400)
+                                    .json(errorJsonResponse("Error in db response", "Error in db response"));
+                            }
                         } else {
                             res.status(400)
-                                .json(errorJsonResponse("Error in db response", "Error in db response"));
+                                .json(errorJsonResponse(err, "Contact to your Developer"));
                         }
-                    } else {
-                        res.status(400)
-                            .json(errorJsonResponse(err, "Contact to your Developer"));
-                    }
-                });
+                    });
+            } else {
+                res.status(406).json(errorJsonResponse("your order is not Accepted, please select another time slot and book your order", "your order is not Accepted, please select another time slot and book your order"));
+            }
         }
     } catch (error) {
         console.log(error);
     }
 }
+
+async function BasketGenerator(bookingProduct) {
+    try {
+
+        let basketResponse = [];
+
+        await Promise.all(bookingProduct.map(async (bookingItem) => {
+
+            let productItem = await getProduct(bookingItem.product_id);
+            let productTeam = await getTeam(bookingItem.teamMember_id);
+            let object = {
+                productItem,
+                productTeam
+            };
+            basketResponse.push(object);
+
+        }));
+
+        return basketResponse;
+
+    } catch (error) {
+        console.log(error);
+        return error;
+    }
+}
+
+async function getProduct(productId) {
+    let listProductList = getCache('productList');
+    if (listProductList !== null) {
+        let singleProduct = listProductList.find((product) => product.id === productId);
+        if (singleProduct)
+            return singleProduct;
+        else
+            return null;
+
+    } else {
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0}).exec();
+        setCache('productList', listProductList);
+        return getProduct(productId);
+    }
+}
+
+async function getTeam(teamId) {
+    let teamList = getCache('teamList');
+    if (teamList !== null) {
+        let singleTeam = teamList.find((team) => team.id === teamId);
+        if (singleTeam)
+            return singleTeam;
+        else
+            return null;
+    } else {
+        teamList = await Team.find({}, {_id: 0, __v: 0, description: 0}).exec();
+        setCache('teamList', teamList);
+        return getTeam(teamId);
+    }
+}
+
+
