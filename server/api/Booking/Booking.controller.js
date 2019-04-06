@@ -51,138 +51,145 @@ export async function index(req, res) {
 
         //Calculate the total time
         await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
-            let TeamMemberProductSingle = await TeamMemberProduct.findOne({
-                product_id: singleBookingProduct.product_id,
-                teamMember_id: singleBookingProduct.teamMember_id
-            }).exec();
+            let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
-            let ProductItem = await Product.findOne({
-                id: singleBookingProduct.product_id
-            }).exec();
+            let ProductItem = await getProduct(singleBookingProduct.product_id);
 
-            if (ProductItem) {
+            if (ProductItem !== null)
                 totalPrice += ProductItem.price;
+            else
+                allProductFound = false;
 
-            } else {
-                console.log("price is not found");
-            }
-
-            if (TeamMemberProductSingle) {
+            if (TeamMemberProductSingle !== null) {
                 totalTime += TeamMemberProductSingle.approxTime;
             } else {
                 allProductFound = false;
             }
+
         }));
 
         if (!allProductFound) {
             let message = "your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.";
             res.status(400).json(errorJsonResponse(message, message));
         } else {
+            //check currentTime and booking selected time.
+            if (currentDate.getTime() < NormalEndDateTime.getTime()) {
+                let _LastBooking = await Booking.findOne({
+                    bookingEndTime: {
+                        $gte: NormalStartDateTime.toUTCString(),
+                        $lte: NormalEndDateTime.toUTCString()
+                    }
+                }).sort({bookingEndTime: -1}).limit(1).exec();
 
-            let _LastBooking = await Booking.findOne({
-                bookingEndTime: {
-                    $gte: NormalStartDateTime.toUTCString(),
-                    $lte: NormalEndDateTime.toUTCString()
+                if (_LastBooking !== null) {
+
+                    //Get Booking LastTime
+                    let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
+                    let addMinute = new Date(lastBookingDateTimeCalculation);
+                    addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+
+                    //arrivalTime
+                    bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
+                    // order finish time.
+                    bookingEndDateTime = addMinute.toUTCString();
+
+                    const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
+                    const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+                    if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
+                        not_accesptable = true;
+                    }
+
+                } else {
+                    //first order set stating time and add minutes and generate end time
+
+                    if (currentDate.getTime() < NormalStartDateTime.getTime()) {
+                        bookingStartDateTime = NormalStartDateTime.toUTCString();
+                        let addMinute = NormalStartDateTime;
+                        addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
+                        bookingEndDateTime = addMinute.toUTCString();
+                    } else {
+                        bookingStartDateTime = currentDate.toUTCString();
+                        let addMinute = currentDate;
+                        addMinute.setMinutes(currentDate.getMinutes() + totalTime);
+                        bookingEndDateTime = addMinute.toUTCString();
+                    }
                 }
-            }).sort({bookingEndTime: -1}).limit(1).exec();
 
-            if (_LastBooking !== null) {
+                if (!not_accesptable) {
+                    let BasketResponseGenerator = await BasketGenerator(bookingProduct);
 
-                //Get Booking LastTime
-                let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
-                let addMinute = new Date(lastBookingDateTimeCalculation);
-                addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+                    let BookingAdd = new Booking({
+                        id: getGuid(),
+                        customer_id: userId,
+                        basket: BasketResponseGenerator,
+                        total: totalPrice,
+                        bookingDateTime: new Date().toUTCString(),
+                        bookingStartTime: bookingStartDateTime,
+                        bookingEndTime: bookingEndDateTime,
+                        status: "New Order create",
+                        statusDateTime: new Date().toUTCString()
+                    });
+                    BookingAdd.save()
+                        .then(async function (InsertBooking, err) {
+                            if (!err) {
+                                if (InsertBooking) {
+                                    let responseObject = {
+                                        id: InsertBooking.id,
+                                        customerId: InsertBooking.customer_id,
+                                        customerName: fullName,
+                                        productList: BasketResponseGenerator,
+                                        total: InsertBooking.total,
+                                        bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
+                                        arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
+                                        bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
+                                        status: InsertBooking.status,
+                                        statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
+                                        _id: InsertBooking._id
+                                    };
 
-                //arrivalTime
-                bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
-                // order finish time.
-                bookingEndDateTime = addMinute.toUTCString();
-
-                const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
-                const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-                if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
-                    not_accesptable = true;
-                }
-
-            } else {
-                //first order set stating time and add minutes and generate end time
-                bookingStartDateTime = NormalStartDateTime.toUTCString();
-                let addMinute = NormalStartDateTime;
-                addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
-                bookingEndDateTime = addMinute.toUTCString();
-            }
-
-            if (!not_accesptable) {
-                let BasketResponseGenerator = await BasketGenerator(bookingProduct);
-
-                let BookingAdd = new Booking({
-                    id: getGuid(),
-                    customer_id: userId,
-                    basket: BasketResponseGenerator,
-                    total: totalPrice,
-                    bookingDateTime: new Date().toUTCString(),
-                    bookingStartTime: bookingStartDateTime,
-                    bookingEndTime: bookingEndDateTime,
-                    status: "New Order create",
-                    statusDateTime: new Date().toUTCString()
-                });
-                BookingAdd.save()
-                    .then(async function (InsertBooking, err) {
-                        if (!err) {
-                            if (InsertBooking) {
-                                let responseObject = {
-                                    id: InsertBooking.id,
-                                    customerId: InsertBooking.customer_id,
-                                    customerName: fullName,
-                                    productList: BasketResponseGenerator,
-                                    total: InsertBooking.total,
-                                    bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
-                                    arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
-                                    bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
-                                    status: InsertBooking.status,
-                                    statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
-                                    _id: InsertBooking._id
-                                };
-
-                                //ProductItemStore into BookingItem Collection.
-                                await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
-                                    let BookingItemsAdd = new BookingItems({
-                                        id: getGuid(),
-                                        booking_id: InsertBooking.id,
-                                        product_id: singleBookingProduct.product_id,
-                                        team_id: singleBookingProduct.teamMember_id,
-                                        active: true,
-                                    });
-                                    BookingItemsAdd.save()
-                                        .then(async function (InsertBookingItems, err) {
-                                            if (!err) {
-                                                if (!InsertBookingItems) {
-                                                    res.status(400)
-                                                        .json(errorJsonResponse("Error in db BookingItems response", "Error in db BookingItems response"));
-                                                }
-                                            } else {
-                                                res.status(400)
-                                                    .json(errorJsonResponse(err, "Contact to your Developer"));
-                                            }
+                                    //ProductItemStore into BookingItem Collection.
+                                    await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+                                        let BookingItemsAdd = new BookingItems({
+                                            id: getGuid(),
+                                            booking_id: InsertBooking.id,
+                                            product_id: singleBookingProduct.product_id,
+                                            team_id: singleBookingProduct.teamMember_id,
+                                            active: true,
                                         });
-                                }));
+                                        BookingItemsAdd.save()
+                                            .then(async function (InsertBookingItems, err) {
+                                                if (!err) {
+                                                    if (!InsertBookingItems) {
+                                                        res.status(400)
+                                                            .json(errorJsonResponse("Error in db BookingItems response", "Error in db BookingItems response"));
+                                                    }
+                                                } else {
+                                                    res.status(400)
+                                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                }
+                                            });
+                                    }));
 
-                                res.status(200).json({
-                                    total: totalTime,
-                                    orderPlace: responseObject
-                                });
+                                    res.status(200).json({
+                                        total: totalTime,
+                                        orderPlace: responseObject
+                                    });
 
+                                } else {
+                                    res.status(400)
+                                        .json(errorJsonResponse("Error in db response", "Error in db response"));
+                                }
                             } else {
                                 res.status(400)
-                                    .json(errorJsonResponse("Error in db response", "Error in db response"));
+                                    .json(errorJsonResponse(err, "Contact to your Developer"));
                             }
-                        } else {
-                            res.status(400)
-                                .json(errorJsonResponse(err, "Contact to your Developer"));
-                        }
-                    });
+                        });
+                } else {
+                    res.status(406).json(errorJsonResponse("your order is not Accepted, please select another time slot and book your order", "your order is not Accepted, please select another time slot and book your order"));
+                }
             } else {
-                res.status(406).json(errorJsonResponse("your order is not Accepted, please select another time slot and book your order", "your order is not Accepted, please select another time slot and book your order"));
+                let message = "you have selected wrong time, please choose the valid time slot.";
+                res.status(400).json(errorJsonResponse(message, message));
             }
         }
     } catch (error) {
@@ -215,34 +222,60 @@ async function BasketGenerator(bookingProduct) {
     }
 }
 
-async function getProduct(productId) {
+async function getProduct(productId, index = 0) {
     let listProductList = getCache('productList');
     if (listProductList !== null) {
         let singleProduct = listProductList.find((product) => product.id === productId);
         if (singleProduct)
             return singleProduct;
-        else
-            return null;
-
+        else {
+            if (index === 0)
+                return getProduct(productId, 1);
+            else
+                return null;
+        }
     } else {
         listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0}).exec();
         setCache('productList', listProductList);
-        return getProduct(productId);
+        return getProduct(productId, 1);
     }
 }
 
-async function getTeam(teamId) {
+async function getTeam(teamId, index = 0) {
     let teamList = getCache('teamList');
     if (teamList !== null) {
         let singleTeam = teamList.find((team) => team.id === teamId);
         if (singleTeam)
             return singleTeam;
-        else
-            return null;
+        else {
+            if (index === 0)
+                return getTeam(teamId, 1);
+            else
+                return null;
+        }
     } else {
         teamList = await Team.find({}, {_id: 0, __v: 0, description: 0}).exec();
         setCache('teamList', teamList);
-        return getTeam(teamId);
+        return getTeam(teamId, 1);
+    }
+}
+
+async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
+    let teamMemberProductList = getCache('teamMemberProductList');
+    if (teamMemberProductList !== null) {
+        let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMember_id === teamMember_id);
+        if (singleTeamMemberProduct)
+            return singleTeamMemberProduct;
+        else {
+            if (index === 0)
+                return getTeamMemberProductList(product_id, teamMember_id, 1);
+            else
+                return null;
+        }
+    } else {
+        teamMemberProductList = await TeamMemberProduct.find().exec();
+        setCache('teamMemberProductList', teamMemberProductList);
+        return getTeamMemberProductList(product_id, teamMember_id, 1);
     }
 }
 
