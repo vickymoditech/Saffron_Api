@@ -22,9 +22,9 @@ export function socketOpen(server) {
 
 
 // Publish Message To socket.
-export async function socketPublishMessage(publishMessage, publishData) {
+export async function socketPublishMessage(publishChannelName, publishData) {
     try {
-        io.sockets.emit(publishMessage, publishData);
+        io.sockets.emit(publishChannelName, publishData);
         return "success";
     }
     catch (error) {

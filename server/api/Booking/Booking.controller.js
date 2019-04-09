@@ -5,6 +5,7 @@ import BookingItems from '../BookingItems/BookingItems.model';
 import Team from '../Team/Team.model';
 
 import {jwtdata, errorJsonResponse, getGuid, setCache, getCache} from '../../config/commonHelper';
+import {socketPublishMessage} from '../Socket/index';
 
 let moment = require('moment-timezone');
 var _ = require('lodash');
@@ -85,13 +86,20 @@ export async function index(req, res) {
 
                     //Get Booking LastTime
                     let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
-                    let addMinute = new Date(lastBookingDateTimeCalculation);
-                    addMinute.setMinutes(addMinute.getMinutes() + totalTime);
-
-                    //arrivalTime
-                    bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
-                    // order finish time.
-                    bookingEndDateTime = addMinute.toUTCString();
+                    let addMinute = null;
+                    if (currentDate.getTime() < NormalStartDateTime.getTime()) {
+                        addMinute = new Date(lastBookingDateTimeCalculation);
+                        addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+                        //set arrivalTime
+                        bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
+                        //set order finish time.
+                        bookingEndDateTime = addMinute.toUTCString();
+                    } else {
+                        bookingStartDateTime = currentDate.toUTCString();
+                        addMinute = currentDate;
+                        addMinute.setMinutes(currentDate.getMinutes() + totalTime);
+                        bookingEndDateTime = addMinute.toUTCString();
+                    }
 
                     const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                     const diffMinutes = Math.ceil(diffTime / (1000 * 60));
@@ -100,8 +108,8 @@ export async function index(req, res) {
                     }
 
                 } else {
-                    //first order set stating time and add minutes and generate end time
 
+                    //first order set stating time and add minutes and generate end time
                     if (currentDate.getTime() < NormalStartDateTime.getTime()) {
                         bookingStartDateTime = NormalStartDateTime.toUTCString();
                         let addMinute = NormalStartDateTime;
@@ -116,12 +124,14 @@ export async function index(req, res) {
                 }
 
                 if (!not_accesptable) {
+                    //Generate the Basket Response.
                     let BasketResponseGenerator = await BasketGenerator(bookingProduct);
+
 
                     let BookingAdd = new Booking({
                         id: getGuid(),
                         customer_id: userId,
-                        basket: BasketResponseGenerator,
+                        basket: BasketResponseGenerator.basketResponse,
                         total: totalPrice,
                         bookingDateTime: new Date().toUTCString(),
                         bookingStartTime: bookingStartDateTime,
@@ -137,7 +147,7 @@ export async function index(req, res) {
                                         id: InsertBooking.id,
                                         customerId: InsertBooking.customer_id,
                                         customerName: fullName,
-                                        productList: BasketResponseGenerator,
+                                        productList: InsertBooking.basket,
                                         total: InsertBooking.total,
                                         bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
                                         arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
@@ -170,8 +180,15 @@ export async function index(req, res) {
                                             });
                                     }));
 
+                                    BasketResponseGenerator.teamWiseProductList.map((singleObject) => {
+                                        let copyResponse = _.clone(responseObject);
+                                        copyResponse.productList = singleObject.productList;
+                                        console.log(copyResponse);
+                                        socketPublishMessage(singleObject.id, copyResponse).then((result) => {});
+                                    });
+
                                     res.status(200).json({
-                                        total: totalTime,
+                                        totalTime,
                                         orderPlace: responseObject
                                     });
 
@@ -201,6 +218,7 @@ async function BasketGenerator(bookingProduct) {
     try {
 
         let basketResponse = [];
+        let teamWiseProductList = [];
 
         await Promise.all(bookingProduct.map(async (bookingItem) => {
 
@@ -212,9 +230,20 @@ async function BasketGenerator(bookingProduct) {
             };
             basketResponse.push(object);
 
+            let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
+            if (!teamMember) {
+                let pushData = {
+                    id: productTeam.id,
+                    productList: [],
+                };
+                pushData.productList.push(productItem);
+                teamWiseProductList.push(pushData);
+            } else {
+                teamMember.productList.push(productItem);
+            }
         }));
 
-        return basketResponse;
+        return {basketResponse, teamWiseProductList};
 
     } catch (error) {
         console.log(error);
