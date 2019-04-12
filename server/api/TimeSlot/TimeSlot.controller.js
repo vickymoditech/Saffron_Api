@@ -20,9 +20,26 @@ function handleError(res, statusCode) {
 
 // Gets a list of TimeSlots
 export function index(req, res) {
-    return TimeSlot.find({}, {__v: 0, _id: 0}).exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+    let timeSlotListResponse = [];
+    return TimeSlot.find({}, {__v: 0, _id: 0}).then((timeSlotList, err) => {
+        if (!err) {
+            timeSlotList.forEach((timeSlot) => {
+                let currentDate = new Date();
+                let year = currentDate.getFullYear();
+                let month = currentDate.getMonth();
+                let date = currentDate.getDate();
+                let split = timeSlot.end_time.split(":");
+                let timeSlotEndingTime = new Date(year, month, date, split[0], split[1], 0);
+                if (!(currentDate.getTime() > timeSlotEndingTime.getTime())) {
+                    timeSlotListResponse.push(timeSlot);
+                }
+            });
+            res.status(200).json(timeSlotListResponse);
+        } else {
+            res.status(400)
+                .json(errorJsonResponse(err, "Contact to your Developer"));
+        }
+    });
 }
 
 export function addTimeSlot(req, res, next) {

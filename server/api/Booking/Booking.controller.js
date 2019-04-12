@@ -86,9 +86,8 @@ export async function index(req, res) {
 
                     //Get Booking LastTime
                     let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
-                    let addMinute = null;
-                    if (currentDate.getTime() < NormalStartDateTime.getTime()) {
-                        addMinute = new Date(lastBookingDateTimeCalculation);
+                    let addMinute = new Date(lastBookingDateTimeCalculation);
+                    if (currentDate.getTime() < addMinute.getTime()) {
                         addMinute.setMinutes(addMinute.getMinutes() + totalTime);
                         //set arrivalTime
                         bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
@@ -180,12 +179,13 @@ export async function index(req, res) {
                                             });
                                     }));
 
-                                    BasketResponseGenerator.teamWiseProductList.map((singleObject) => {
+                                    BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
                                         let copyResponse = _.clone(responseObject);
                                         copyResponse.productList = singleObject.productList;
-                                        console.log(copyResponse);
-                                        socketPublishMessage(singleObject.id, copyResponse).then((result) => {});
+                                        await socketPublishMessage(singleObject.id, copyResponse);
                                     });
+
+                                    await socketPublishMessage("SOD", responseObject);
 
                                     res.status(200).json({
                                         totalTime,
