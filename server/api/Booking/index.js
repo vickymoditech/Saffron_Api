@@ -10,6 +10,8 @@ var router = express.Router();
 //New Booking
 router.post('/', validations.validateAuthorizationUser, validate(validations.newBookingOrder), controller.index);
 
+router.get('/', validations.validateAuthorization, controller.getBookingOrder);
+
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
     let allErrorField;

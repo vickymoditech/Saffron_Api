@@ -5,11 +5,14 @@ var BookingSchema = new mongoose.Schema({
     id: String,
     customer_id: Number,
     basket: mongoose.Schema.Types.Mixed,
+    teamWiseProductList: mongoose.Schema.Types.Mixed,
     total: Number,
     bookingDateTime: Date,
     bookingStartTime: Date,
     bookingEndTime: Date,
     status: String,
+    column: String,
+    customerName: String,
     statusDateTime: Date
 });
 

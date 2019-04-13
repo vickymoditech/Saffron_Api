@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 
 mongoose.Promise = require('bluebird');
 import config from './config/environment';
+import '../server/api/CronJob/index';
+
 //import http from 'http';
 import cors from 'cors';
 

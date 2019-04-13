@@ -10,23 +10,6 @@ import {socketPublishMessage} from '../Socket/index';
 let moment = require('moment-timezone');
 var _ = require('lodash');
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode).json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode).send(err);
-    };
-}
-
 // New Booking
 export async function index(req, res) {
     try {
@@ -131,11 +114,14 @@ export async function index(req, res) {
                         id: getGuid(),
                         customer_id: userId,
                         basket: BasketResponseGenerator.basketResponse,
+                        teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
                         total: totalPrice,
                         bookingDateTime: new Date().toUTCString(),
                         bookingStartTime: bookingStartDateTime,
                         bookingEndTime: bookingEndDateTime,
-                        status: "New Order create",
+                        status: "waiting",
+                        column: 'recent orders',
+                        customerName: fullName,
                         statusDateTime: new Date().toUTCString()
                     });
                     BookingAdd.save()
@@ -152,6 +138,7 @@ export async function index(req, res) {
                                         arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
                                         bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
                                         status: InsertBooking.status,
+                                        column: InsertBooking.column,
                                         statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
                                         _id: InsertBooking._id
                                     };
@@ -185,7 +172,26 @@ export async function index(req, res) {
                                         await socketPublishMessage(singleObject.id, copyResponse);
                                     });
 
-                                    await socketPublishMessage("SOD", responseObject);
+
+                                    let publishMessage = {
+                                        message: "new order",
+                                        data: {
+                                            id: InsertBooking.id,
+                                            customerId: InsertBooking.customer_id,
+                                            customerName: fullName,
+                                            basket: InsertBooking.basket,
+                                            total: InsertBooking.total,
+                                            bookingDateTime: InsertBooking.bookingDateTime,
+                                            bookingStartTime: InsertBooking.bookingStartTime,
+                                            bookingEndTime: InsertBooking.bookingEndTime,
+                                            status: InsertBooking.status,
+                                            column: InsertBooking.column,
+                                            statusDateTime: InsertBooking.statusDateTime,
+                                            _id: InsertBooking._id
+                                        }
+                                    };
+
+                                    await socketPublishMessage("SOD", publishMessage);
 
                                     res.status(200).json({
                                         totalTime,
@@ -308,4 +314,51 @@ async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
     }
 }
 
+export async function getBookingOrder(req, res) {
+    try {
 
+        let startDayDateTime = moment().tz('Asia/Kolkata').startOf("day").format();
+        let endDayDateTime = moment().tz('Asia/Kolkata').endOf("day").format();
+        let NormalDateStartDateTime = new Date(startDayDateTime);
+        let NormalDateEndDateTime = new Date(endDayDateTime);
+
+        let responseObject = {
+            runningOrder: [],
+            runningLate: [],
+            recentOrders: []
+        };
+
+        let recentOrders = await Booking.find({
+            status: 'waiting',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            }
+        }).sort({bookingStartTime: 1}).exec();
+
+        let runningOrders = await Booking.find({
+            status: 'process',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            }
+        }).sort({bookingStartTime: 1}).exec();
+
+        let lateOrders = await Booking.find({
+            status: 'late',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            }
+        }).sort({bookingStartTime: 1}).exec();
+
+        responseObject.recentOrders = recentOrders;
+        responseObject.runningLate = lateOrders;
+        responseObject.runningOrder = runningOrders;
+
+        res.status(200).json(responseObject);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
