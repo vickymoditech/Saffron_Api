@@ -21,9 +21,9 @@ export async function index(req, res) {
         let totalTime = 0;
         let allProductFound = true;
         let userId = req.decoded.user.userId;
-        let fullName = req.decoded.user.first_name + " " + req.decoded.user.last_name;
-        let bookingStartDateTime = "";
-        let bookingEndDateTime = "";
+        let fullName = req.decoded.user.first_name + ' ' + req.decoded.user.last_name;
+        let bookingStartDateTime = '';
+        let bookingEndDateTime = '';
         let currentDate = new Date();
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
@@ -34,17 +34,18 @@ export async function index(req, res) {
         let not_accesptable = false;
 
         //Calculate the total time
-        await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+        await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
             let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
             let ProductItem = await getProduct(singleBookingProduct.product_id);
 
-            if (ProductItem !== null)
+            if(ProductItem !== null) {
                 totalPrice += ProductItem.price;
-            else
+            } else {
                 allProductFound = false;
+            }
 
-            if (TeamMemberProductSingle !== null) {
+            if(TeamMemberProductSingle !== null) {
                 totalTime += TeamMemberProductSingle.approxTime;
             } else {
                 allProductFound = false;
@@ -52,25 +53,30 @@ export async function index(req, res) {
 
         }));
 
-        if (!allProductFound) {
-            let message = "your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.";
-            res.status(400).json(errorJsonResponse(message, message));
+        if(!allProductFound) {
+            let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
+            res.status(400)
+                .json(errorJsonResponse(message, message));
         } else {
             //check currentTime and booking selected time.
-            if (currentDate.getTime() < NormalEndDateTime.getTime()) {
+            if(currentDate.getTime() < NormalEndDateTime.getTime()) {
                 let _LastBooking = await Booking.findOne({
                     bookingEndTime: {
                         $gte: NormalStartDateTime.toUTCString(),
                         $lte: NormalEndDateTime.toUTCString()
                     }
-                }).sort({bookingEndTime: -1}).limit(1).exec();
+                })
+                    .sort({bookingEndTime: -1})
+                    .limit(1)
+                    .exec();
 
-                if (_LastBooking !== null) {
+                if(_LastBooking !== null) {
 
                     //Get Booking LastTime
-                    let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
+                    let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata')
+                        .format();
                     let addMinute = new Date(lastBookingDateTimeCalculation);
-                    if (currentDate.getTime() < addMinute.getTime()) {
+                    if(currentDate.getTime() < addMinute.getTime()) {
                         addMinute.setMinutes(addMinute.getMinutes() + totalTime);
                         //set arrivalTime
                         bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
@@ -85,14 +91,14 @@ export async function index(req, res) {
 
                     const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                     const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-                    if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
+                    if(!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
                         not_accesptable = true;
                     }
 
                 } else {
 
                     //first order set stating time and add minutes and generate end time
-                    if (currentDate.getTime() < NormalStartDateTime.getTime()) {
+                    if(currentDate.getTime() < NormalStartDateTime.getTime()) {
                         bookingStartDateTime = NormalStartDateTime.toUTCString();
                         let addMinute = NormalStartDateTime;
                         addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
@@ -105,7 +111,7 @@ export async function index(req, res) {
                     }
                 }
 
-                if (!not_accesptable) {
+                if(!not_accesptable) {
                     //Generate the Basket Response.
                     let BasketResponseGenerator = await BasketGenerator(bookingProduct);
 
@@ -119,32 +125,36 @@ export async function index(req, res) {
                         bookingDateTime: new Date().toUTCString(),
                         bookingStartTime: bookingStartDateTime,
                         bookingEndTime: bookingEndDateTime,
-                        status: "waiting",
+                        status: 'waiting',
                         column: 'recent orders',
                         customerName: fullName,
                         statusDateTime: new Date().toUTCString()
                     });
                     BookingAdd.save()
-                        .then(async function (InsertBooking, err) {
-                            if (!err) {
-                                if (InsertBooking) {
+                        .then(async function(InsertBooking, err) {
+                            if(!err) {
+                                if(InsertBooking) {
                                     let responseObject = {
                                         id: InsertBooking.id,
-                                        customerId: InsertBooking.customer_id,
+                                        customer_id: InsertBooking.customer_id,
                                         customerName: fullName,
                                         productList: InsertBooking.basket,
                                         total: InsertBooking.total,
-                                        bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
-                                        arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
-                                        bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
+                                        bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata')
+                                            .format(),
+                                        arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata')
+                                            .format(),
+                                        bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata')
+                                            .format(),
                                         status: InsertBooking.status,
                                         column: InsertBooking.column,
-                                        statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
+                                        statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata')
+                                            .format(),
                                         _id: InsertBooking._id
                                     };
 
                                     //ProductItemStore into BookingItem Collection.
-                                    await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+                                    await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
                                         let BookingItemsAdd = new BookingItems({
                                             id: getGuid(),
                                             booking_id: InsertBooking.id,
@@ -153,33 +163,35 @@ export async function index(req, res) {
                                             active: true,
                                         });
                                         BookingItemsAdd.save()
-                                            .then(async function (InsertBookingItems, err) {
-                                                if (!err) {
-                                                    if (!InsertBookingItems) {
+                                            .then(async function(InsertBookingItems, err) {
+                                                if(!err) {
+                                                    if(!InsertBookingItems) {
                                                         res.status(400)
-                                                            .json(errorJsonResponse("Error in db BookingItems response", "Error in db BookingItems response"));
+                                                            .json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
                                                     }
                                                 } else {
                                                     res.status(400)
-                                                        .json(errorJsonResponse(err, "Contact to your Developer"));
+                                                        .json(errorJsonResponse(err, 'Contact to your Developer'));
                                                 }
                                             });
                                     }));
 
-                                    BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
-                                        let copyResponse = _.clone(responseObject);
-                                        copyResponse.productList = singleObject.productList;
-                                        await socketPublishMessage(singleObject.id, copyResponse);
-                                    });
-
+                                    //ToDO send to TeamMember
+                                    // BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
+                                    //     let copyResponse = _.clone(responseObject);
+                                    //     copyResponse.productList = singleObject.productList;
+                                    //     await socketPublishMessage(singleObject.id, copyResponse);
+                                    // });
 
                                     let publishMessage = {
-                                        message: "new order",
+                                        message: 'new order',
                                         data: {
+                                            _id: InsertBooking._id,
                                             id: InsertBooking.id,
-                                            customerId: InsertBooking.customer_id,
+                                            customer_id: InsertBooking.customer_id,
                                             customerName: fullName,
                                             basket: InsertBooking.basket,
+                                            teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
                                             total: InsertBooking.total,
                                             bookingDateTime: InsertBooking.bookingDateTime,
                                             bookingStartTime: InsertBooking.bookingStartTime,
@@ -187,35 +199,37 @@ export async function index(req, res) {
                                             status: InsertBooking.status,
                                             column: InsertBooking.column,
                                             statusDateTime: InsertBooking.statusDateTime,
-                                            _id: InsertBooking._id
                                         }
                                     };
 
-                                    await socketPublishMessage("SOD", publishMessage);
+                                    await socketPublishMessage('SOD', publishMessage);
 
-                                    res.status(200).json({
-                                        totalTime,
-                                        orderPlace: responseObject
-                                    });
+                                    res.status(200)
+                                        .json({
+                                            totalTime,
+                                            orderPlace: responseObject
+                                        });
 
                                 } else {
                                     res.status(400)
-                                        .json(errorJsonResponse("Error in db response", "Error in db response"));
+                                        .json(errorJsonResponse('Error in db response', 'Error in db response'));
                                 }
                             } else {
                                 res.status(400)
-                                    .json(errorJsonResponse(err, "Contact to your Developer"));
+                                    .json(errorJsonResponse(err, 'Contact to your Developer'));
                             }
                         });
                 } else {
-                    res.status(406).json(errorJsonResponse("your order is not Accepted, please select another time slot and book your order", "your order is not Accepted, please select another time slot and book your order"));
+                    res.status(406)
+                        .json(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
                 }
             } else {
-                let message = "you have selected wrong time, please choose the valid time slot.";
-                res.status(400).json(errorJsonResponse(message, message));
+                let message = 'you have selected wrong time, please choose the valid time slot.';
+                res.status(400)
+                    .json(errorJsonResponse(message, message));
             }
         }
-    } catch (error) {
+    } catch(error) {
         console.log(error);
     }
 }
@@ -226,7 +240,7 @@ async function BasketGenerator(bookingProduct) {
         let basketResponse = [];
         let teamWiseProductList = [];
 
-        await Promise.all(bookingProduct.map(async (bookingItem) => {
+        await Promise.all(bookingProduct.map(async(bookingItem) => {
 
             let productItem = await getProduct(bookingItem.product_id);
             let productTeam = await getTeam(bookingItem.teamMember_id);
@@ -237,7 +251,7 @@ async function BasketGenerator(bookingProduct) {
             basketResponse.push(object);
 
             let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
-            if (!teamMember) {
+            if(!teamMember) {
                 let pushData = {
                     id: productTeam.id,
                     productList: [],
@@ -251,7 +265,7 @@ async function BasketGenerator(bookingProduct) {
 
         return {basketResponse, teamWiseProductList};
 
-    } catch (error) {
+    } catch(error) {
         console.log(error);
         return error;
     }
@@ -259,18 +273,20 @@ async function BasketGenerator(bookingProduct) {
 
 async function getProduct(productId, index = 0) {
     let listProductList = getCache('productList');
-    if (listProductList !== null) {
+    if(listProductList !== null) {
         let singleProduct = listProductList.find((product) => product.id === productId);
-        if (singleProduct)
+        if(singleProduct) {
             return singleProduct;
-        else {
-            if (index === 0)
+        } else {
+            if(index === 0) {
                 return getProduct(productId, 1);
-            else
+            } else {
                 return null;
+            }
         }
     } else {
-        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0}).exec();
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0})
+            .exec();
         setCache('productList', listProductList);
         return getProduct(productId, 1);
     }
@@ -278,18 +294,20 @@ async function getProduct(productId, index = 0) {
 
 async function getTeam(teamId, index = 0) {
     let teamList = getCache('teamList');
-    if (teamList !== null) {
+    if(teamList !== null) {
         let singleTeam = teamList.find((team) => team.id === teamId);
-        if (singleTeam)
+        if(singleTeam) {
             return singleTeam;
-        else {
-            if (index === 0)
+        } else {
+            if(index === 0) {
                 return getTeam(teamId, 1);
-            else
+            } else {
                 return null;
+            }
         }
     } else {
-        teamList = await Team.find({}, {_id: 0, __v: 0, description: 0}).exec();
+        teamList = await Team.find({}, {_id: 0, __v: 0, description: 0})
+            .exec();
         setCache('teamList', teamList);
         return getTeam(teamId, 1);
     }
@@ -297,18 +315,20 @@ async function getTeam(teamId, index = 0) {
 
 async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
     let teamMemberProductList = getCache('teamMemberProductList');
-    if (teamMemberProductList !== null) {
+    if(teamMemberProductList !== null) {
         let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMember_id === teamMember_id);
-        if (singleTeamMemberProduct)
+        if(singleTeamMemberProduct) {
             return singleTeamMemberProduct;
-        else {
-            if (index === 0)
+        } else {
+            if(index === 0) {
                 return getTeamMemberProductList(product_id, teamMember_id, 1);
-            else
+            } else {
                 return null;
+            }
         }
     } else {
-        teamMemberProductList = await TeamMemberProduct.find().exec();
+        teamMemberProductList = await TeamMemberProduct.find()
+            .exec();
         setCache('teamMemberProductList', teamMemberProductList);
         return getTeamMemberProductList(product_id, teamMember_id, 1);
     }
@@ -317,8 +337,14 @@ async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
 export async function getBookingOrder(req, res) {
     try {
 
-        let startDayDateTime = moment().tz('Asia/Kolkata').startOf("day").format();
-        let endDayDateTime = moment().tz('Asia/Kolkata').endOf("day").format();
+        let startDayDateTime = moment()
+            .tz('Asia/Kolkata')
+            .startOf('day')
+            .format();
+        let endDayDateTime = moment()
+            .tz('Asia/Kolkata')
+            .endOf('day')
+            .format();
         let NormalDateStartDateTime = new Date(startDayDateTime);
         let NormalDateEndDateTime = new Date(endDayDateTime);
 
@@ -334,7 +360,9 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        }).sort({bookingStartTime: 1}).exec();
+        })
+            .sort({bookingStartTime: 1})
+            .exec();
 
         let runningOrders = await Booking.find({
             status: 'process',
@@ -342,7 +370,9 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        }).sort({bookingStartTime: 1}).exec();
+        })
+            .sort({bookingStartTime: 1})
+            .exec();
 
         let lateOrders = await Booking.find({
             status: 'late',
@@ -350,15 +380,86 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        }).sort({bookingStartTime: 1}).exec();
+        })
+            .sort({bookingStartTime: 1})
+            .exec();
 
         responseObject.recentOrders = recentOrders;
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
 
-        res.status(200).json(responseObject);
+        res.status(200)
+            .json(responseObject);
 
-    } catch (error) {
+    } catch(error) {
+        console.log(error);
+    }
+}
+
+export async function updateBookingOrder(req, res) {
+    try {
+
+        let orderId = req.params.id;
+        let orderType = req.body.orderType;
+
+        let status = 'process';
+        let column = 'running';
+        let message = 'running';
+
+        if(orderType === 'finish') {
+            status = 'finish';
+            column = 'finish';
+            message = 'finish';
+        }
+
+        let currentTime = moment.tz('Asia/Kolkata')
+            .format();
+        let currentDate = new Date(currentTime);
+        let statusDateTime = currentDate.toUTCString();
+
+        let updateResult = await Booking.update({id: orderId}, {
+            status: status,
+            column: column,
+            statusDateTime: statusDateTime
+        })
+            .exec();
+
+        if(updateResult) {
+            if(updateResult.nModified === 1 || updateResult.n === 1) {
+
+                let sodPublishMessage = {
+                    message: message,
+                    data: {
+                        id: orderId,
+                        orderType: orderType,
+                        status: status,
+                        column: column,
+                        statusDateTime: statusDateTime
+                    }
+                };
+                await socketPublishMessage('SOD', sodPublishMessage);
+
+                //TODO send to teamMember
+                // _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
+                //     let _singleLateBookingClone = _.clone(_singleLateBooking);
+                //     _singleLateBookingClone.basket = singleTeamWiseProductList.productItem;
+                //     _singleLateBookingClone.status = 'late';
+                //     _singleLateBookingClone.column = 'running late';
+                //     _singleLateBookingClone.statusDateTime = statusDateTime;
+                //     //await socketPublishMessage(singleTeamWiseProductList.productTeam.id, _singleLateBookingClone);
+                // });
+
+                res.status(200)
+                    .json();
+
+            } else {
+                console.log(updateResult);
+            }
+        } else {
+            console.log('contact to developer');
+        }
+
+    } catch(error) {
         console.log(error);
     }
 }
