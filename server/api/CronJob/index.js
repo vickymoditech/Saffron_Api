@@ -1,19 +1,16 @@
 import Booking from '../Booking/Booking.model';
 import {socketPublishMessage} from '../Socket/index';
+import {getGuid} from '../../config/commonHelper';
 
 let moment = require('moment-timezone');
 var _ = require('lodash');
 
-setInterval(async() => {
+setInterval(async () => {
     try {
 
-        let startDayDateTime = moment()
-            .tz('Asia/Kolkata')
-            .startOf('day')
-            .format();
+        let startDayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
         let NormalDateStartDateTime = new Date(startDayDateTime);
-        let currentTime = moment.tz('Asia/Kolkata')
-            .format();
+        let currentTime = moment.tz('Asia/Kolkata').format();
         let currentDate = new Date(currentTime);
 
         let _LateBooking = await Booking.find({
@@ -26,7 +23,7 @@ setInterval(async() => {
         })
             .exec();
 
-        await Promise.all(_LateBooking.map(async(singleBooking) => {
+        await Promise.all(_LateBooking.map(async (singleBooking) => {
             let statusDateTime = currentDate.toUTCString();
 
             let updateResult = await Booking.update({id: singleBooking.id}, {
@@ -36,8 +33,8 @@ setInterval(async() => {
             })
                 .exec();
 
-            if(updateResult) {
-                if(updateResult.nModified === 1 || updateResult.n === 1) {
+            if (updateResult) {
+                if (updateResult.nModified === 1 || updateResult.n === 1) {
 
                     let _singleLateBooking = _LateBooking.find((singleLateBooking) => singleLateBooking.id === singleBooking.id);
 
@@ -80,10 +77,50 @@ setInterval(async() => {
 
         }));
 
-    } catch(error) {
+    } catch (error) {
         console.log(error);
     }
 
 }, 10000);
+
+setInterval(async () => {
+
+    let currentTime = moment.tz('Asia/Kolkata').format();
+    let currentDate = new Date(currentTime);
+    let hours = currentDate.getHours();
+    let minutes = currentDate.getMinutes();
+    let NormalStartDateTime = new Date(currentDate.getYear(), currentDate.getMonth(), currentDate.getDate(), 10, 0, 0);
+
+    if (hours === 1 && minutes === 10) {
+        let BookingAdd = new Booking({
+            id: getGuid(),
+            customer_id: 10000000,
+            basket: {},
+            teamWiseProductList: {},
+            total: 0,
+            bookingDateTime: new Date().toUTCString(),
+            bookingStartTime: NormalStartDateTime.toUTCString(),
+            bookingEndTime: NormalStartDateTime.toUTCString(),
+            status: 'first Order',
+            column: 'first Order',
+            customerName: 'Developer',
+            visited: false,
+            statusDateTime: new Date().toUTCString()
+        });
+        await BookingAdd.save().then(async function (InsertBooking, err) {
+            if (!err) {
+                if (InsertBooking) {
+                    console.log("Save successfully");
+                } else {
+                    console.log(InsertBooking);
+                }
+            } else {
+                console.log(err);
+            }
+        });
+    }
+
+}, 60000);
+
 
 

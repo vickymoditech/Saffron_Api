@@ -13,6 +13,7 @@ var BookingSchema = new mongoose.Schema({
     status: String,
     column: String,
     customerName: String,
+    visited: Boolean,
     statusDateTime: Date
 });
 
