@@ -12,12 +12,14 @@ router.post('/', validations.validateAuthorizationUser, validate(validations.new
 
 router.get('/', validations.validateAuthorization, controller.getBookingOrder);
 
-router.put('/:id', validations.validateAuthorization, controller.updateBookingOrder);
+router.put('/:orderId', validations.validateAuthorization, controller.updateBookingOrder);
 
-router.use(function(err, req, res, next) {
+router.get('/TeamMemberOrder/:teamMemberId', validations.validateAuthorization, controller.getTeamMemberBookingOrder);
+
+router.use(function (err, req, res, next) {
     let arrayMessages = [];
     let allErrorField;
-    for(let i = 0; i < err.errors.length; i++) {
+    for (let i = 0; i < err.errors.length; i++) {
         let Single_error = err.errors[i].messages.toString()
             .replace(/"/g, '');
         arrayMessages.push(Single_error);

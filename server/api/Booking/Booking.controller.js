@@ -31,7 +31,7 @@ export async function index(req, res) {
         let NormalStartDateTime = new Date(year, month, date, startTimeHours, startTimeMinutes, 0);
         let NormalEndDateTime = new Date(year, month, date, endTimeHours, endTimeMinutes, 0);
         let totalPrice = 0;
-        let not_accesptable = false;
+        let not_acceptAble = false;
 
         //Calculate the total time
         await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
@@ -62,13 +62,6 @@ export async function index(req, res) {
             //check currentTime and booking selected time.
             if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
-                // let _LastBooking = await Booking.findOne({
-                //     bookingEndTime: {
-                //         $gte: NormalStartDateTime.toUTCString(),
-                //         $lte: NormalEndDateTime.toUTCString()
-                //     }
-                // }).sort({bookingEndTime: -1}).limit(1).exec();
-
                 let _LastBooking = await getLastBookingOrder();
 
                 if (_LastBooking !== null && _LastBooking.visited === false) {
@@ -84,20 +77,22 @@ export async function index(req, res) {
                         //set order finish time.
                         bookingEndDateTime = addMinute.toUTCString();
                     } else {
-                        bookingStartDateTime = currentDate.toUTCString();
-                        addMinute = currentDate;
-                        addMinute.setMinutes(currentDate.getMinutes() + totalTime);
+                        let currentTimeWithZeroMinutes = new Date(year, month, date, currentDate.getHours(), currentDate.getMinutes(), 0);
+                        bookingStartDateTime = currentTimeWithZeroMinutes.toUTCString();
+                        addMinute = currentTimeWithZeroMinutes;
+                        addMinute.setMinutes(currentTimeWithZeroMinutes.getMinutes() + totalTime);
                         bookingEndDateTime = addMinute.toUTCString();
                     }
 
                     const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                     const diffMinutes = Math.ceil(diffTime / (1000 * 60));
                     if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
-                        not_accesptable = true;
+                        not_acceptAble = true;
                     }
 
                 } else {
 
+                    //Never execute this part.
                     //first order set stating time and add minutes and generate end time
                     if (currentDate.getTime() < NormalStartDateTime.getTime()) {
                         bookingStartDateTime = NormalStartDateTime.toUTCString();
@@ -112,7 +107,7 @@ export async function index(req, res) {
                     }
                 }
 
-                if (!not_accesptable) {
+                if (!not_acceptAble) {
                     //Generate the Basket Response.
                     let BasketResponseGenerator = await BasketGenerator(bookingProduct);
 
@@ -257,6 +252,7 @@ async function BasketGenerator(bookingProduct) {
                 let pushData = {
                     id: productTeam.id,
                     productList: [],
+                    orderStatus: false,
                 };
                 pushData.productList.push(productItem);
                 teamWiseProductList.push(pushData);
@@ -415,7 +411,7 @@ export async function getBookingOrder(req, res) {
 export async function updateBookingOrder(req, res) {
     try {
 
-        let orderId = req.params.id;
+        let orderId = req.params.orderId;
         let orderType = req.body.orderType;
 
         let status = 'process';
@@ -474,6 +470,34 @@ export async function updateBookingOrder(req, res) {
         } else {
             console.log('contact to developer');
         }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function getTeamMemberBookingOrder(req, res) {
+    try {
+
+        let startDayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+        let endDayDateTime = moment().tz('Asia/Kolkata').endOf('day').format();
+        let NormalDateStartDateTime = new Date(startDayDateTime);
+        let NormalDateEndDateTime = new Date(endDayDateTime);
+
+        let BookingOrder = await Booking.find({
+            status: 'late',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            },
+            teamWiseProductList: {
+                id: '50a7cbe0-ce11-11e8-9d23-517ab0b850d5',
+                orderStatus: false
+            }
+        }).exec();
+
+        res.status(200).json(BookingOrder);
+
 
     } catch (error) {
         console.log(error);
