@@ -1,4 +1,5 @@
 import Booking from '../Booking/Booking.model';
+import TimeSlot from '../TimeSlot/TimeSlot.model';
 import {socketPublishMessage} from '../Socket/index';
 import {getGuid} from '../../config/commonHelper';
 
@@ -89,31 +90,42 @@ setInterval(async () => {
     let currentDate = new Date(currentTime);
     let hours = currentDate.getHours();
     let minutes = currentDate.getMinutes();
-    let NormalStartDateTime = new Date(currentDate.getYear(), currentDate.getMonth(), currentDate.getDate(), 10, 0, 0);
 
-    if (hours === 1 && minutes === 10) {
-        let BookingAdd = new Booking({
-            id: getGuid(),
-            customer_id: 10000000,
-            basket: {},
-            teamWiseProductList: {},
-            total: 0,
-            bookingDateTime: new Date().toUTCString(),
-            bookingStartTime: NormalStartDateTime.toUTCString(),
-            bookingEndTime: NormalStartDateTime.toUTCString(),
-            status: 'first Order',
-            column: 'first Order',
-            customerName: 'Developer',
-            visited: false,
-            statusDateTime: new Date().toUTCString()
-        });
-        await BookingAdd.save().then(async function (InsertBooking, err) {
+    if (hours === 17 && minutes === 19) {
+        TimeSlot.find({}, {__v: 0, _id: 0}).then(async (timeSlotList, err) => {
             if (!err) {
-                if (InsertBooking) {
-                    console.log("Save successfully");
-                } else {
-                    console.log(InsertBooking);
-                }
+
+                timeSlotList.forEach(async (singleTimeSlot) => {
+                    let split = singleTimeSlot.start_time.split(":");
+                    let NormalStartDateTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), split[0], split[1], 0);
+                    let BookingAdd = new Booking({
+                        id: getGuid(),
+                        customer_id: 10000000,
+                        basket: {},
+                        teamWiseProductList: {},
+                        total: 0,
+                        bookingDateTime: new Date().toUTCString(),
+                        bookingStartTime: NormalStartDateTime.toUTCString(),
+                        bookingEndTime: NormalStartDateTime.toUTCString(),
+                        status: 'first Order',
+                        column: 'first Order',
+                        customerName: 'Developer Test',
+                        visited: false,
+                        statusDateTime: new Date().toUTCString()
+                    });
+                    await BookingAdd.save().then(async function (InsertBooking, err) {
+                        if (!err) {
+                            if (InsertBooking) {
+                                console.log("Save successfully");
+                            } else {
+                                console.log(InsertBooking);
+                            }
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                });
+
             } else {
                 console.log(err);
             }

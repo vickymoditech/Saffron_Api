@@ -6,8 +6,11 @@ import {errorJsonResponse} from '../../config/commonHelper';
 
 var router = express.Router();
 
-//Get All Time Slot
+//Get All Time Slot (for User) time slot display according to current time
 router.get('/', controller.index);
+
+//Get All Time Slot
+router.get('/GetAllTimeSlots', validations.validateAuthorization, controller.getAllTimeSlot);
 
 //Add new Time Slot
 router.post('/', validations.validateAuthorization, validate(validations.addTimeSlot), controller.addTimeSlot);

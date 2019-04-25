@@ -42,6 +42,22 @@ export function index(req, res) {
     });
 }
 
+export function getAllTimeSlot(req, res, next) {
+    try {
+        return TimeSlot.find({}, {__v: 0, _id: 0}).then((timeSlotList, err) => {
+            if (!err) {
+                res.status(200).json(timeSlotList);
+            } else {
+                res.status(400)
+                    .json(errorJsonResponse(err, "Contact to your Developer"));
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 export function addTimeSlot(req, res, next) {
     try {
         if (req.body) {

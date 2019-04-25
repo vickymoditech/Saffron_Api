@@ -62,7 +62,7 @@ export async function index(req, res) {
             //check currentTime and booking selected time.
             if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
-                let _LastBooking = await getLastBookingOrder();
+                let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
 
                 if (_LastBooking !== null && _LastBooking.visited === false) {
 
@@ -290,16 +290,18 @@ async function getProduct(productId, index = 0) {
     }
 }
 
-async function getLastBookingOrder() {
+async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime) {
+
     let _LastBookingOrder = await Booking.findOneAndUpdate({
         visited: false,
+        bookingEndTime: {$gte: NormalStartDateTime.toUTCString(), $lte: NormalEndDateTime.toUTCString()}
     }, {$set: {visited: true}}, {sort: {bookingEndTime: -1}}).exec();
 
     if (_LastBookingOrder === null)
     //Todo should not be received null value
-        return getLastBookingOrder();
+        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
     else if (_LastBookingOrder.visited === true)
-        return getLastBookingOrder();
+        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
     else
         return _LastBookingOrder;
 }
@@ -479,24 +481,66 @@ export async function updateBookingOrder(req, res) {
 export async function getTeamMemberBookingOrder(req, res) {
     try {
 
+        let teamMemberId = req.params.teamMemberId;
         let startDayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
         let endDayDateTime = moment().tz('Asia/Kolkata').endOf('day').format();
         let NormalDateStartDateTime = new Date(startDayDateTime);
         let NormalDateEndDateTime = new Date(endDayDateTime);
 
-        let BookingOrder = await Booking.find({
+        let responseObject = {
+            runningOrder: [],
+            runningLate: [],
+            recentOrders: []
+        };
+
+        let recentOrders = await Booking.find({
+            status: 'waiting',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            },
+            teamWiseProductList: {
+                $elemMatch: {
+                    id: teamMemberId,
+                    orderStatus: false
+                }
+            }
+        }).sort({bookingStartTime: 1}).exec();
+
+        let runningOrders = await Booking.find({
+            status: 'process',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            },
+            teamWiseProductList: {
+                $elemMatch: {
+                    id: teamMemberId,
+                    orderStatus: false
+                }
+            }
+        }).sort({bookingStartTime: 1}).exec();
+
+        let lateOrders = await Booking.find({
             status: 'late',
             bookingEndTime: {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             },
             teamWiseProductList: {
-                id: '50a7cbe0-ce11-11e8-9d23-517ab0b850d5',
-                orderStatus: false
+                $elemMatch: {
+                    id: teamMemberId,
+                    orderStatus: false
+                }
             }
-        }).exec();
+        }).sort({bookingStartTime: 1}).exec();
 
-        res.status(200).json(BookingOrder);
+        responseObject.recentOrders = recentOrders;
+        responseObject.runningLate = lateOrders;
+        responseObject.runningOrder = runningOrders;
+
+        res.status(200)
+            .json(responseObject);
 
 
     } catch (error) {
