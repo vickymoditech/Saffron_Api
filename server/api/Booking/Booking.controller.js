@@ -24,7 +24,8 @@ export async function index(req, res) {
         let fullName = req.decoded.user.first_name + ' ' + req.decoded.user.last_name;
         let bookingStartDateTime = '';
         let bookingEndDateTime = '';
-        let currentDate = new Date();
+        let momentDateTime = moment().tz('Asia/Kolkata').format();
+        let currentDate = new Date(momentDateTime);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
         let date = currentDate.getDate();
@@ -118,14 +119,14 @@ export async function index(req, res) {
                         basket: BasketResponseGenerator.basketResponse,
                         teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
                         total: totalPrice,
-                        bookingDateTime: new Date().toUTCString(),
+                        bookingDateTime: currentDate.toUTCString(),
                         bookingStartTime: bookingStartDateTime,
                         bookingEndTime: bookingEndDateTime,
                         status: 'waiting',
                         column: 'recent orders',
                         customerName: fullName,
                         visited: false,
-                        statusDateTime: new Date().toUTCString()
+                        statusDateTime: currentDate.toUTCString()
                     });
                     BookingAdd.save()
                         .then(async function (InsertBooking, err) {
@@ -174,12 +175,28 @@ export async function index(req, res) {
                                     }));
 
                                     //ToDO send to TeamMember
-                                    // BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
-                                    //     let copyResponse = _.clone(responseObject);
-                                    //     copyResponse.productList = singleObject.productList;
-                                    //     await socketPublishMessage(singleObject.id, copyResponse);
-                                    // });
+                                    BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
+                                        let publishMessage = {
+                                            message: 'new order',
+                                            data: {
+                                                _id: InsertBooking._id,
+                                                id: InsertBooking.id,
+                                                customer_id: InsertBooking.customer_id,
+                                                customerName: fullName,
+                                                basket: singleObject.productList,
+                                                total: InsertBooking.total,
+                                                bookingDateTime: InsertBooking.bookingDateTime,
+                                                bookingStartTime: InsertBooking.bookingStartTime,
+                                                bookingEndTime: InsertBooking.bookingEndTime,
+                                                status: InsertBooking.status,
+                                                column: InsertBooking.column,
+                                                statusDateTime: InsertBooking.statusDateTime,
+                                            }
+                                        };
+                                        await socketPublishMessage(singleObject.id, publishMessage);
+                                    });
 
+                                    //ToDO send to SOD
                                     let publishMessage = {
                                         message: 'new order',
                                         data: {
@@ -188,7 +205,7 @@ export async function index(req, res) {
                                             customer_id: InsertBooking.customer_id,
                                             customerName: fullName,
                                             basket: InsertBooking.basket,
-                                            teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
+                                            //teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
                                             total: InsertBooking.total,
                                             bookingDateTime: InsertBooking.bookingDateTime,
                                             bookingStartTime: InsertBooking.bookingStartTime,
@@ -374,7 +391,7 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        })
+        }, {teamWiseProductList: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -384,7 +401,7 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        })
+        }, {teamWiseProductList: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -394,7 +411,7 @@ export async function getBookingOrder(req, res) {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }
-        })
+        }, {teamWiseProductList: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -426,8 +443,7 @@ export async function updateBookingOrder(req, res) {
             message = 'finish';
         }
 
-        let currentTime = moment.tz('Asia/Kolkata')
-            .format();
+        let currentTime = moment.tz('Asia/Kolkata').format();
         let currentDate = new Date(currentTime);
         let statusDateTime = currentDate.toUTCString();
 
@@ -453,18 +469,15 @@ export async function updateBookingOrder(req, res) {
                 };
                 await socketPublishMessage('SOD', sodPublishMessage);
 
+                let _singleLateBooking = await Booking.findOne({id: orderId}).exec();
+
                 //TODO send to teamMember
-                // _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
-                //     let _singleLateBookingClone = _.clone(_singleLateBooking);
-                //     _singleLateBookingClone.basket = singleTeamWiseProductList.productItem;
-                //     _singleLateBookingClone.status = 'late';
-                //     _singleLateBookingClone.column = 'running late';
-                //     _singleLateBookingClone.statusDateTime = statusDateTime;
-                //     //await socketPublishMessage(singleTeamWiseProductList.productTeam.id, _singleLateBookingClone);
-                // });
+                _singleLateBooking.teamWiseProductList.forEach(async (singleTeamWiseProductList) => {
+                    await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
+                });
 
                 res.status(200)
-                    .json();
+                    .json({result: true});
 
             } else {
                 console.log(updateResult);

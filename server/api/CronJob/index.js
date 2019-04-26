@@ -6,6 +6,7 @@ import {getGuid} from '../../config/commonHelper';
 let moment = require('moment-timezone');
 var _ = require('lodash');
 
+//todo find running late orders
 setInterval(async () => {
     try {
 
@@ -47,7 +48,7 @@ setInterval(async () => {
                             customer_id: _singleLateBooking.customer_id,
                             customerName: _singleLateBooking.customerName,
                             basket: _singleLateBooking.basket,
-                            teamWiseProductList: _singleLateBooking.teamWiseProductList,
+                            //teamWiseProductList: _singleLateBooking.teamWiseProductList,
                             total: _singleLateBooking.total,
                             bookingDateTime: _singleLateBooking.bookingDateTime,
                             bookingStartTime: _singleLateBooking.bookingStartTime,
@@ -59,15 +60,28 @@ setInterval(async () => {
                     };
                     await socketPublishMessage('SOD', sodPublishMessage);
 
-                    //TODO send to teamMember
-                    // _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
-                    //     let _singleLateBookingClone = _.clone(_singleLateBooking);
-                    //     _singleLateBookingClone.basket = singleTeamWiseProductList.productItem;
-                    //     _singleLateBookingClone.status = 'late';
-                    //     _singleLateBookingClone.column = 'running late';
-                    //     _singleLateBookingClone.statusDateTime = statusDateTime;
-                    //     //await socketPublishMessage(singleTeamWiseProductList.productTeam.id, _singleLateBookingClone);
-                    // });
+                    //ToDO send to TeamMember
+                    _singleLateBooking.teamWiseProductList.map(async (singleObject) => {
+                        let publishMessage = {
+                            message: 'running late',
+                            data: {
+                                _id: _singleLateBooking._id,
+                                id: _singleLateBooking.id,
+                                customer_id: _singleLateBooking.customer_id,
+                                customerName: _singleLateBooking.customerName,
+                                basket: singleObject.productItem,
+                                total: _singleLateBooking.total,
+                                bookingDateTime: _singleLateBooking.bookingDateTime,
+                                bookingStartTime: _singleLateBooking.bookingStartTime,
+                                bookingEndTime: _singleLateBooking.bookingEndTime,
+                                status: 'late',
+                                column: 'running late',
+                                statusDateTime: statusDateTime
+                            }
+                        };
+                        await socketPublishMessage(singleObject.id, publishMessage);
+                    });
+
 
                 } else {
                     console.log(updateResult);
@@ -91,7 +105,7 @@ setInterval(async () => {
     let hours = currentDate.getHours();
     let minutes = currentDate.getMinutes();
 
-    if (hours === 17 && minutes === 19) {
+    if (hours === 18 && minutes === 5) {
         TimeSlot.find({}, {__v: 0, _id: 0}).then(async (timeSlotList, err) => {
             if (!err) {
 
@@ -104,14 +118,14 @@ setInterval(async () => {
                         basket: {},
                         teamWiseProductList: {},
                         total: 0,
-                        bookingDateTime: new Date().toUTCString(),
+                        bookingDateTime: currentDate.toUTCString(),
                         bookingStartTime: NormalStartDateTime.toUTCString(),
                         bookingEndTime: NormalStartDateTime.toUTCString(),
                         status: 'first Order',
                         column: 'first Order',
                         customerName: 'Developer Test',
                         visited: false,
-                        statusDateTime: new Date().toUTCString()
+                        statusDateTime: currentDate.toUTCString()
                     });
                     await BookingAdd.save().then(async function (InsertBooking, err) {
                         if (!err) {
