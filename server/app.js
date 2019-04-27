@@ -11,7 +11,7 @@ mongoose.Promise = require('bluebird');
 import config from './config/environment';
 import '../server/api/CronJob/index';
 
-//import http from 'http';
+import http from 'http';
 import cors from 'cors';
 
 import expressConfig from './config/express';
@@ -23,7 +23,9 @@ import {socketOpen} from '../server/api/Socket';
 let https = require('https');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
+
+//todo Swagger
+//const swaggerDocument = require('./swagger.json');
 
 
 
@@ -41,7 +43,8 @@ console.log(__dirname);
 app.use(cors());
 app.use('/images', express.static(__dirname + '/images'));
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//todo Swagger
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 var privateKey = fs.readFileSync('server-key.pem').toString();
@@ -53,7 +56,8 @@ var credentials = {
     rejectUnauthorized: true
 };
 
-let server = https.createServer(credentials, app);
+//let server = https.createServer(credentials, app);
+let server = http.createServer(app);
 //server.setSecure(credentials);
 
 socketOpen(server);

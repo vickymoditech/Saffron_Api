@@ -10,10 +10,13 @@ var router = express.Router();
 //New Booking
 router.post('/', validations.validateAuthorizationUser, validate(validations.newBookingOrder), controller.index);
 
+//Get all order for SOD
 router.get('/', validations.validateAuthorization, controller.getBookingOrder);
 
-router.put('/:orderId', validations.validateAuthorization, controller.updateBookingOrder);
+//Order move to process or finish
+router.put('/:orderId', validations.validateAuthorization,validate(validations.updateBookingOrder), controller.updateBookingOrder);
 
+//Get all order for TemMember
 router.get('/TeamMemberOrder/:teamMemberId', validations.validateAuthorization, controller.getTeamMemberBookingOrder);
 
 router.use(function (err, req, res, next) {

@@ -1,4 +1,5 @@
 import Oauth from './oauth.model';
+import Booking from '../Booking/Booking.model';
 import moment from 'moment/moment';
 import {jwtdata, errorJsonResponse, getGuid, UserAvatarImageUploadLocation} from '../../config/commonHelper';
 import jwt from 'jsonwebtoken';
@@ -63,7 +64,7 @@ export function login(req, res) {
         if (check_field) {
 
             Oauth.findOne({userId: userId, password: pass, block: false}, {_id: 0, __v: 0})
-                .exec(function (err, loginUser) {
+                .exec(async function (err, loginUser) {
                     if (!err) {
                         if (loginUser) {
                             let expiresIn = 60 * 60 * 24; // expires in 24 hours
@@ -73,12 +74,29 @@ export function login(req, res) {
                             });
                             let expires = moment(issued)
                                 .add(expiresIn, 'seconds');
+
+                            let startDayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+                            let endDayDateTime = moment().tz('Asia/Kolkata').endOf('day').format();
+                            let NormalDateStartDateTime = new Date(startDayDateTime);
+                            let NormalDateEndDateTime = new Date(endDayDateTime);
+
+                            let getCurrentDayOrders = await Booking.find({
+                                customer_id:userId,
+                                bookingEndTime: {
+                                    $gte: NormalDateStartDateTime.toUTCString(),
+                                    $lte: NormalDateEndDateTime.toUTCString()
+                                }
+                            }, {teamWiseProductList: 0})
+                                .sort({bookingStartTime: 1})
+                                .exec();
+
                             res.status(200)
                                 .json({
                                     accessToken,
                                     expiresIn,
                                     issued,
-                                    expires
+                                    expires,
+                                    TodayOrders:getCurrentDayOrders
                                 });
                         } else {
                             res.status(400).json(errorJsonResponse("Invalid user", "Invalid user"));
@@ -123,7 +141,8 @@ export function register(req, res, next) {
                         userId: mobile_number,
                         password: password,
                         role: role,
-                        block: false
+                        block: false,
+                        image_url: ""
                     });
                     registrationUser.save()
                         .then(function (RegistrationSuccess, err) {

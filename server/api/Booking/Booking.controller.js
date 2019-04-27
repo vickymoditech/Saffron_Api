@@ -480,6 +480,8 @@ export async function updateBookingOrder(req, res) {
                     .json({result: true});
 
             } else {
+                res.status(200)
+                    .json({result: false});
                 console.log(updateResult);
             }
         } else {

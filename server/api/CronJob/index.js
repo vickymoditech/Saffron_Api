@@ -105,7 +105,7 @@ setInterval(async () => {
     let hours = currentDate.getHours();
     let minutes = currentDate.getMinutes();
 
-    if (hours === 18 && minutes === 5) {
+    if (hours === 1 && minutes === 10) {
         TimeSlot.find({}, {__v: 0, _id: 0}).then(async (timeSlotList, err) => {
             if (!err) {
 
