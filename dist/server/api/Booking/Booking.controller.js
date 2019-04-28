@@ -38,225 +38,231 @@ let index = exports.index = (() => {
             let totalPrice = 0;
             let not_acceptAble = false;
 
-            //Calculate the total time
-            yield _promise2.default.all(bookingProduct.map((() => {
-                var _ref2 = (0, _asyncToGenerator3.default)(function* (singleBookingProduct) {
-                    let TeamMemberProductSingle = yield getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
+            if (currentDate.getHours() >= 7) {
 
-                    let ProductItem = yield getProduct(singleBookingProduct.product_id);
+                //Calculate the total time
+                yield _promise2.default.all(bookingProduct.map((() => {
+                    var _ref2 = (0, _asyncToGenerator3.default)(function* (singleBookingProduct) {
+                        let TeamMemberProductSingle = yield getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
-                    if (ProductItem !== null) {
-                        totalPrice += ProductItem.price;
-                    } else {
-                        allProductFound = false;
-                    }
+                        let ProductItem = yield getProduct(singleBookingProduct.product_id);
 
-                    if (TeamMemberProductSingle !== null) {
-                        totalTime += TeamMemberProductSingle.approxTime;
-                    } else {
-                        allProductFound = false;
-                    }
-                });
-
-                return function (_x3) {
-                    return _ref2.apply(this, arguments);
-                };
-            })()));
-
-            if (!allProductFound) {
-                let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
-                res.status(400).json((0, _commonHelper.errorJsonResponse)(message, message));
-            } else {
-
-                //check currentTime and booking selected time.
-                if (currentDate.getTime() < NormalEndDateTime.getTime()) {
-
-                    let _LastBooking = yield getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
-
-                    if (_LastBooking !== null && _LastBooking.visited === false) {
-
-                        //Get Booking LastTime
-                        let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
-                        let addMinute = new Date(lastBookingDateTimeCalculation);
-                        if (currentDate.getTime() < addMinute.getTime()) {
-                            addMinute.setMinutes(addMinute.getMinutes() + totalTime);
-                            //set arrivalTime
-                            bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
-                            //set order finish time.
-                            bookingEndDateTime = addMinute.toUTCString();
+                        if (ProductItem !== null) {
+                            totalPrice += ProductItem.price;
                         } else {
-                            let currentTimeWithZeroMinutes = new Date(year, month, date, currentDate.getHours(), currentDate.getMinutes(), 0);
-                            bookingStartDateTime = currentTimeWithZeroMinutes.toUTCString();
-                            addMinute = currentTimeWithZeroMinutes;
-                            addMinute.setMinutes(currentTimeWithZeroMinutes.getMinutes() + totalTime);
-                            bookingEndDateTime = addMinute.toUTCString();
+                            allProductFound = false;
                         }
 
-                        const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
-                        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-                        if (!(NormalEndDateTime.getTime() >= addMinute.getTime() && diffMinutes >= 0)) {
-                            not_acceptAble = true;
-                        }
-                    } else {
-
-                        //Never execute this part.
-                        //first order set stating time and add minutes and generate end time
-                        if (currentDate.getTime() < NormalStartDateTime.getTime()) {
-                            bookingStartDateTime = NormalStartDateTime.toUTCString();
-                            let addMinute = NormalStartDateTime;
-                            addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
-                            bookingEndDateTime = addMinute.toUTCString();
+                        if (TeamMemberProductSingle !== null) {
+                            totalTime += TeamMemberProductSingle.approxTime;
                         } else {
-                            bookingStartDateTime = currentDate.toUTCString();
-                            let addMinute = currentDate;
-                            addMinute.setMinutes(currentDate.getMinutes() + totalTime);
-                            bookingEndDateTime = addMinute.toUTCString();
+                            allProductFound = false;
                         }
-                    }
+                    });
 
-                    if (!not_acceptAble) {
-                        //Generate the Basket Response.
-                        let BasketResponseGenerator = yield BasketGenerator(bookingProduct);
+                    return function (_x3) {
+                        return _ref2.apply(this, arguments);
+                    };
+                })()));
 
-                        let BookingAdd = new _Booking2.default({
-                            id: (0, _commonHelper.getGuid)(),
-                            customer_id: userId,
-                            basket: BasketResponseGenerator.basketResponse,
-                            teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
-                            total: totalPrice,
-                            bookingDateTime: currentDate.toUTCString(),
-                            bookingStartTime: bookingStartDateTime,
-                            bookingEndTime: bookingEndDateTime,
-                            status: 'waiting',
-                            column: 'recent orders',
-                            customerName: fullName,
-                            visited: false,
-                            statusDateTime: currentDate.toUTCString()
-                        });
-                        BookingAdd.save().then((() => {
-                            var _ref3 = (0, _asyncToGenerator3.default)(function* (InsertBooking, err) {
-                                if (!err) {
-                                    if (InsertBooking) {
-                                        let responseObject = {
-                                            id: InsertBooking.id,
-                                            customer_id: InsertBooking.customer_id,
-                                            customerName: fullName,
-                                            productList: InsertBooking.basket,
-                                            total: InsertBooking.total,
-                                            bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
-                                            arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
-                                            bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
-                                            status: InsertBooking.status,
-                                            column: InsertBooking.column,
-                                            statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
-                                            _id: InsertBooking._id
-                                        };
+                if (!allProductFound) {
+                    let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
+                    res.status(400).json((0, _commonHelper.errorJsonResponse)(message, message));
+                } else {
 
-                                        //ProductItemStore into BookingItem Collection.
-                                        yield _promise2.default.all(bookingProduct.map((() => {
-                                            var _ref4 = (0, _asyncToGenerator3.default)(function* (singleBookingProduct) {
-                                                let BookingItemsAdd = new _BookingItems2.default({
-                                                    id: (0, _commonHelper.getGuid)(),
-                                                    booking_id: InsertBooking.id,
-                                                    product_id: singleBookingProduct.product_id,
-                                                    team_id: singleBookingProduct.teamMember_id,
-                                                    active: true
-                                                });
-                                                BookingItemsAdd.save().then((() => {
-                                                    var _ref5 = (0, _asyncToGenerator3.default)(function* (InsertBookingItems, err) {
-                                                        if (!err) {
-                                                            if (!InsertBookingItems) {
-                                                                res.status(400).json((0, _commonHelper.errorJsonResponse)('Error in db BookingItems response', 'Error in db BookingItems response'));
-                                                            }
-                                                        } else {
-                                                            res.status(400).json((0, _commonHelper.errorJsonResponse)(err, 'Contact to your Developer'));
-                                                        }
-                                                    });
+                    //check currentTime and booking selected time.
+                    if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
-                                                    return function (_x7, _x8) {
-                                                        return _ref5.apply(this, arguments);
-                                                    };
-                                                })());
-                                            });
+                        let _LastBooking = yield getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
 
-                                            return function (_x6) {
-                                                return _ref4.apply(this, arguments);
-                                            };
-                                        })()));
+                        if (_LastBooking !== null && _LastBooking.visited === false) {
 
-                                        //ToDO send to TeamMember
-                                        BasketResponseGenerator.teamWiseProductList.map((() => {
-                                            var _ref6 = (0, _asyncToGenerator3.default)(function* (singleObject) {
-                                                let publishMessage = {
-                                                    message: 'new order',
-                                                    data: {
-                                                        _id: InsertBooking._id,
-                                                        id: InsertBooking.id,
-                                                        customer_id: InsertBooking.customer_id,
-                                                        customerName: fullName,
-                                                        basket: singleObject.productList,
-                                                        total: InsertBooking.total,
-                                                        bookingDateTime: InsertBooking.bookingDateTime,
-                                                        bookingStartTime: InsertBooking.bookingStartTime,
-                                                        bookingEndTime: InsertBooking.bookingEndTime,
-                                                        status: InsertBooking.status,
-                                                        column: InsertBooking.column,
-                                                        statusDateTime: InsertBooking.statusDateTime
-                                                    }
-                                                };
-                                                yield (0, _index.socketPublishMessage)(singleObject.id, publishMessage);
-                                            });
+                            //Get Booking LastTime
+                            let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
+                            let addMinute = new Date(lastBookingDateTimeCalculation);
+                            if (currentDate.getTime() < addMinute.getTime()) {
+                                addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+                                //set arrivalTime
+                                bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
+                                //set order finish time.
+                                bookingEndDateTime = addMinute.toUTCString();
+                            } else {
+                                let currentTimeWithZeroMinutes = new Date(year, month, date, currentDate.getHours(), currentDate.getMinutes(), 0);
+                                bookingStartDateTime = currentTimeWithZeroMinutes.toUTCString();
+                                addMinute = currentTimeWithZeroMinutes;
+                                addMinute.setMinutes(currentTimeWithZeroMinutes.getMinutes() + totalTime);
+                                bookingEndDateTime = addMinute.toUTCString();
+                            }
 
-                                            return function (_x9) {
-                                                return _ref6.apply(this, arguments);
-                                            };
-                                        })());
+                            const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
+                            const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+                            if (!(NormalEndDateTime.getTime() >= addMinute.getTime() && diffMinutes >= 0)) {
+                                not_acceptAble = true;
+                            }
+                        } else {
 
-                                        //ToDO send to SOD
-                                        let publishMessage = {
-                                            message: 'new order',
-                                            data: {
-                                                _id: InsertBooking._id,
+                            //Never execute this part.
+                            //first order set stating time and add minutes and generate end time
+                            if (currentDate.getTime() < NormalStartDateTime.getTime()) {
+                                bookingStartDateTime = NormalStartDateTime.toUTCString();
+                                let addMinute = NormalStartDateTime;
+                                addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
+                                bookingEndDateTime = addMinute.toUTCString();
+                            } else {
+                                bookingStartDateTime = currentDate.toUTCString();
+                                let addMinute = currentDate;
+                                addMinute.setMinutes(currentDate.getMinutes() + totalTime);
+                                bookingEndDateTime = addMinute.toUTCString();
+                            }
+                        }
+
+                        if (!not_acceptAble) {
+                            //Generate the Basket Response.
+                            let BasketResponseGenerator = yield BasketGenerator(bookingProduct);
+
+                            let BookingAdd = new _Booking2.default({
+                                id: (0, _commonHelper.getGuid)(),
+                                customer_id: userId,
+                                basket: BasketResponseGenerator.basketResponse,
+                                teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
+                                total: totalPrice,
+                                bookingDateTime: currentDate.toUTCString(),
+                                bookingStartTime: bookingStartDateTime,
+                                bookingEndTime: bookingEndDateTime,
+                                status: 'waiting',
+                                column: 'recent orders',
+                                customerName: fullName,
+                                visited: false,
+                                statusDateTime: currentDate.toUTCString()
+                            });
+                            BookingAdd.save().then((() => {
+                                var _ref3 = (0, _asyncToGenerator3.default)(function* (InsertBooking, err) {
+                                    if (!err) {
+                                        if (InsertBooking) {
+                                            let responseObject = {
                                                 id: InsertBooking.id,
                                                 customer_id: InsertBooking.customer_id,
                                                 customerName: fullName,
-                                                basket: InsertBooking.basket,
-                                                //teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
+                                                productList: InsertBooking.basket,
                                                 total: InsertBooking.total,
-                                                bookingDateTime: InsertBooking.bookingDateTime,
-                                                bookingStartTime: InsertBooking.bookingStartTime,
-                                                bookingEndTime: InsertBooking.bookingEndTime,
+                                                bookingDateTime: moment.tz(InsertBooking.bookingDateTime, 'Asia/Kolkata').format(),
+                                                arrivalTime: moment.tz(InsertBooking.bookingStartTime, 'Asia/Kolkata').format(),
+                                                bookingEndTime: moment.tz(InsertBooking.bookingEndTime, 'Asia/Kolkata').format(),
                                                 status: InsertBooking.status,
                                                 column: InsertBooking.column,
-                                                statusDateTime: InsertBooking.statusDateTime
-                                            }
-                                        };
+                                                statusDateTime: moment.tz(InsertBooking.statusDateTime, 'Asia/Kolkata').format(),
+                                                _id: InsertBooking._id
+                                            };
 
-                                        yield (0, _index.socketPublishMessage)('SOD', publishMessage);
+                                            //ProductItemStore into BookingItem Collection.
+                                            yield _promise2.default.all(bookingProduct.map((() => {
+                                                var _ref4 = (0, _asyncToGenerator3.default)(function* (singleBookingProduct) {
+                                                    let BookingItemsAdd = new _BookingItems2.default({
+                                                        id: (0, _commonHelper.getGuid)(),
+                                                        booking_id: InsertBooking.id,
+                                                        product_id: singleBookingProduct.product_id,
+                                                        team_id: singleBookingProduct.teamMember_id,
+                                                        active: true
+                                                    });
+                                                    BookingItemsAdd.save().then((() => {
+                                                        var _ref5 = (0, _asyncToGenerator3.default)(function* (InsertBookingItems, err) {
+                                                            if (!err) {
+                                                                if (!InsertBookingItems) {
+                                                                    res.status(400).json((0, _commonHelper.errorJsonResponse)('Error in db BookingItems response', 'Error in db BookingItems response'));
+                                                                }
+                                                            } else {
+                                                                res.status(400).json((0, _commonHelper.errorJsonResponse)(err, 'Contact to your Developer'));
+                                                            }
+                                                        });
 
-                                        res.status(200).json({
-                                            totalTime,
-                                            orderPlace: responseObject
-                                        });
+                                                        return function (_x7, _x8) {
+                                                            return _ref5.apply(this, arguments);
+                                                        };
+                                                    })());
+                                                });
+
+                                                return function (_x6) {
+                                                    return _ref4.apply(this, arguments);
+                                                };
+                                            })()));
+
+                                            //ToDO send to TeamMember
+                                            BasketResponseGenerator.teamWiseProductList.map((() => {
+                                                var _ref6 = (0, _asyncToGenerator3.default)(function* (singleObject) {
+                                                    let publishMessage = {
+                                                        message: 'new order',
+                                                        data: {
+                                                            _id: InsertBooking._id,
+                                                            id: InsertBooking.id,
+                                                            customer_id: InsertBooking.customer_id,
+                                                            customerName: fullName,
+                                                            basket: singleObject.productList,
+                                                            total: InsertBooking.total,
+                                                            bookingDateTime: InsertBooking.bookingDateTime,
+                                                            bookingStartTime: InsertBooking.bookingStartTime,
+                                                            bookingEndTime: InsertBooking.bookingEndTime,
+                                                            status: InsertBooking.status,
+                                                            column: InsertBooking.column,
+                                                            statusDateTime: InsertBooking.statusDateTime
+                                                        }
+                                                    };
+                                                    yield (0, _index.socketPublishMessage)(singleObject.id, publishMessage);
+                                                });
+
+                                                return function (_x9) {
+                                                    return _ref6.apply(this, arguments);
+                                                };
+                                            })());
+
+                                            //ToDO send to SOD
+                                            let publishMessage = {
+                                                message: 'new order',
+                                                data: {
+                                                    _id: InsertBooking._id,
+                                                    id: InsertBooking.id,
+                                                    customer_id: InsertBooking.customer_id,
+                                                    customerName: fullName,
+                                                    basket: InsertBooking.basket,
+                                                    //teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
+                                                    total: InsertBooking.total,
+                                                    bookingDateTime: InsertBooking.bookingDateTime,
+                                                    bookingStartTime: InsertBooking.bookingStartTime,
+                                                    bookingEndTime: InsertBooking.bookingEndTime,
+                                                    status: InsertBooking.status,
+                                                    column: InsertBooking.column,
+                                                    statusDateTime: InsertBooking.statusDateTime
+                                                }
+                                            };
+
+                                            yield (0, _index.socketPublishMessage)('SOD', publishMessage);
+
+                                            res.status(200).json({
+                                                totalTime,
+                                                orderPlace: responseObject
+                                            });
+                                        } else {
+                                            res.status(400).json((0, _commonHelper.errorJsonResponse)('Error in db response', 'Error in db response'));
+                                        }
                                     } else {
-                                        res.status(400).json((0, _commonHelper.errorJsonResponse)('Error in db response', 'Error in db response'));
+                                        res.status(400).json((0, _commonHelper.errorJsonResponse)(err, 'Contact to your Developer'));
                                     }
-                                } else {
-                                    res.status(400).json((0, _commonHelper.errorJsonResponse)(err, 'Contact to your Developer'));
-                                }
-                            });
+                                });
 
-                            return function (_x4, _x5) {
-                                return _ref3.apply(this, arguments);
-                            };
-                        })());
+                                return function (_x4, _x5) {
+                                    return _ref3.apply(this, arguments);
+                                };
+                            })());
+                        } else {
+                            res.status(406).json((0, _commonHelper.errorJsonResponse)('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
+                        }
                     } else {
-                        res.status(406).json((0, _commonHelper.errorJsonResponse)('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
+                        let message = 'you have selected wrong time, please choose the valid time slot.';
+                        res.status(400).json((0, _commonHelper.errorJsonResponse)(message, message));
                     }
-                } else {
-                    let message = 'you have selected wrong time, please choose the valid time slot.';
-                    res.status(400).json((0, _commonHelper.errorJsonResponse)(message, message));
                 }
+            } else {
+                let message = 'Booking will be started at 7 am';
+                res.status(400).json((0, _commonHelper.errorJsonResponse)(message, message));
             }
         } catch (error) {
             console.log(error);
@@ -357,7 +363,13 @@ let getLastBookingOrder = (() => {
 
         if (_LastBookingOrder === null)
             //Todo should not be received null value
-            return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);else if (_LastBookingOrder.visited === true) return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);else return _LastBookingOrder;
+            {
+                return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
+            } else if (_LastBookingOrder.visited === true) {
+            return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
+        } else {
+            return _LastBookingOrder;
+        }
     });
 
     return function getLastBookingOrder(_x13, _x14) {

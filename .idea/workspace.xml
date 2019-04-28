@@ -3,45 +3,18 @@
   <component name="ChangeListManager">
     <list default="true" id="cb923d29-6ff5-4351-9a67-626303613f3d" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/client/app/main/main.html" afterPath="$PROJECT_DIR$/client/app/main/main.html" />
-      <change beforePath="$PROJECT_DIR$/dist/client/app.af4d664c4960ecdeafac.js" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/app.html" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.eot" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.svg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/FontAwesome.otf" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.eot" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.svg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.ttf" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff2" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/images/yeoman-1cab7d4d37.png" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/assets/rev-manifest.json" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/favicon.ico" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/polyfills.af4d664c4960ecdeafac.js" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/robots.txt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/client/vendor.af4d664c4960ecdeafac.js" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/package.json" afterPath="" />
       <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js" />
       <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/index.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/index.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/validation.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/validation.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/CronJob/index.js" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/CronJob/index.js.map" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js" />
-      <change beforePath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js.map" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/app.js" afterPath="$PROJECT_DIR$/dist/server/app.js" />
-      <change beforePath="$PROJECT_DIR$/dist/server/app.js.map" afterPath="$PROJECT_DIR$/dist/server/app.js.map" />
-      <change beforePath="$PROJECT_DIR$/dist/server/ca-crt.pem" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/server/server-crt.pem" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/server/server-csr.pem" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/dist/server/server-key.pem" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
-      <change beforePath="$PROJECT_DIR$/server/app.js" afterPath="$PROJECT_DIR$/server/app.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/development.js" afterPath="$PROJECT_DIR$/dist/server/config/environment/development.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/development.js.map" afterPath="$PROJECT_DIR$/dist/server/config/environment/development.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/production.js" afterPath="$PROJECT_DIR$/dist/server/config/environment/production.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/production.js.map" afterPath="$PROJECT_DIR$/dist/server/config/environment/production.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/test.js" afterPath="$PROJECT_DIR$/dist/server/config/environment/test.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/config/environment/test.js.map" afterPath="$PROJECT_DIR$/dist/server/config/environment/test.js.map" />
+      <change beforePath="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" afterPath="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" />
+      <change beforePath="$PROJECT_DIR$/server/config/environment/development.js" afterPath="$PROJECT_DIR$/server/config/environment/development.js" />
+      <change beforePath="$PROJECT_DIR$/server/config/environment/production.js" afterPath="$PROJECT_DIR$/server/config/environment/production.js" />
+      <change beforePath="$PROJECT_DIR$/server/config/environment/test.js" afterPath="$PROJECT_DIR$/server/config/environment/test.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -76,11 +49,65 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="development.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="development.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/config/environment/development.js">
           <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="12" column="31" lean-forward="false" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="production.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/config/environment/production.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/config/environment/test.js">
+          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="325">
-              <caret line="13" column="16" lean-forward="false" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+              <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/api/CronJob/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="175">
+              <caret line="103" column="44" lean-forward="false" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
+              <folding>
+                <element signature="e#0#47#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="250">
+              <caret line="10" column="109" lean-forward="false" selection-start-line="10" selection-start-column="109" selection-end-line="10" selection-end-column="109" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Booking.controller.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.controller.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="115" column="55" lean-forward="false" selection-start-line="115" selection-start-column="55" selection-end-line="115" selection-end-column="55" />
               <folding />
             </state>
           </provider>
@@ -120,9 +147,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/server/api/Basket/Basket.model.js" />
-        <option value="$PROJECT_DIR$/server/api/BookingProduct/index.js" />
-        <option value="$PROJECT_DIR$/server/api/Basket/index.js" />
         <option value="$PROJECT_DIR$/server/api/Basket/Basket.controller.js" />
         <option value="$PROJECT_DIR$/server/api/SliderImages/SliderImages.model.js" />
         <option value="$PROJECT_DIR$/server/api/SliderImages/index.js" />
@@ -164,13 +188,16 @@
         <option value="$PROJECT_DIR$/server/api/Booking/Booking.model.js" />
         <option value="$PROJECT_DIR$/server/api/TimeSlot/TimeSlot.controller.js" />
         <option value="$PROJECT_DIR$/server/api/TimeSlot/index.js" />
-        <option value="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" />
         <option value="$PROJECT_DIR$/server/api/Booking/validation.js" />
         <option value="$PROJECT_DIR$/server/api/oauth/oauth.controller.js" />
         <option value="$PROJECT_DIR$/server/api/Booking/index.js" />
-        <option value="$PROJECT_DIR$/server/api/CronJob/index.js" />
         <option value="$PROJECT_DIR$/server/app.js" />
         <option value="$PROJECT_DIR$/client/app/main/main.html" />
+        <option value="$PROJECT_DIR$/server/config/environment/development.js" />
+        <option value="$PROJECT_DIR$/server/config/environment/production.js" />
+        <option value="$PROJECT_DIR$/server/config/environment/test.js" />
+        <option value="$PROJECT_DIR$/server/api/CronJob/index.js" />
+        <option value="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" />
       </list>
     </option>
   </component>
@@ -254,6 +281,26 @@
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
               <item name="server" type="cbb8eebc:String" user="server" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
+              <item name="server" type="cbb8eebc:String" user="server" />
+              <item name="api" type="cbb8eebc:String" user="api" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
+              <item name="server" type="cbb8eebc:String" user="server" />
+              <item name="api" type="cbb8eebc:String" user="api" />
+              <item name="Booking" type="cbb8eebc:String" user="Booking" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
+              <item name="server" type="cbb8eebc:String" user="server" />
+              <item name="api" type="cbb8eebc:String" user="api" />
+              <item name="CronJob" type="cbb8eebc:String" user="CronJob" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
@@ -495,12 +542,12 @@
       <workItem from="1556340704870" duration="13254000" />
       <workItem from="1556378206519" duration="3848000" />
       <workItem from="1556388892957" duration="1154000" />
-      <workItem from="1556423653609" duration="22000" />
+      <workItem from="1556423653609" duration="2174000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="667897000" />
+    <option name="totallyTimeSpent" value="670049000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -524,10 +571,10 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3243574" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.79390246" sideWeight="0.47972116" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.79314566" sideWeight="0.47972116" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24702702" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18162163" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -586,20 +633,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/server/api/Service/Swagger_Service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Gallery/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="42" lean-forward="true" selection-start-line="3" selection-start-column="42" selection-end-line="3" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/api/TimeSlot/validation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="668">
@@ -819,13 +852,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10725">
-          <caret line="436" column="31" lean-forward="false" selection-start-line="436" selection-start-column="31" selection-end-line="436" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/api/Booking/validation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2600">
@@ -896,24 +922,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/CronJob/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25">
-          <caret line="112" column="20" lean-forward="false" selection-start-line="112" selection-start-column="20" selection-end-line="112" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/ca-crt.pem">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="19" column="118" lean-forward="false" selection-start-line="19" selection-start-column="118" selection-end-line="19" selection-end-column="118" />
         </state>
       </provider>
     </entry>
@@ -947,8 +959,52 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/config/environment/development.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="12" column="31" lean-forward="false" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/config/environment/production.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/config/environment/test.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="325">
-          <caret line="13" column="16" lean-forward="false" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="250">
+          <caret line="10" column="109" lean-forward="false" selection-start-line="10" selection-start-column="109" selection-end-line="10" selection-end-column="109" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/api/CronJob/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="103" column="44" lean-forward="false" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="115" column="55" lean-forward="false" selection-start-line="115" selection-start-column="55" selection-end-line="115" selection-end-column="55" />
           <folding />
         </state>
       </provider>
