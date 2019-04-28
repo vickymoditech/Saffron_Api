@@ -131,7 +131,7 @@ setInterval((0, _asyncToGenerator3.default)(function* () {
     let hours = currentDate.getHours();
     let minutes = currentDate.getMinutes();
 
-    if (hours === 10 && minutes === 24) {
+    if (hours === 1 && minutes === 10) {
         _TimeSlot2.default.find({}, { __v: 0, _id: 0 }).then((() => {
             var _ref5 = (0, _asyncToGenerator3.default)(function* (timeSlotList, err) {
                 if (!err) {

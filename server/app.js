@@ -47,18 +47,17 @@ app.use('/images', express.static(__dirname + '/images'));
 //app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-var privateKey = fs.readFileSync('server-key.pem').toString();
-var certificate = fs.readFileSync('server-crt.pem').toString();
-var ca = fs.readFileSync('ca-crt.pem').toString();
-var credentials = {
+//var privateKey = fs.readFileSync('server-key.pem').toString();
+//var certificate = fs.readFileSync('server-crt.pem').toString();
+//var ca = fs.readFileSync('ca-crt.pem').toString();
+/*var credentials = {
     key: privateKey, cert: certificate,
     requestCert: false,
     rejectUnauthorized: true
-};
+};*/
 
 //let server = https.createServer(credentials, app);
 let server = http.createServer(app);
-//server.setSecure(credentials);
 
 socketOpen(server);
 console.log("socket connection successfully created");

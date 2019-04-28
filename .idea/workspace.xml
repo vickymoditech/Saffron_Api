@@ -2,186 +2,46 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cb923d29-6ff5-4351-9a67-626303613f3d" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/app.af4d664c4960ecdeafac.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/app.html" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.eot" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/FontAwesome.otf" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.eot" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.ttf" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff2" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/images/yeoman-1cab7d4d37.png" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/assets/rev-manifest.json" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/favicon.ico" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/polyfills.af4d664c4960ecdeafac.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/robots.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/client/vendor.af4d664c4960ecdeafac.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/package.json" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/BookingItems.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/BookingItems/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/Gallery.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Gallery/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/Product.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Product/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Service.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Swagger_Service.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/Swagger_Service.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Service/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/SliderImages.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/SliderImages/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Socket/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Socket/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/Team.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Team/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/TeamMemberProduct.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TeamMemberProduct/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/TimeSlot.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/TimeSlot/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/Video.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/Video/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/validation.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/oauth/validation.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.controller.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.controller.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.events.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.events.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.model.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/api/thing/thing.model.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/app.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/app.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/ca-crt.pem" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/components/errors/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/components/errors/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/commonHelper.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/commonHelper.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/development.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/development.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/production.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/production.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/shared.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/shared.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/test.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/environment/test.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/express.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/express.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/local.env.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/local.env.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/seed.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/config/seed.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/index.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/index.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/routes.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/routes.js.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/server-crt.pem" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/server-csr.pem" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/dist/server/server-key.pem" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" afterPath="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" />
-      <change beforePath="$PROJECT_DIR$/server/api/Booking/index.js" afterPath="$PROJECT_DIR$/server/api/Booking/index.js" />
-      <change beforePath="$PROJECT_DIR$/server/api/Booking/validation.js" afterPath="$PROJECT_DIR$/server/api/Booking/validation.js" />
-      <change beforePath="$PROJECT_DIR$/server/api/CronJob/index.js" afterPath="$PROJECT_DIR$/server/api/CronJob/index.js" />
-      <change beforePath="$PROJECT_DIR$/server/api/oauth/oauth.controller.js" afterPath="$PROJECT_DIR$/server/api/oauth/oauth.controller.js" />
+      <change beforePath="$PROJECT_DIR$/client/app/main/main.html" afterPath="$PROJECT_DIR$/client/app/main/main.html" />
+      <change beforePath="$PROJECT_DIR$/dist/client/app.af4d664c4960ecdeafac.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/app.html" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.eot" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.svg" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/FontAwesome.otf" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.eot" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.svg" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.ttf" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/fonts/font-awesome/fontawesome-webfont.woff2" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/images/yeoman-1cab7d4d37.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/assets/rev-manifest.json" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/favicon.ico" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/polyfills.af4d664c4960ecdeafac.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/robots.txt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/client/vendor.af4d664c4960ecdeafac.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/package.json" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/Booking.controller.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/index.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/index.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/index.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/validation.js" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/Booking/validation.js.map" afterPath="$PROJECT_DIR$/dist/server/api/Booking/validation.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/CronJob/index.js" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/CronJob/index.js.map" afterPath="$PROJECT_DIR$/dist/server/api/CronJob/index.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js.map" afterPath="$PROJECT_DIR$/dist/server/api/oauth/oauth.controller.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/app.js" afterPath="$PROJECT_DIR$/dist/server/app.js" />
+      <change beforePath="$PROJECT_DIR$/dist/server/app.js.map" afterPath="$PROJECT_DIR$/dist/server/app.js.map" />
+      <change beforePath="$PROJECT_DIR$/dist/server/ca-crt.pem" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/server/server-crt.pem" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/server/server-csr.pem" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dist/server/server-key.pem" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
       <change beforePath="$PROJECT_DIR$/server/app.js" afterPath="$PROJECT_DIR$/server/app.js" />
-      <change beforePath="$PROJECT_DIR$/server/swagger.json" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -192,115 +52,46 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Booking.controller.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.controller.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="436" column="31" lean-forward="true" selection-start-line="436" selection-start-column="31" selection-end-line="436" selection-end-column="31" />
-              <folding>
-                <element signature="e#0#38#0" expanded="true" />
-                <marker date="1556347689681" expanded="true" signature="23923:23968" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
-              <caret line="19" column="66" lean-forward="true" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/oauth/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="19" column="80" lean-forward="true" selection-start-line="19" selection-start-column="80" selection-end-line="19" selection-end-column="80" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="oauth.controller.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/oauth/oauth.controller.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-875">
-              <caret line="13" column="30" lean-forward="true" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
-              <folding>
-                <element signature="e#0#34#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ca-crt.pem" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/ca-crt.pem">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="oauth.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/oauth/oauth.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Booking.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="5" column="15" lean-forward="false" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="15" />
-              <folding>
-                <element signature="e#0#32#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="validation.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/Booking/validation.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="355">
-              <caret line="106" column="12" lean-forward="true" selection-start-line="106" selection-start-column="12" selection-end-line="106" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="validation.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/api/oauth/validation.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="127" column="45" lean-forward="true" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="45" />
-              <folding>
-                <element signature="e#0#31#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="45" column="14" lean-forward="true" selection-start-line="45" selection-start-column="14" selection-end-line="45" selection-end-column="14" />
+            <state relative-caret-position="1225">
+              <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
               <folding>
                 <element signature="e#154#196#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.component.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/app/main/main.component.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#42#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="development.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/config/environment/development.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="325">
+              <caret line="13" column="16" lean-forward="false" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/app/main/main.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -329,7 +120,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/server/api/BookingProduct/BookingProduct.controller.js" />
         <option value="$PROJECT_DIR$/server/api/Basket/Basket.model.js" />
         <option value="$PROJECT_DIR$/server/api/BookingProduct/index.js" />
         <option value="$PROJECT_DIR$/server/api/Basket/index.js" />
@@ -374,12 +164,13 @@
         <option value="$PROJECT_DIR$/server/api/Booking/Booking.model.js" />
         <option value="$PROJECT_DIR$/server/api/TimeSlot/TimeSlot.controller.js" />
         <option value="$PROJECT_DIR$/server/api/TimeSlot/index.js" />
-        <option value="$PROJECT_DIR$/server/api/CronJob/index.js" />
         <option value="$PROJECT_DIR$/server/api/Booking/Booking.controller.js" />
-        <option value="$PROJECT_DIR$/server/api/Booking/index.js" />
         <option value="$PROJECT_DIR$/server/api/Booking/validation.js" />
         <option value="$PROJECT_DIR$/server/api/oauth/oauth.controller.js" />
+        <option value="$PROJECT_DIR$/server/api/Booking/index.js" />
+        <option value="$PROJECT_DIR$/server/api/CronJob/index.js" />
         <option value="$PROJECT_DIR$/server/app.js" />
+        <option value="$PROJECT_DIR$/client/app/main/main.html" />
       </list>
     </option>
   </component>
@@ -439,6 +230,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -450,8 +242,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -468,34 +259,20 @@
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
               <item name="server" type="cbb8eebc:String" user="server" />
-              <item name="api" type="cbb8eebc:String" user="api" />
+              <item name="config" type="cbb8eebc:String" user="config" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
               <item name="server" type="cbb8eebc:String" user="server" />
-              <item name="api" type="cbb8eebc:String" user="api" />
-              <item name="Booking" type="cbb8eebc:String" user="Booking" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
-              <item name="server" type="cbb8eebc:String" user="server" />
-              <item name="api" type="cbb8eebc:String" user="api" />
-              <item name="CronJob" type="cbb8eebc:String" user="CronJob" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="Saffron_Api" type="cbb8eebc:String" user="Saffron_Api" />
-              <item name="server" type="cbb8eebc:String" user="server" />
-              <item name="api" type="cbb8eebc:String" user="api" />
-              <item name="oauth" type="cbb8eebc:String" user="oauth" />
+              <item name="config" type="cbb8eebc:String" user="config" />
+              <item name="environment" type="cbb8eebc:String" user="environment" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -715,12 +492,15 @@
       <workItem from="1556183054461" duration="9375000" />
       <workItem from="1556248153234" duration="604000" />
       <workItem from="1556271807700" duration="4671000" />
-      <workItem from="1556340704870" duration="11955000" />
+      <workItem from="1556340704870" duration="13254000" />
+      <workItem from="1556378206519" duration="3848000" />
+      <workItem from="1556388892957" duration="1154000" />
+      <workItem from="1556423653609" duration="22000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="661574000" />
+    <option name="totallyTimeSpent" value="667897000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -736,25 +516,24 @@
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.328" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32560974" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.47333333" sideWeight="0.5202788" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3243574" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32533333" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.79436964" sideWeight="0.47972116" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.79390246" sideWeight="0.47972116" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23405406" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925338" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24702702" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -762,6 +541,7 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925338" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -806,55 +586,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/server/api/Video/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="15" column="105" lean-forward="false" selection-start-line="15" selection-start-column="105" selection-end-line="15" selection-end-column="105" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Video/Video.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="40" column="83" lean-forward="false" selection-start-line="40" selection-start-column="83" selection-end-line="40" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Gallery/Gallery.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="10" column="15" lean-forward="true" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Service/index.spec.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/TimeSlot/TimeSlot.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Service/validation.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-522">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/TimeSlot/TimeSlot.integration.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/api/Service/Swagger_Service.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1000,15 +731,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2450">
           <caret line="98" column="34" lean-forward="false" selection-start-line="98" selection-start-column="34" selection-end-line="98" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/config/environment/development.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1016,17 +738,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="750">
           <caret line="33" column="14" lean-forward="false" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/app/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#32#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1034,9 +745,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1875">
           <caret line="99" column="37" lean-forward="false" selection-start-line="99" selection-start-column="37" selection-end-line="99" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#82#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1082,29 +790,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/CronJob/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="54" column="78" lean-forward="false" selection-start-line="54" selection-start-column="78" selection-end-line="54" selection-end-column="78" />
-          <folding>
-            <element signature="e#0#47#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/swagger.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="12" column="23" lean-forward="false" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/server/swagger.json" />
     <entry file="file://$PROJECT_DIR$/server/routes.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1112,9 +802,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="5" column="15" lean-forward="false" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1122,54 +809,34 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
           <caret line="9" column="49" lean-forward="true" selection-start-line="9" selection-start-column="49" selection-end-line="9" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/api/oauth/validation.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="127" column="45" lean-forward="true" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="3125">
+          <caret line="127" column="45" lean-forward="false" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="45" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/api/Booking/Booking.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="436" column="31" lean-forward="true" selection-start-line="436" selection-start-column="31" selection-end-line="436" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-            <marker date="1556347689681" expanded="true" signature="23923:23968" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="19" column="66" lean-forward="true" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="10725">
+          <caret line="436" column="31" lean-forward="false" selection-start-line="436" selection-start-column="31" selection-end-line="436" selection-end-column="31" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/api/Booking/validation.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="355">
-          <caret line="106" column="12" lean-forward="true" selection-start-line="106" selection-start-column="12" selection-end-line="106" selection-end-column="12" />
-          <folding />
+        <state relative-caret-position="2600">
+          <caret line="106" column="12" lean-forward="false" selection-start-line="106" selection-start-column="12" selection-end-line="106" selection-end-column="12" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/api/oauth/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
-          <caret line="19" column="80" lean-forward="true" selection-start-line="19" selection-start-column="80" selection-end-line="19" selection-end-column="80" />
-          <folding />
+          <caret line="19" column="80" lean-forward="false" selection-start-line="19" selection-start-column="80" selection-end-line="19" selection-end-column="80" />
         </state>
       </provider>
     </entry>
@@ -1177,17 +844,62 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/api/oauth/oauth.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-875">
-          <caret line="13" column="30" lean-forward="true" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="225">
+          <caret line="13" column="30" lean-forward="false" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/app.component.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/app.constants.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/scripts/controllers/demo.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="15" column="6" lean-forward="true" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/polyfills.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="12" column="18" lean-forward="true" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/api/CronJob/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25">
+          <caret line="112" column="20" lean-forward="false" selection-start-line="112" selection-start-column="20" selection-end-line="112" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -1195,17 +907,49 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/api/Booking/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="19" column="118" lean-forward="false" selection-start-line="19" selection-start-column="118" selection-end-line="19" selection-end-column="118" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="45" column="14" lean-forward="true" selection-start-line="45" selection-start-column="14" selection-end-line="45" selection-end-column="14" />
+        <state relative-caret-position="1225">
+          <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
           <folding>
             <element signature="e#154#196#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/main/main.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/app/main/main.component.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/config/environment/development.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="13" column="16" lean-forward="false" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>

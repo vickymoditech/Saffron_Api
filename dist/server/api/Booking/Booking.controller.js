@@ -532,6 +532,7 @@ let updateBookingOrder = exports.updateBookingOrder = (() => {
 
                     res.status(200).json({ result: true });
                 } else {
+                    res.status(200).json({ result: false });
                     console.log(updateResult);
                 }
             } else {

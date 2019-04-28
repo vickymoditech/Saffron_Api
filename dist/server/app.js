@@ -22,6 +22,10 @@ var _environment2 = _interopRequireDefault(_environment);
 
 require('../server/api/CronJob/index');
 
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
 var _cors = require('cors');
 
 var _cors2 = _interopRequireDefault(_cors);
@@ -43,8 +47,6 @@ var _Socket = require('../server/api/Socket');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _mongoose2.default.Promise = require('bluebird');
-
-//import http from 'http';
 
 
 //const http2 = require('http2');
@@ -74,17 +76,17 @@ app.use('/images', _express2.default.static(__dirname + '/images'));
 //app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-var privateKey = fs.readFileSync('server-key.pem').toString();
-var certificate = fs.readFileSync('server-crt.pem').toString();
-var ca = fs.readFileSync('ca-crt.pem').toString();
-var credentials = {
+//var privateKey = fs.readFileSync('server-key.pem').toString();
+//var certificate = fs.readFileSync('server-crt.pem').toString();
+//var ca = fs.readFileSync('ca-crt.pem').toString();
+/*var credentials = {
     key: privateKey, cert: certificate,
     requestCert: false,
     rejectUnauthorized: true
-};
+};*/
 
-let server = https.createServer(credentials, app);
-//server.setSecure(credentials);
+//let server = https.createServer(credentials, app);
+let server = _http2.default.createServer(app);
 
 (0, _Socket.socketOpen)(server);
 console.log("socket connection successfully created");

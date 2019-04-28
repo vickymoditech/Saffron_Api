@@ -8,6 +8,10 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
 exports.index = index;
 exports.index_contactNo = index_contactNo;
 exports.login = login;
@@ -20,6 +24,10 @@ exports.changeUserBlockStatus = changeUserBlockStatus;
 var _oauth = require('./oauth.model');
 
 var _oauth2 = _interopRequireDefault(_oauth);
+
+var _Booking = require('../Booking/Booking.model');
+
+var _Booking2 = _interopRequireDefault(_Booking);
 
 var _moment = require('moment/moment');
 
@@ -87,28 +95,49 @@ function login(req, res) {
 
         if (check_field) {
 
-            _oauth2.default.findOne({ userId: userId, password: pass, block: false }, { _id: 0, __v: 0 }).exec(function (err, loginUser) {
-                if (!err) {
-                    if (loginUser) {
-                        let expiresIn = 60 * 60 * 24; // expires in 24 hours
-                        let issued = (0, _moment2.default)(Date.now());
-                        let accessToken = _jsonwebtoken2.default.sign({ user: loginUser }, _commonHelper.jwtdata.jwtSecretKey, {
-                            expiresIn: expiresIn
-                        });
-                        let expires = (0, _moment2.default)(issued).add(expiresIn, 'seconds');
-                        res.status(200).json({
-                            accessToken,
-                            expiresIn,
-                            issued,
-                            expires
-                        });
+            _oauth2.default.findOne({ userId: userId, password: pass, block: false }, { _id: 0, __v: 0 }).exec((() => {
+                var _ref = (0, _asyncToGenerator3.default)(function* (err, loginUser) {
+                    if (!err) {
+                        if (loginUser) {
+                            let expiresIn = 60 * 60 * 24; // expires in 24 hours
+                            let issued = (0, _moment2.default)(Date.now());
+                            let accessToken = _jsonwebtoken2.default.sign({ user: loginUser }, _commonHelper.jwtdata.jwtSecretKey, {
+                                expiresIn: expiresIn
+                            });
+                            let expires = (0, _moment2.default)(issued).add(expiresIn, 'seconds');
+
+                            let startDayDateTime = (0, _moment2.default)().tz('Asia/Kolkata').startOf('day').format();
+                            let endDayDateTime = (0, _moment2.default)().tz('Asia/Kolkata').endOf('day').format();
+                            let NormalDateStartDateTime = new Date(startDayDateTime);
+                            let NormalDateEndDateTime = new Date(endDayDateTime);
+
+                            let getCurrentDayOrders = yield _Booking2.default.find({
+                                customer_id: userId,
+                                bookingEndTime: {
+                                    $gte: NormalDateStartDateTime.toUTCString(),
+                                    $lte: NormalDateEndDateTime.toUTCString()
+                                }
+                            }, { teamWiseProductList: 0 }).sort({ bookingStartTime: 1 }).exec();
+
+                            res.status(200).json({
+                                accessToken,
+                                expiresIn,
+                                issued,
+                                expires,
+                                TodayOrders: getCurrentDayOrders
+                            });
+                        } else {
+                            res.status(400).json((0, _commonHelper.errorJsonResponse)("Invalid user", "Invalid user"));
+                        }
                     } else {
-                        res.status(400).json((0, _commonHelper.errorJsonResponse)("Invalid user", "Invalid user"));
+                        res.status(400).json((0, _commonHelper.errorJsonResponse)(err, "sorry, come to the shop."));
                     }
-                } else {
-                    res.status(400).json((0, _commonHelper.errorJsonResponse)(err, "sorry, come to the shop."));
-                }
-            });
+                });
+
+                return function (_x, _x2) {
+                    return _ref.apply(this, arguments);
+                };
+            })());
         }
     }
 }
@@ -144,7 +173,8 @@ function register(req, res, next) {
                         userId: mobile_number,
                         password: password,
                         role: role,
-                        block: false
+                        block: false,
+                        image_url: ""
                     });
                     registrationUser.save().then(function (RegistrationSuccess, err) {
                         if (!err) {
