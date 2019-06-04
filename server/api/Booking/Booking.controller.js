@@ -6,6 +6,7 @@ import Team from '../Team/Team.model';
 
 import {jwtdata, errorJsonResponse, getGuid, setCache, getCache} from '../../config/commonHelper';
 import {socketPublishMessage} from '../Socket/index';
+import Log from '../../config/Log';
 
 let moment = require('moment-timezone');
 var _ = require('lodash');
@@ -36,7 +37,32 @@ export async function index(req, res) {
         let totalPrice = 0;
         let not_acceptAble = false;
 
-        if(currentDate.getHours() >= 7) {
+        let requestObj = {
+            startTimeHours,
+            startTimeMinutes,
+            endTimeHours,
+            endTimeMinutes,
+            bookingProduct,
+            totalTime,
+            allProductFound,
+            userId,
+            fullName,
+            bookingStartDateTime,
+            bookingEndDateTime,
+            momentDateTime,
+            currentDate,
+            year,
+            month,
+            date,
+            NormalStartDateTime,
+            NormalEndDateTime,
+            totalPrice,
+            not_acceptAble,
+        };
+
+        Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(requestObj));
+
+        if (currentDate.getHours() >= 7) {
 
             //Calculate the total time
             await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
@@ -60,8 +86,8 @@ export async function index(req, res) {
 
             if(!allProductFound) {
                 let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
-                res.status(400)
-                    .json(errorJsonResponse(message, message));
+                Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
+                res.status(400).json(errorJsonResponse(message, message));
             } else {
 
                 //check currentTime and booking selected time.
@@ -165,15 +191,15 @@ export async function index(req, res) {
                                                 active: true,
                                             });
                                             BookingItemsAdd.save()
-                                                .then(async function(InsertBookingItems, err) {
-                                                    if(!err) {
-                                                        if(!InsertBookingItems) {
-                                                            res.status(400)
-                                                                .json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
+                                                .then(async function (InsertBookingItems, err) {
+                                                    if (!err) {
+                                                        if (!InsertBookingItems) {
+                                                            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db BookingItems response')));
+                                                            res.status(400).json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
                                                         }
                                                     } else {
-                                                        res.status(400)
-                                                            .json(errorJsonResponse(err, 'Contact to your Developer'));
+                                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Contact to your Developer')));
+                                                        res.status(400).json(errorJsonResponse(err, 'Contact to your Developer'));
                                                     }
                                                 });
                                         }));
@@ -222,27 +248,31 @@ export async function index(req, res) {
 
                                         await socketPublishMessage('SOD', publishMessage);
 
-                                        res.status(200)
-                                            .json({
-                                                totalTime,
-                                                orderPlace: responseObject
-                                            });
+                                        Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify({
+                                            totalTime,
+                                            orderPlace: responseObject
+                                        }));
+                                        res.status(200).json({totalTime, orderPlace: responseObject});
 
                                     } else {
+                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(InsertBooking, 'Error in db response')));
                                         res.status(400)
                                             .json(errorJsonResponse('Error in db response', 'Error in db response'));
                                     }
                                 } else {
+                                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db response')));
                                     res.status(400)
                                         .json(errorJsonResponse(err, 'Contact to your Developer'));
                                 }
                             });
                     } else {
+                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order')));
                         res.status(406)
                             .json(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
                     }
                 } else {
                     let message = 'you have selected wrong time, please choose the valid time slot.';
+                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
                     res.status(400)
                         .json(errorJsonResponse(message, message));
                 }
@@ -250,10 +280,12 @@ export async function index(req, res) {
 
         } else {
             let message = 'Booking will be started at 7 am';
+            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
             res.status(400)
                 .json(errorJsonResponse(message, message));
         }
-    } catch(error) {
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
         console.log(error);
     }
 }
@@ -292,6 +324,7 @@ async function BasketGenerator(bookingProduct) {
 
     } catch(error) {
         console.log(error);
+        Log.writeLog(Log.eLogLevel.error, '[BasketGenerator] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
         return error;
     }
 }
@@ -325,13 +358,15 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime) {
     }, {$set: {visited: true}}, {sort: {bookingEndTime: -1}})
         .exec();
 
-    if(_LastBookingOrder === null)
     //Todo should not be received null value
-    {
+    if (_LastBookingOrder === null) {
+        Log.writeLog(Log.eLogLevel.error, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
         return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
-    } else if(_LastBookingOrder.visited === true) {
+    } else if (_LastBookingOrder.visited === true) {
+        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
         return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
     } else {
+        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
         return _LastBookingOrder;
     }
 }
@@ -432,10 +467,12 @@ export async function getBookingOrder(req, res) {
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
 
+        Log.writeLog(Log.eLogLevel.info, '[getBookingOrder] : ' + JSON.stringify(responseObject));
         res.status(200)
             .json(responseObject);
 
-    } catch(error) {
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[getBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
         console.log(error);
     }
 }
@@ -491,10 +528,12 @@ export async function updateBookingOrder(req, res) {
                     await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
                 });
 
+                Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}));
                 res.status(200)
                     .json({result: true});
 
             } else {
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})));
                 res.status(200)
                     .json({result: false});
                 console.log(updateResult);
@@ -503,7 +542,8 @@ export async function updateBookingOrder(req, res) {
             console.log('contact to developer');
         }
 
-    } catch(error) {
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
         console.log(error);
     }
 }
@@ -581,11 +621,13 @@ export async function getTeamMemberBookingOrder(req, res) {
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
 
+        Log.writeLog(Log.eLogLevel.info, '[getTeamMemberBookingOrder] : ' + JSON.stringify(responseObject));
         res.status(200)
             .json(responseObject);
 
 
-    } catch(error) {
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[getTeamMemberBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
         console.log(error);
     }
 }

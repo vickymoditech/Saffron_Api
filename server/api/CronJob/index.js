@@ -2,6 +2,7 @@ import Booking from '../Booking/Booking.model';
 import TimeSlot from '../TimeSlot/TimeSlot.model';
 import {socketPublishMessage} from '../Socket/index';
 import {getGuid} from '../../config/commonHelper';
+import Log from '../../config/Log';
 
 let moment = require('moment-timezone');
 var _ = require('lodash');
@@ -84,15 +85,18 @@ setInterval(async () => {
 
 
                 } else {
+                    Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(updateResult));
                     console.log(updateResult);
                 }
             } else {
+                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(updateResult,'contact to Developer')));
                 console.log('contact to developer');
             }
 
         }));
 
     } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(error.message.toString(),error.message.toString())));
         console.log(error);
     }
 
@@ -130,17 +134,21 @@ setInterval(async () => {
                     await BookingAdd.save().then(async function (InsertBooking, err) {
                         if (!err) {
                             if (InsertBooking) {
+                                Log.writeLog(Log.eLogLevel.info, '[setInterval] : ' + JSON.stringify("Save Successfully"));
                                 console.log("Save successfully");
                             } else {
+                                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(InsertBooking,InsertBooking)));
                                 console.log(InsertBooking);
                             }
                         } else {
+                            Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(),err.message.toString())));
                             console.log(err);
                         }
                     });
                 });
 
             } else {
+                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(),err.message.toString())));
                 console.log(err);
             }
         });

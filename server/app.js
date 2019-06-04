@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 
 mongoose.Promise = require('bluebird');
 import config from './config/environment';
+import Log from './config/Log';
 import '../server/api/CronJob/index';
 
 import http from 'http';
@@ -26,7 +27,6 @@ const swaggerUi = require('swagger-ui-express');
 
 //todo Swagger
 //const swaggerDocument = require('./swagger.json');
-
 
 
 mongoose.connect(config.mongo.uri, {useMongoClient: true});
@@ -66,8 +66,13 @@ registerRoutes(app);
 
 // Start server
 function startServer() {
+
+    new Log();
+    Log.logInit();
+
     app.angularFullstack = server.listen(config.port, config.ip, function () {
         console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+        Log.writeLog(Log.eLogLevel.info, 'Express server listening on ' + config.port + ', in ' + app.get('env') + ' mode');
     });
 }
 
