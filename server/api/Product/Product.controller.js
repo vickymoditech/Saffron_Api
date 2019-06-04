@@ -50,10 +50,10 @@ export async function index(req, res) {
                 "products": {"$first": "$itemsObjects"}
             }
         },
-        {$sort: {date: 1}}).exec(async (error, bookingProductList) => {
+        {$sort: {date: 1}}).exec(async (error, ProductList) => {
 
         let i = 0;
-        let result = await Promise.all(bookingProductList.map(async (Service) => {
+        let result = await Promise.all(ProductList.map(async (Service) => {
             i++;
             return await Promise.all(Service.products.map(async (Product) => {
                 i++;
@@ -68,7 +68,7 @@ export async function index(req, res) {
         }));
 
         let response = {
-            bookingProduct: bookingProductList
+            AllProducts: ProductList
         };
 
         res.status(200).json(response);
