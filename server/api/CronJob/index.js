@@ -135,14 +135,11 @@ setInterval(async () => {
                         if (!err) {
                             if (InsertBooking) {
                                 Log.writeLog(Log.eLogLevel.info, '[setInterval] : ' + JSON.stringify("Save Successfully"));
-                                console.log("Save successfully");
                             } else {
                                 Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(InsertBooking,InsertBooking)));
-                                console.log(InsertBooking);
                             }
                         } else {
                             Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(),err.message.toString())));
-                            console.log(err);
                         }
                     });
                 });

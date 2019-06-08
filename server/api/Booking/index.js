@@ -17,7 +17,7 @@ router.get('/', validations.validateAuthorization, controller.getBookingOrder);
 router.put('/:orderId', validations.validateAuthorization,validate(validations.updateBookingOrder), controller.updateBookingOrder);
 
 //Get all order for TemMember
-router.get('/TeamMemberOrder/:teamMemberId', validations.validateAuthorization, controller.getTeamMemberBookingOrder);
+router.get('/TeamMemberOrder/:teamMemberId', validations.validateAuthorizationEmployee, controller.getTeamMemberBookingOrder);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];

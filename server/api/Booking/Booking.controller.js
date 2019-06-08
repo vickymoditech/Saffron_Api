@@ -581,7 +581,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        })
+        },{basket:0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -597,7 +597,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        })
+        },{basket:0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -613,7 +613,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        })
+        },{basket:0})
             .sort({bookingStartTime: 1})
             .exec();
 
