@@ -30,7 +30,7 @@
   ```
   
 ###Step - 3
-- ``` sudo nano /etc/init.d/mongod ``` (if you want mongodb run as an authentication). - service code. 
+- ``` sudo nano /etc/init.d/mongod ``` (if you want to run mongodb as an authentication). - service code. 
 add --auth in command field. 
 
 ###Mongoose Connection string change
