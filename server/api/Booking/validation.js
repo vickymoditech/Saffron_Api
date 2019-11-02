@@ -141,7 +141,7 @@ export default {
                     });
                 } else {
                     // if everything is good, save to request for use in other routes
-                    if (decoded.user.role.toLowerCase() === "Admin" || decoded.user.role.toLowerCase() === "employee") {
+                    if (decoded.user.role.toLowerCase() === "admin" || decoded.user.role.toLowerCase() === "employee") {
                         req.decoded = decoded;
                         next();
                     } else {

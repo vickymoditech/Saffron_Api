@@ -9,10 +9,11 @@ import {socketPublishMessage} from '../Socket/index';
 import Log from '../../config/Log';
 
 let moment = require('moment-timezone');
-var _ = require('lodash');
+let _ = require('lodash');
 
 // New Booking
 export async function index(req, res) {
+    let uniqueId = getGuid();
     try {
         let startTimeHours = req.body.startTime.hours;
         let startTimeMinutes = req.body.startTime.minutes;
@@ -60,23 +61,23 @@ export async function index(req, res) {
             not_acceptAble,
         };
 
-        Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(requestObj));
+        Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(requestObj), uniqueId);
 
         if (currentDate.getHours() >= 7) {
 
             //Calculate the total time
-            await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
+            await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
                 let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
                 let ProductItem = await getProduct(singleBookingProduct.product_id);
 
-                if(ProductItem !== null) {
+                if (ProductItem !== null) {
                     totalPrice += ProductItem.price;
                 } else {
                     allProductFound = false;
                 }
 
-                if(TeamMemberProductSingle !== null) {
+                if (TeamMemberProductSingle !== null) {
                     totalTime += TeamMemberProductSingle.approxTime;
                 } else {
                     allProductFound = false;
@@ -84,24 +85,24 @@ export async function index(req, res) {
 
             }));
 
-            if(!allProductFound) {
+            if (!allProductFound) {
                 let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
-                Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
+                Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)), uniqueId);
                 res.status(400).json(errorJsonResponse(message, message));
             } else {
 
                 //check currentTime and booking selected time.
-                if(currentDate.getTime() < NormalEndDateTime.getTime()) {
+                if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
-                    let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
+                    let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
 
-                    if(_LastBooking !== null && _LastBooking.visited === false) {
+                    if (_LastBooking !== null && _LastBooking.visited === false) {
 
                         //Get Booking LastTime
                         let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata')
                             .format();
                         let addMinute = new Date(lastBookingDateTimeCalculation);
-                        if(currentDate.getTime() < addMinute.getTime()) {
+                        if (currentDate.getTime() < addMinute.getTime()) {
                             addMinute.setMinutes(addMinute.getMinutes() + totalTime);
                             //set arrivalTime
                             bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
@@ -117,7 +118,7 @@ export async function index(req, res) {
 
                         const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                         const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-                        if(!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
+                        if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
                             not_acceptAble = true;
                         }
 
@@ -125,7 +126,7 @@ export async function index(req, res) {
 
                         //Never execute this part.
                         //first order set stating time and add minutes and generate end time
-                        if(currentDate.getTime() < NormalStartDateTime.getTime()) {
+                        if (currentDate.getTime() < NormalStartDateTime.getTime()) {
                             bookingStartDateTime = NormalStartDateTime.toUTCString();
                             let addMinute = NormalStartDateTime;
                             addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
@@ -138,10 +139,9 @@ export async function index(req, res) {
                         }
                     }
 
-                    if(!not_acceptAble) {
+                    if (!not_acceptAble) {
                         //Generate the Basket Response.
-                        let BasketResponseGenerator = await BasketGenerator(bookingProduct);
-
+                        let BasketResponseGenerator = await BasketGenerator(bookingProduct, uniqueId);
 
                         let BookingAdd = new Booking({
                             id: getGuid(),
@@ -159,9 +159,9 @@ export async function index(req, res) {
                             statusDateTime: currentDate.toUTCString()
                         });
                         BookingAdd.save()
-                            .then(async function(InsertBooking, err) {
-                                if(!err) {
-                                    if(InsertBooking) {
+                            .then(async function (InsertBooking, err) {
+                                if (!err) {
+                                    if (InsertBooking) {
                                         let responseObject = {
                                             id: InsertBooking.id,
                                             customer_id: InsertBooking.customer_id,
@@ -182,7 +182,7 @@ export async function index(req, res) {
                                         };
 
                                         //ProductItemStore into BookingItem Collection.
-                                        await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
+                                        await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
                                             let BookingItemsAdd = new BookingItems({
                                                 id: getGuid(),
                                                 booking_id: InsertBooking.id,
@@ -194,18 +194,18 @@ export async function index(req, res) {
                                                 .then(async function (InsertBookingItems, err) {
                                                     if (!err) {
                                                         if (!InsertBookingItems) {
-                                                            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db BookingItems response')));
+                                                            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db BookingItems response')), uniqueId);
                                                             res.status(400).json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
                                                         }
                                                     } else {
-                                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Contact to your Developer')));
+                                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Contact to your Developer')), uniqueId);
                                                         res.status(400).json(errorJsonResponse(err, 'Contact to your Developer'));
                                                     }
                                                 });
                                         }));
 
                                         //ToDO send to TeamMember
-                                        BasketResponseGenerator.teamWiseProductList.map(async(singleObject) => {
+                                        BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
                                             let publishMessage = {
                                                 message: 'new order',
                                                 data: {
@@ -251,28 +251,28 @@ export async function index(req, res) {
                                         Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify({
                                             totalTime,
                                             orderPlace: responseObject
-                                        }));
+                                        }), uniqueId);
                                         res.status(200).json({totalTime, orderPlace: responseObject});
 
                                     } else {
-                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(InsertBooking, 'Error in db response')));
+                                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(InsertBooking, 'Error in db response')), uniqueId);
                                         res.status(400)
                                             .json(errorJsonResponse('Error in db response', 'Error in db response'));
                                     }
                                 } else {
-                                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db response')));
+                                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db response')), uniqueId);
                                     res.status(400)
                                         .json(errorJsonResponse(err, 'Contact to your Developer'));
                                 }
                             });
                     } else {
-                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order')));
+                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order')), uniqueId);
                         res.status(406)
                             .json(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
                     }
                 } else {
                     let message = 'you have selected wrong time, please choose the valid time slot.';
-                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
+                    Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)), uniqueId);
                     res.status(400)
                         .json(errorJsonResponse(message, message));
                 }
@@ -280,25 +280,25 @@ export async function index(req, res) {
 
         } else {
             let message = 'Booking will be started at 7 am';
-            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)));
+            Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)), uniqueId);
             res.status(400)
                 .json(errorJsonResponse(message, message));
         }
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
 }
 
-async function BasketGenerator(bookingProduct) {
+async function BasketGenerator(bookingProduct, uniqueId) {
     try {
 
         let basketResponse = [];
         let teamWiseProductList = [];
 
-        await Promise.all(bookingProduct.map(async(bookingItem) => {
+        await Promise.all(bookingProduct.map(async (bookingItem) => {
 
-            let productItem = await getProduct(bookingItem.product_id);
+            let productItem = await getProduct(bookingItem.product_id, uniqueId);
             let productTeam = await getTeam(bookingItem.teamMember_id);
             let object = {
                 productItem,
@@ -307,7 +307,7 @@ async function BasketGenerator(bookingProduct) {
             basketResponse.push(object);
 
             let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
-            if(!teamMember) {
+            if (!teamMember) {
                 let pushData = {
                     id: productTeam.id,
                     productList: [],
@@ -322,22 +322,22 @@ async function BasketGenerator(bookingProduct) {
 
         return {basketResponse, teamWiseProductList};
 
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        Log.writeLog(Log.eLogLevel.error, '[BasketGenerator] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[BasketGenerator] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         return error;
     }
 }
 
-async function getProduct(productId, index = 0) {
+async function getProduct(productId, uniqueId, index = 0) {
     let listProductList = getCache('productList');
-    if(listProductList !== null) {
+    if (listProductList !== null) {
         let singleProduct = listProductList.find((product) => product.id === productId);
-        if(singleProduct) {
+        if (singleProduct) {
             return singleProduct;
         } else {
-            if(index === 0) {
-                return getProduct(productId, 1);
+            if (index === 0) {
+                return getProduct(productId, uniqueId, 1);
             } else {
                 return null;
             }
@@ -346,11 +346,11 @@ async function getProduct(productId, index = 0) {
         listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0})
             .exec();
         setCache('productList', listProductList);
-        return getProduct(productId, 1);
+        return getProduct(productId, uniqueId, 1);
     }
 }
 
-async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime) {
+async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId) {
 
     let _LastBookingOrder = await Booking.findOneAndUpdate({
         visited: false,
@@ -360,25 +360,25 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime) {
 
     //Todo should not be received null value
     if (_LastBookingOrder === null) {
-        Log.writeLog(Log.eLogLevel.error, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
-        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
+        Log.writeLog(Log.eLogLevel.error, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
+        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
     } else if (_LastBookingOrder.visited === true) {
-        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
-        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime);
+        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
+        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
     } else {
-        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)));
+        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
         return _LastBookingOrder;
     }
 }
 
 async function getTeam(teamId, index = 0) {
     let teamList = getCache('teamList');
-    if(teamList !== null) {
+    if (teamList !== null) {
         let singleTeam = teamList.find((team) => team.id === teamId);
-        if(singleTeam) {
+        if (singleTeam) {
             return singleTeam;
         } else {
-            if(index === 0) {
+            if (index === 0) {
                 return getTeam(teamId, 1);
             } else {
                 return null;
@@ -392,15 +392,15 @@ async function getTeam(teamId, index = 0) {
     }
 }
 
-async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
+async function getTeamMemberProductList(product_id, teamMember_id, uniqueId, index = 0) {
     let teamMemberProductList = getCache('teamMemberProductList');
-    if(teamMemberProductList !== null) {
+    if (teamMemberProductList !== null) {
         let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMember_id === teamMember_id);
-        if(singleTeamMemberProduct) {
+        if (singleTeamMemberProduct) {
             return singleTeamMemberProduct;
         } else {
-            if(index === 0) {
-                return getTeamMemberProductList(product_id, teamMember_id, 1);
+            if (index === 0) {
+                return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
             } else {
                 return null;
             }
@@ -409,13 +409,13 @@ async function getTeamMemberProductList(product_id, teamMember_id, index = 0) {
         teamMemberProductList = await TeamMemberProduct.find()
             .exec();
         setCache('teamMemberProductList', teamMemberProductList);
-        return getTeamMemberProductList(product_id, teamMember_id, 1);
+        return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
     }
 }
 
 export async function getBookingOrder(req, res) {
+    let uniqueId = getGuid();
     try {
-
         let startDayDateTime = moment()
             .tz('Asia/Kolkata')
             .startOf('day')
@@ -467,17 +467,18 @@ export async function getBookingOrder(req, res) {
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
 
-        Log.writeLog(Log.eLogLevel.info, '[getBookingOrder] : ' + JSON.stringify(responseObject));
+        Log.writeLog(Log.eLogLevel.info, '[getBookingOrder] : ' + JSON.stringify(responseObject), uniqueId);
         res.status(200)
             .json(responseObject);
 
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[getBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[getBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
 }
 
 export async function updateBookingOrder(req, res) {
+    let uniqueId = getGuid();
     try {
 
         let orderId = req.params.orderId;
@@ -487,7 +488,7 @@ export async function updateBookingOrder(req, res) {
         let column = 'running';
         let message = 'running';
 
-        if(orderType === 'finish') {
+        if (orderType === 'finish') {
             status = 'finish';
             column = 'finish';
             message = 'finish';
@@ -505,8 +506,8 @@ export async function updateBookingOrder(req, res) {
         })
             .exec();
 
-        if(updateResult) {
-            if(updateResult.nModified === 1 || updateResult.n === 1) {
+        if (updateResult) {
+            if (updateResult.nModified === 1 || updateResult.n === 1) {
 
                 let sodPublishMessage = {
                     message: message,
@@ -524,31 +525,33 @@ export async function updateBookingOrder(req, res) {
                     .exec();
 
                 //TODO send to teamMember
-                _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
+                _singleLateBooking.teamWiseProductList.forEach(async (singleTeamWiseProductList) => {
                     await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
                 });
 
-                Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}));
+                Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
                 res.status(200)
                     .json({result: true});
 
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})));
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})), uniqueId);
                 res.status(200)
                     .json({result: false});
                 console.log(updateResult);
             }
         } else {
+            Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
             console.log('contact to developer');
         }
 
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
 }
 
 export async function getTeamMemberBookingOrder(req, res) {
+    let uniqueId = getGuid();
     try {
 
         let teamMemberId = req.params.teamMemberId;
@@ -581,7 +584,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        },{basket:0})
+        }, {basket: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -597,7 +600,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        },{basket:0})
+        }, {basket: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -613,7 +616,7 @@ export async function getTeamMemberBookingOrder(req, res) {
                     orderStatus: false
                 }
             }
-        },{basket:0})
+        }, {basket: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
@@ -621,13 +624,13 @@ export async function getTeamMemberBookingOrder(req, res) {
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
 
-        Log.writeLog(Log.eLogLevel.info, '[getTeamMemberBookingOrder] : ' + JSON.stringify(responseObject));
+        Log.writeLog(Log.eLogLevel.info, '[getTeamMemberBookingOrder] : ' + JSON.stringify(responseObject), uniqueId);
         res.status(200)
             .json(responseObject);
 
 
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[getTeamMemberBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[getTeamMemberBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
 }

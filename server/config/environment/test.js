@@ -1,5 +1,4 @@
-'use strict';
-/*eslint no-process-env:0*/
+let homeDir = require('homedir');
 
 // Test specific configuration
 // ===========================
@@ -10,5 +9,10 @@ module.exports = {
         //uri: 'mongodb://127.0.0.1:27017/saffron'
         uri: 'mongodb://202.71.13.239:27017/saffron'
     },
+
+    logFile: {
+        filePath: homeDir() + '/Saffron'
+    },
+
     port: '9000',
 };

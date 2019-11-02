@@ -5,7 +5,7 @@ import {getGuid} from '../../config/commonHelper';
 import Log from '../../config/Log';
 
 let moment = require('moment-timezone');
-var _ = require('lodash');
+let _ = require('lodash');
 
 //todo find running late orders
 setInterval(async () => {
