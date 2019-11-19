@@ -430,7 +430,8 @@ export async function getBookingOrder(req, res) {
         let responseObject = {
             runningOrder: [],
             runningLate: [],
-            recentOrders: []
+            recentOrders: [],
+            recentComplete: []
         };
 
         let recentOrders = await Booking.find({
@@ -463,9 +464,21 @@ export async function getBookingOrder(req, res) {
             .sort({bookingStartTime: 1})
             .exec();
 
+        let recentComplete = await Booking.find({
+            status: 'finish',
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            }
+        }, {teamWiseProductList: 0})
+            .sort({bookingStartTime: 1})
+            .exec();
+
+
         responseObject.recentOrders = recentOrders;
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
+        responseObject.recentComplete = recentComplete;
 
         Log.writeLog(Log.eLogLevel.info, '[getBookingOrder] : ' + JSON.stringify(responseObject), uniqueId);
         res.status(200)
