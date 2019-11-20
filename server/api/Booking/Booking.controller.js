@@ -69,7 +69,7 @@ export async function index(req, res) {
             await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
                 let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
-                let ProductItem = await getProduct(singleBookingProduct.product_id);
+                let ProductItem = await getProduct(singleBookingProduct.product_id, uniqueId);
 
                 if (ProductItem !== null) {
                     totalPrice += ProductItem.price;
@@ -94,6 +94,10 @@ export async function index(req, res) {
                 //check currentTime and booking selected time.
                 if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
+                    //Generate the Basket Response.
+                    let BasketResponseGenerator = await BasketGenerator(bookingProduct, uniqueId);
+
+                    //get LastBooking order
                     let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
 
                     if (_LastBooking !== null && _LastBooking.visited === false) {
@@ -119,7 +123,41 @@ export async function index(req, res) {
                         const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                         const diffMinutes = Math.ceil(diffTime / (1000 * 60));
                         if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
-                            not_acceptAble = true;
+
+                            //check last order time and endTimeSlot time has less diff - 5
+                            addMinute = new Date(lastBookingDateTimeCalculation);
+                            const diffTimeActual = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
+                            const diffMinutesActual = Math.ceil(diffTimeActual / (1000 * 60));
+
+                            if (diffMinutesActual > 5) {
+
+                                await Booking.findOneAndUpdate({
+                                    visited: true,
+                                    timeSlotFull: false,
+                                    bookingEndTime: {
+                                        $gte: NormalStartDateTime.toUTCString(),
+                                        $lte: NormalEndDateTime.toUTCString()
+                                    }
+                                }, {$set: {visited: false}}, {sort: {bookingEndTime: -1}})
+                                    .exec();
+
+                                throw new Error(`your selected time slot has been full for your order, you can remove some item from the basket and again place the order otherwise you can select another time slot for this order`);
+
+                            } else {
+
+                                await Booking.findOneAndUpdate({
+                                    visited: true,
+                                    timeSlotFull: false,
+                                    bookingEndTime: {
+                                        $gte: NormalStartDateTime.toUTCString(),
+                                        $lte: NormalEndDateTime.toUTCString()
+                                    }
+                                }, {$set: {timeSlotFull: true}}, {sort: {bookingEndTime: -1}})
+                                    .exec();
+
+                                throw new Error("your selected time slot has been full please select another time slot and please order again");
+
+                            }
                         }
 
                     } else {
@@ -140,8 +178,6 @@ export async function index(req, res) {
                     }
 
                     if (!not_acceptAble) {
-                        //Generate the Basket Response.
-                        let BasketResponseGenerator = await BasketGenerator(bookingProduct, uniqueId);
 
                         let BookingAdd = new Booking({
                             id: getGuid(),
@@ -266,9 +302,11 @@ export async function index(req, res) {
                                 }
                             });
                     } else {
-                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order')), uniqueId);
+
+                        Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse('your order has not been Accepted, please select another time slot and book your order', 'your order has not been Accepted, please select another time slot and book your order')), uniqueId);
                         res.status(406)
-                            .json(errorJsonResponse('your order is not Accepted, please select another time slot and book your order', 'your order is not Accepted, please select another time slot and book your order'));
+                            .json(errorJsonResponse('your order has not been Accepted, please select another time slot and book your order', 'your order has not Accepted, please select another time slot and book your order'));
+
                     }
                 } else {
                     let message = 'you have selected wrong time, please choose the valid time slot.';
@@ -286,7 +324,8 @@ export async function index(req, res) {
         }
     } catch (error) {
         Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
-        console.log(error);
+        res.status(400)
+            .json(errorJsonResponse(error.message.toString(), error.message.toString()));
     }
 }
 
@@ -299,25 +338,29 @@ async function BasketGenerator(bookingProduct, uniqueId) {
         await Promise.all(bookingProduct.map(async (bookingItem) => {
 
             let productItem = await getProduct(bookingItem.product_id, uniqueId);
-            let productTeam = await getTeam(bookingItem.teamMember_id);
-            let object = {
-                productItem,
-                productTeam
-            };
-            basketResponse.push(object);
+            let productTeam = await getTeam(bookingItem.teamMember_id, uniqueId);
 
-            let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
-            if (!teamMember) {
-                let pushData = {
-                    id: productTeam.id,
-                    productList: [],
-                    orderStatus: false,
+            if (productItem && productTeam) {
+                let object = {
+                    productItem,
+                    productTeam
                 };
-                pushData.productList.push(productItem);
-                teamWiseProductList.push(pushData);
-            } else {
-                teamMember.productList.push(productItem);
-            }
+                basketResponse.push(object);
+
+                let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
+                if (!teamMember) {
+                    let pushData = {
+                        id: productTeam.id,
+                        productList: [],
+                        orderStatus: false,
+                    };
+                    pushData.productList.push(productItem);
+                    teamWiseProductList.push(pushData);
+                } else {
+                    teamMember.productList.push(productItem);
+                }
+            } else
+                throw new Error("you have passed wrong id for basket generation");
         }));
 
         return {basketResponse, teamWiseProductList};
@@ -325,7 +368,7 @@ async function BasketGenerator(bookingProduct, uniqueId) {
     } catch (error) {
         console.log(error);
         Log.writeLog(Log.eLogLevel.error, '[BasketGenerator] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
-        return error;
+        throw new Error("you have passed wrong id for basket generation");
     }
 }
 
@@ -339,6 +382,7 @@ async function getProduct(productId, uniqueId, index = 0) {
             if (index === 0) {
                 return getProduct(productId, uniqueId, 1);
             } else {
+                Log.writeLog(Log.eLogLevel.error, `[getTeam] : Product not found = ${productId}`, uniqueId);
                 return null;
             }
         }
@@ -361,9 +405,21 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
     //Todo should not be received null value
     if (_LastBookingOrder === null) {
         Log.writeLog(Log.eLogLevel.error, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
-        return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
+
+        let _LastBookingOrderAgain = await Booking.findOneAndUpdate({
+            visited: true, timeSlotFull: true,
+            bookingEndTime: {$gte: NormalStartDateTime.toUTCString(), $lte: NormalEndDateTime.toUTCString()}
+        }, {sort: {bookingEndTime: -1}})
+            .exec();
+
+        if (_LastBookingOrderAgain) {
+            throw new Error("your selected time slot has been full please select another time slot and please order again");
+        } else {
+            return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
+        }
+
     } else if (_LastBookingOrder.visited === true) {
-        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
+        Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder-true] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
         return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
     } else {
         Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
@@ -371,7 +427,7 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
     }
 }
 
-async function getTeam(teamId, index = 0) {
+async function getTeam(teamId, uniqueId, index = 0) {
     let teamList = getCache('teamList');
     if (teamList !== null) {
         let singleTeam = teamList.find((team) => team.id === teamId);
@@ -379,8 +435,9 @@ async function getTeam(teamId, index = 0) {
             return singleTeam;
         } else {
             if (index === 0) {
-                return getTeam(teamId, 1);
+                return getTeam(teamId, uniqueId, 1);
             } else {
+                Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
                 return null;
             }
         }
@@ -388,7 +445,7 @@ async function getTeam(teamId, index = 0) {
         teamList = await Team.find({}, {_id: 0, __v: 0, description: 0})
             .exec();
         setCache('teamList', teamList);
-        return getTeam(teamId, 1);
+        return getTeam(teamId, uniqueId, 1);
     }
 }
 

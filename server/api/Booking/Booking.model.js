@@ -14,6 +14,7 @@ var BookingSchema = new mongoose.Schema({
     column: String,
     customerName: String,
     visited: Boolean,
+    timeSlotFull: {type: Boolean, default: false},
     statusDateTime: Date
 });
 
