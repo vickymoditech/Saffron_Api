@@ -2,7 +2,7 @@ import Booking from './Booking.model';
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
 import Product from '../Product/Product.model';
 import BookingItems from '../BookingItems/BookingItems.model';
-import Team from '../Team/Team.model';
+import Oauth from '../oauth/oauth.model';
 
 import {jwtdata, errorJsonResponse, getGuid, setCache, getCache} from '../../config/commonHelper';
 import {socketPublishMessage} from '../Socket/index';
@@ -67,8 +67,8 @@ export async function index(req, res) {
 
             //Calculate the total time
             await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
-                let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id);
 
+                let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id, uniqueId);
                 let ProductItem = await getProduct(singleBookingProduct.product_id, uniqueId);
 
                 if (ProductItem !== null) {
@@ -442,7 +442,7 @@ async function getTeam(teamId, uniqueId, index = 0) {
             }
         }
     } else {
-        teamList = await Team.find({}, {_id: 0, __v: 0, description: 0})
+        teamList = await Oauth.find({role: {$in: ['admin', 'employee']}}, {_id: 0, __v: 0, description: 0})
             .exec();
         setCache('teamList', teamList);
         return getTeam(teamId, uniqueId, 1);
@@ -452,19 +452,19 @@ async function getTeam(teamId, uniqueId, index = 0) {
 async function getTeamMemberProductList(product_id, teamMember_id, uniqueId, index = 0) {
     let teamMemberProductList = getCache('teamMemberProductList');
     if (teamMemberProductList !== null) {
-        let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMember_id === teamMember_id);
+        let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMemberProduct.teamMember_id === teamMember_id);
         if (singleTeamMemberProduct) {
             return singleTeamMemberProduct;
         } else {
             if (index === 0) {
                 return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
             } else {
+                Log.writeLog(Log.eLogLevel.error, `[getTeamMemberProductList] : Record not found ProductId = ${product_id}  teamId = ${teamMember_id}`, uniqueId);
                 return null;
             }
         }
     } else {
-        teamMemberProductList = await TeamMemberProduct.find()
-            .exec();
+        teamMemberProductList = await TeamMemberProduct.find().exec();
         setCache('teamMemberProductList', teamMemberProductList);
         return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
     }

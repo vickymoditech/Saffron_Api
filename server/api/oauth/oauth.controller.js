@@ -28,18 +28,18 @@ function handleError(res, statusCode) {
 
 // Gets a list of oauth
 export function index(req, res) {
-    return Oauth.find({}, {_id: 0, __v: 0}).exec()
+    return Oauth.find({role: 'user'}, {_id: 0, __v: 0, password: 0}).exec()
         .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
 
+// Get userList based on Mobile Number
 export function index_contactNo(req, res) {
     let contactNo = '^' + req.params.contactNo + '.*';
     return Oauth.find({userId: {$regex: contactNo}}, {_id: 0, __v: 0}).exec()
         .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
-
 
 //Login Valid User
 export function login(req, res) {
@@ -81,7 +81,7 @@ export function login(req, res) {
                             let NormalDateEndDateTime = new Date(endDayDateTime);
 
                             let getCurrentDayOrders = await Booking.find({
-                                customer_id:userId,
+                                customer_id: userId,
                                 bookingEndTime: {
                                     $gte: NormalDateStartDateTime.toUTCString(),
                                     $lte: NormalDateEndDateTime.toUTCString()
@@ -96,7 +96,7 @@ export function login(req, res) {
                                     expiresIn,
                                     issued,
                                     expires,
-                                    TodayOrders:getCurrentDayOrders
+                                    TodayOrders: getCurrentDayOrders
                                 });
                         } else {
                             res.status(400).json(errorJsonResponse("Invalid user", "Invalid user"));
@@ -124,9 +124,9 @@ export function register(req, res, next) {
 
             let alreadyAvailable = false;
             //check mobile number is already register or not
-            Oauth.find({userId: mobile_number}).exec(function (err, findUser) {
+            Oauth.findOne({userId: mobile_number}).exec(function (err, findUser) {
 
-                if (findUser.length > 0) {
+                if (findUser) {
                     alreadyAvailable = true;
                 }
 
@@ -369,8 +369,8 @@ export function deleteUser(req, res, next) {
 }
 
 export function uploadUserAvatar(req, res, next) {
-
     try {
+
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 

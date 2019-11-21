@@ -1,26 +1,7 @@
-import {applyPatch} from 'fast-json-patch';
 import TeamMemberProduct from './TeamMemberProduct.model';
 import {errorJsonResponse, getGuid} from '../../config/commonHelper';
 import Product from '../Product/Product.model';
-
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode)
-                .json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode)
-            .send(err);
-    };
-}
+import Oauth from '../oauth/oauth.model';
 
 export function addTeamProduct(req, res, next) {
     try {
@@ -34,32 +15,44 @@ export function addTeamProduct(req, res, next) {
             };
 
             try {
-                Product.find({id: product_id}).exec(function (err, findProduct) {
-                    if (findProduct.length > 0) {
-                        let TeamMemberProductAdd = new TeamMemberProduct({
-                            id: getGuid(),
-                            teamMember_id: TeamObject.id,
-                            product_id: TeamObject.product_id,
-                            approxTime: 5,
+                Product.findOne({id: product_id}).exec(function (err, findProduct) {
+
+                    if (findProduct) {
+
+                        Oauth.findOne({id: id, role: {$in: ['admin', 'employee']}}).exec((err, findTeamMember) => {
+
+                            if (findTeamMember) {
+
+                                let TeamMemberProductAdd = new TeamMemberProduct({
+                                    id: getGuid(),
+                                    teamMember_id: TeamObject.id,
+                                    product_id: TeamObject.product_id,
+                                    approxTime: 5,
+                                });
+
+                                TeamMemberProductAdd.save()
+                                    .then(function (InsertTeamMemberProductAdd, err) {
+                                        if (!err) {
+                                            if (InsertTeamMemberProductAdd) {
+                                                res.status(200)
+                                                    .json({
+                                                        data: InsertTeamMemberProductAdd,
+                                                        result: "Successfully Add new product"
+                                                    });
+                                            } else {
+                                                res.status(400)
+                                                    .json(errorJsonResponse("Error in db response", "Invalid_Image"));
+                                            }
+                                        } else {
+                                            res.status(400)
+                                                .json(errorJsonResponse(err, "Contact to your Developer"));
+                                        }
+                                    });
+
+                            } else {
+                                res.status(400).json(errorJsonResponse("TeamMember is not found", "TeamMember is not found"));
+                            }
                         });
-                        TeamMemberProductAdd.save()
-                            .then(function (InsertTeamMemberProductAdd, err) {
-                                if (!err) {
-                                    if (InsertTeamMemberProductAdd) {
-                                        res.status(200)
-                                            .json({
-                                                data: InsertTeamMemberProductAdd,
-                                                result: "Successfully Add new product"
-                                            });
-                                    } else {
-                                        res.status(400)
-                                            .json(errorJsonResponse("Error in db response", "Invalid_Image"));
-                                    }
-                                } else {
-                                    res.status(400)
-                                        .json(errorJsonResponse(err, "Contact to your Developer"));
-                                }
-                            });
                     }
                     else {
                         res.status(400).json(errorJsonResponse("Product is not found", "Product is not found"));
@@ -128,10 +121,11 @@ export function removeTeamProduct(req, res, next) {
 export function teamMemberProductsList(req, res, next) {
     try {
         if (req.params.teamMemberId) {
-            let teamMemberId = req.params.teamMemberId;
 
+            let teamMemberId = req.params.teamMemberId;
             TeamMemberProduct.find({teamMember_id: teamMemberId}).exec((err, listTeamMemberProduct) => {
                 if (!err) {
+
                     let productList = [];
                     listTeamMemberProduct.forEach((teamMemberProduct) => {
                         productList.push(teamMemberProduct.product_id);
@@ -143,7 +137,8 @@ export function teamMemberProductsList(req, res, next) {
                         }
                     }).exec(function (err, product) {
                         res.status(200).json(product);
-                    })
+                    });
+
                 } else {
                     res.status(400)
                         .json(errorJsonResponse(err, "Contact to your Developer"));
