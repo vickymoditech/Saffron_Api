@@ -1,4 +1,3 @@
-import Team from './Team.model';
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
 import Oauth from '../oauth/oauth.model';
 import {errorJsonResponse, getGuid, UserAvatarImageUploadLocation} from '../../config/commonHelper';
