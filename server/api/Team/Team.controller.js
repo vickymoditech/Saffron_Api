@@ -43,7 +43,7 @@ export function deleteTeam(req, res, next) {
             //Remove all the TeamMemberProduct
             TeamMemberProduct.remove({teamMember_id: teamId}).exec((err, deleteTeamMember) => {
                 if (deleteTeamMember) {
-                    Team.remove({id: teamId})
+                    Oauth.remove({id: teamId})
                         .exec(function (err, DeleteTeam) {
                             if (!err) {
                                 if (DeleteTeam) {
@@ -82,7 +82,7 @@ export function addNewTeam(req, res, next) {
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 
-            if (Object.keys(files).length > 0 && fields.first_name && fields.description && fields.mobile_number && fields.last_name && fields.email_id && fields.password && isImage(files.filetoupload.name)) {
+            if (Object.keys(files).length > 0 && fields.first_name && fields.description && fields.mobile_number && fields.last_name && isImage(files.filetoupload.name)) {
 
                 let uuid = getGuid();
                 let oldpath = files.filetoupload.path;
@@ -92,9 +92,8 @@ export function addNewTeam(req, res, next) {
                 let first_name = fields.first_name.toLowerCase();
                 let last_name = fields.last_name.toLowerCase();
                 let mobile_number = fields.mobile_number.toLowerCase();
-                let email_id = fields.email_id.toLowerCase();
                 let description = fields.description.toLowerCase();
-                let password = fields.password.toLowerCase();
+                let password = "saffron123";
 
                 fs_extra.move(oldpath, newpath, function (err) {
                     if (err) {
@@ -121,7 +120,7 @@ export function addNewTeam(req, res, next) {
                                             last_name: last_name,
                                             description: description,
                                             contact_no: mobile_number,
-                                            email_id: email_id,
+                                            email_id: "",
                                             userId: mobile_number,
                                             password: password,
                                             role: "employee",
@@ -191,7 +190,7 @@ export function updateTeam(req, res, next) {
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
 
-            if (fields.first_name && fields.description && fields.last_name && fields.email_id && fields.id) {
+            if (fields.first_name && fields.last_name && fields.description && fields.id) {
 
                 if (files.filetoupload && isImage(files.filetoupload.name)) {
 
@@ -203,7 +202,6 @@ export function updateTeam(req, res, next) {
                     let renameFilePath = UserAvatarImageUploadLocation.path + uuid + files.filetoupload.name;
                     let first_name = fields.first_name.toLowerCase();
                     let last_name = fields.last_name.toLowerCase();
-                    let email_id = fields.email_id.toLowerCase();
                     let description = fields.description.toLowerCase();
 
                     let TeamObject = {
@@ -211,7 +209,6 @@ export function updateTeam(req, res, next) {
                         image_url: dbpath,
                         first_name,
                         last_name,
-                        email_id,
                         description
                     };
 
@@ -230,7 +227,6 @@ export function updateTeam(req, res, next) {
                                         image_url: dbpath,
                                         first_name: first_name,
                                         last_name: last_name,
-                                        email_id: email_id,
                                         description: description
                                     }).exec(function (err, UpdateTeam) {
                                         if (!err) {
@@ -265,21 +261,18 @@ export function updateTeam(req, res, next) {
                     let description = fields.description.toLowerCase();
                     let first_name = fields.first_name.toLowerCase();
                     let last_name = fields.last_name.toLowerCase();
-                    let email_id = fields.email_id.toLowerCase();
                     let id = fields.id;
 
                     let TeamObject = {
                         id,
                         first_name,
                         last_name,
-                        email_id,
                         description
                     };
 
                     Oauth.update({id: id}, {
                         first_name: first_name,
                         last_name: last_name,
-                        email_id: email_id,
                         description: description
                     }).exec(function (err, UpdateTeam) {
                         if (!err) {
