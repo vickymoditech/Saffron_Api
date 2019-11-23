@@ -16,6 +16,9 @@ router.get('/', validations.validateAuthorization, controller.getBookingOrder);
 //Order move to process or finish
 router.put('/:orderId', validations.validateAuthorization,validate(validations.updateBookingOrder), controller.updateBookingOrder);
 
+//Order move to process or finish
+router.put('/:orderId/teamMember/:teamMemberId', validations.validateAuthorizationEmployee,validate(validations.updateBookingOrder), controller.updateBookingEmployeeOrder);
+
 //Get all order for TemMember
 router.get('/TeamMemberOrder/:teamMemberId', validations.validateAdminEmployeeAuthorization, controller.getTeamMemberBookingOrder);
 

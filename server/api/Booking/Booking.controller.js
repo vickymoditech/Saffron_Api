@@ -240,28 +240,6 @@ export async function index(req, res) {
                                                 });
                                         }));
 
-                                        //ToDO send to TeamMember
-                                        BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
-                                            let publishMessage = {
-                                                message: 'new order',
-                                                data: {
-                                                    _id: InsertBooking._id,
-                                                    id: InsertBooking.id,
-                                                    customer_id: InsertBooking.customer_id,
-                                                    customerName: fullName,
-                                                    basket: singleObject.productList,
-                                                    total: InsertBooking.total,
-                                                    bookingDateTime: InsertBooking.bookingDateTime,
-                                                    bookingStartTime: InsertBooking.bookingStartTime,
-                                                    bookingEndTime: InsertBooking.bookingEndTime,
-                                                    status: InsertBooking.status,
-                                                    column: InsertBooking.column,
-                                                    statusDateTime: InsertBooking.statusDateTime,
-                                                }
-                                            };
-                                            await socketPublishMessage(singleObject.id, publishMessage);
-                                        });
-
                                         //ToDO send to SOD
                                         let publishMessage = {
                                             message: 'new order',
@@ -281,8 +259,29 @@ export async function index(req, res) {
                                                 statusDateTime: InsertBooking.statusDateTime,
                                             }
                                         };
-
                                         await socketPublishMessage('SOD', publishMessage);
+
+                                        //ToDO send to TeamMember
+                                        BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
+                                            let publishMessage = {
+                                                message: 'new order',
+                                                data: {
+                                                    _id: InsertBooking._id,
+                                                    id: InsertBooking.id,
+                                                    customer_id: InsertBooking.customer_id,
+                                                    customerName: fullName,
+                                                    teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
+                                                    total: InsertBooking.total,
+                                                    bookingDateTime: InsertBooking.bookingDateTime,
+                                                    bookingStartTime: InsertBooking.bookingStartTime,
+                                                    bookingEndTime: InsertBooking.bookingEndTime,
+                                                    status: InsertBooking.status,
+                                                    column: InsertBooking.column,
+                                                    statusDateTime: InsertBooking.statusDateTime,
+                                                }
+                                            };
+                                            await socketPublishMessage(singleObject.id, publishMessage);
+                                        });
 
                                         Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify({
                                             totalTime,
@@ -352,7 +351,11 @@ async function BasketGenerator(bookingProduct, uniqueId) {
                     let pushData = {
                         id: productTeam.id,
                         productList: [],
-                        orderStatus: false,
+                        orderStatus: 'waiting',
+                        column: 'recent orders',
+                        statusDateTime:"",
+                        startTime:"",
+                        endTime:""
                     };
                     pushData.productList.push(productItem);
                     teamWiseProductList.push(pushData);
@@ -620,6 +623,155 @@ export async function updateBookingOrder(req, res) {
     }
 }
 
+export async function updateBookingEmployeeOrder(req, res, next) {
+    let uniqueId = getGuid();
+    try {
+
+        let orderId = req.params.orderId;
+        let teamMemberId = req.params.teamMemberId;
+        let orderType = req.body.orderType;
+
+        let currentTime = moment.tz('Asia/Kolkata')
+            .format();
+        let currentDate = new Date(currentTime);
+        let statusDateTime = currentDate.toUTCString();
+
+        let status = 'process';
+        let column = 'running';
+        let message = 'running';
+
+        if (orderType === 'finish') {
+            status = 'finish';
+            column = 'finish';
+            message = 'finish';
+        }
+
+
+        //Todo update innerData for TeamMember orderstatus,startTime,orderstatusTime
+        let updateResultTeamMember = null;
+        if(orderType === 'finish'){
+            updateResultTeamMember = await Booking.update({id: orderId, 'teamWiseProductList.id': teamMemberId}, {
+                $set: {
+                    'teamWiseProductList.$.orderStatus': status,
+                    'teamWiseProductList.$.column': column,
+                    'teamWiseProductList.$.statusDateTime': statusDateTime,
+                    'teamWiseProductList.$.endTime': statusDateTime,
+                }
+            });
+        }else{
+            updateResultTeamMember = await Booking.update({id: orderId, 'teamWiseProductList.id': teamMemberId}, {
+                $set: {
+                    'teamWiseProductList.$.orderStatus': status,
+                    'teamWiseProductList.$.column': column,
+                    'teamWiseProductList.$.statusDateTime': statusDateTime,
+                    'teamWiseProductList.$.startTime': statusDateTime,
+                }
+            });
+        }
+
+        if(updateResultTeamMember) {
+
+            if (updateResultTeamMember.nModified > 0 || updateResultTeamMember.n > 0) {
+
+                if(orderType !== 'finish'){
+                    let updateResult = await Booking.update({id: orderId, column: {$ne: column}}, {
+                        status: status,
+                        column: column,
+                        statusDateTime: statusDateTime
+                    }).exec();
+
+                    let sodPublishMessage = {
+                        message: message,
+                        data: {
+                            id: orderId,
+                            orderType: orderType,
+                            status: status,
+                            column: column,
+                            statusDateTime: statusDateTime
+                        }
+                    };
+
+                    if (updateResult.nModified > 0 || updateResult.n > 0) {
+                        await socketPublishMessage('SOD', sodPublishMessage);
+                        Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderSOD] : ' + JSON.stringify({result: true}), uniqueId);
+                    }
+
+                    await socketPublishMessage(teamMemberId, sodPublishMessage);
+                    Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderTeamMember] : ' + JSON.stringify({result: true}), uniqueId);
+                    res.status(200)
+                        .json({result: true});
+                }else{
+
+                    let sodPublishMessage = {
+                        message: message,
+                        data: {
+                            id: orderId,
+                            orderType: orderType,
+                            status: status,
+                            column: column,
+                            statusDateTime: statusDateTime
+                        }
+                    };
+
+                    let findResult = await Booking.find({
+                        id: orderId,
+                        'teamWiseProductList.orderStatus': 'waiting'
+                    }).exec();
+                    console.log(findResult);
+
+                    let findResult1 = await Booking.find({
+                        id: orderId,
+                        'teamWiseProductList.orderStatus': 'running'
+                    }).exec();
+                    console.log(findResult1);
+
+                    let findResult2 = await Booking.find({
+                        id: orderId,
+                        'teamWiseProductList.orderStatus': 'running late'
+                    }).exec();
+                    console.log(findResult2);
+
+                    if(!((findResult.length > 0) || (findResult1.length > 0) || (findResult2.length > 0))) {
+
+                        let updateResult = await Booking.update({id: orderId}, {
+                            status: status,
+                            column: column,
+                            statusDateTime: statusDateTime
+                        }).exec();
+
+                        if (updateResult.nModified > 0 || updateResult.n > 0) {
+                            await socketPublishMessage('SOD', sodPublishMessage);
+                            Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderSOD] : ' + JSON.stringify({result: true}), uniqueId);
+                        }else{
+                            Log.writeLog(Log.eLogLevel.error, '[updateBookingOrderSOD] : ' + JSON.stringify(updateResult), uniqueId);
+                            res.status(200)
+                                .json({result: false});
+                        }
+                    }
+
+                    await socketPublishMessage(teamMemberId, sodPublishMessage);
+                    Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderTeamMember] : ' + JSON.stringify({result: true}), uniqueId);
+                    res.status(200)
+                        .json({result: true});
+                }
+
+            }else{
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
+                res.status(200)
+                    .json({result: false});
+            }
+        }else{
+            res.status(200)
+                .json({result: false});
+        }
+
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
+        console.log(error);
+    }
+}
+
+
 export async function getTeamMemberBookingOrder(req, res) {
     let uniqueId = getGuid();
     try {
@@ -639,11 +791,11 @@ export async function getTeamMemberBookingOrder(req, res) {
         let responseObject = {
             runningOrder: [],
             runningLate: [],
-            recentOrders: []
+            recentOrders: [],
+            recentComplete:[]
         };
 
         let recentOrders = await Booking.find({
-            status: 'waiting',
             bookingEndTime: {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
@@ -651,7 +803,7 @@ export async function getTeamMemberBookingOrder(req, res) {
             teamWiseProductList: {
                 $elemMatch: {
                     id: teamMemberId,
-                    orderStatus: false
+                    orderStatus: 'waiting'
                 }
             }
         }, {basket: 0})
@@ -659,7 +811,6 @@ export async function getTeamMemberBookingOrder(req, res) {
             .exec();
 
         let runningOrders = await Booking.find({
-            status: 'process',
             bookingEndTime: {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
@@ -667,7 +818,7 @@ export async function getTeamMemberBookingOrder(req, res) {
             teamWiseProductList: {
                 $elemMatch: {
                     id: teamMemberId,
-                    orderStatus: false
+                    orderStatus: 'process'
                 }
             }
         }, {basket: 0})
@@ -675,7 +826,6 @@ export async function getTeamMemberBookingOrder(req, res) {
             .exec();
 
         let lateOrders = await Booking.find({
-            status: 'late',
             bookingEndTime: {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
@@ -683,16 +833,33 @@ export async function getTeamMemberBookingOrder(req, res) {
             teamWiseProductList: {
                 $elemMatch: {
                     id: teamMemberId,
-                    orderStatus: false
+                    orderStatus: 'late'
                 }
             }
         }, {basket: 0})
             .sort({bookingStartTime: 1})
             .exec();
 
+        let recentComplete = await Booking.find({
+            bookingEndTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: NormalDateEndDateTime.toUTCString()
+            },
+            teamWiseProductList: {
+                $elemMatch: {
+                    id: teamMemberId,
+                    orderStatus: 'finish'
+                }
+            }
+        }, {basket: 0})
+            .sort({bookingStartTime: 1})
+            .exec();
+
+
         responseObject.recentOrders = recentOrders;
         responseObject.runningLate = lateOrders;
         responseObject.runningOrder = runningOrders;
+        responseObject.recentComplete = recentComplete;
 
         Log.writeLog(Log.eLogLevel.info, '[getTeamMemberBookingOrder] : ' + JSON.stringify(responseObject), uniqueId);
         res.status(200)

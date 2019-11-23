@@ -27,62 +27,25 @@ setInterval(async () => {
             .exec();
 
         await Promise.all(_LateBooking.map(async (singleBooking) => {
+            let _singleLateBooking = _LateBooking.find((singleLateBooking) => singleLateBooking.id === singleBooking.id);
             let statusDateTime = currentDate.toUTCString();
-
             let updateResult = await Booking.update({id: singleBooking.id}, {
                 status: 'late',
                 column: 'running late',
                 statusDateTime: statusDateTime
-            })
-                .exec();
-
+            }).exec();
             if (updateResult) {
                 if (updateResult.nModified === 1 || updateResult.n === 1) {
-
-                    let _singleLateBooking = _LateBooking.find((singleLateBooking) => singleLateBooking.id === singleBooking.id);
-
                     let sodPublishMessage = {
                         message: 'running late',
                         data: {
-                            _id: _singleLateBooking._id,
                             id: _singleLateBooking.id,
-                            customer_id: _singleLateBooking.customer_id,
-                            customerName: _singleLateBooking.customerName,
-                            basket: _singleLateBooking.basket,
-                            //teamWiseProductList: _singleLateBooking.teamWiseProductList,
-                            total: _singleLateBooking.total,
-                            bookingDateTime: _singleLateBooking.bookingDateTime,
-                            bookingStartTime: _singleLateBooking.bookingStartTime,
-                            bookingEndTime: _singleLateBooking.bookingEndTime,
                             status: 'late',
                             column: 'running late',
                             statusDateTime: statusDateTime
                         }
                     };
                     await socketPublishMessage('SOD', sodPublishMessage);
-
-                    //ToDO send to TeamMember
-                    _singleLateBooking.teamWiseProductList.map(async (singleObject) => {
-                        let publishMessage = {
-                            message: 'running late',
-                            data: {
-                                _id: _singleLateBooking._id,
-                                id: _singleLateBooking.id,
-                                customer_id: _singleLateBooking.customer_id,
-                                customerName: _singleLateBooking.customerName,
-                                basket: singleObject.productItem,
-                                total: _singleLateBooking.total,
-                                bookingDateTime: _singleLateBooking.bookingDateTime,
-                                bookingStartTime: _singleLateBooking.bookingStartTime,
-                                bookingEndTime: _singleLateBooking.bookingEndTime,
-                                status: 'late',
-                                column: 'running late',
-                                statusDateTime: statusDateTime
-                            }
-                        };
-                        await socketPublishMessage(singleObject.id, publishMessage);
-                    });
-
 
                 } else {
                     Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(updateResult));
@@ -92,6 +55,36 @@ setInterval(async () => {
                 Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(updateResult,'contact to Developer')));
                 console.log('contact to developer');
             }
+
+            //Todo for the teamMember
+            _singleLateBooking.teamWiseProductList.map(async(data) => {
+
+                if(data.orderStatus === 'waiting') {
+
+                    //Todo update record
+                    await Booking.update({id: _singleLateBooking.id, 'teamWiseProductList.id': data.id}, {
+                        $set: {
+                            'teamWiseProductList.$.orderStatus': "late",
+                            'teamWiseProductList.$.column': "running late",
+                            'teamWiseProductList.$.statusDateTime': statusDateTime,
+                            'teamWiseProductList.$.startTime': statusDateTime
+                        }
+                    });
+
+                    let sodPublishMessage = {
+                        message: 'running late',
+                        data: {
+                            id: _singleLateBooking.id,
+                            status: 'late',
+                            column: 'running late',
+                            statusDateTime: statusDateTime
+                        }
+                    };
+                    await socketPublishMessage(data.id, sodPublishMessage);
+                }
+
+            });
+
 
         }));
 
