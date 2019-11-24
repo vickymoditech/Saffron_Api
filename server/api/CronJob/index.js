@@ -23,8 +23,7 @@ setInterval(async () => {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: currentDate.toUTCString()
             }
-        })
-            .exec();
+        }).exec();
 
         await Promise.all(_LateBooking.map(async (singleBooking) => {
             let _singleLateBooking = _LateBooking.find((singleLateBooking) => singleLateBooking.id === singleBooking.id);
@@ -67,7 +66,6 @@ setInterval(async () => {
                             'teamWiseProductList.$.orderStatus': "late",
                             'teamWiseProductList.$.column': "running late",
                             'teamWiseProductList.$.statusDateTime': statusDateTime,
-                            'teamWiseProductList.$.startTime': statusDateTime
                         }
                     });
 
@@ -84,8 +82,49 @@ setInterval(async () => {
                 }
 
             });
+        }));
 
+        // check running recent order
+        _LateBooking = await Booking.find({
+            status: 'process',
+            column: 'running',
+            bookingStartTime: {
+                $gte: NormalDateStartDateTime.toUTCString(),
+                $lte: currentDate.toUTCString()
+            }
+        }).exec();
 
+        await Promise.all(_LateBooking.map(async (singleBooking) => {
+            let _singleLateBooking = _LateBooking.find((singleLateBooking) => singleLateBooking.id === singleBooking.id);
+            let statusDateTime = currentDate.toUTCString();
+
+            //Todo for the teamMember
+            _singleLateBooking.teamWiseProductList.map(async(data) => {
+
+                if(data.orderStatus === 'waiting') {
+
+                    //Todo update record
+                    await Booking.update({id: _singleLateBooking.id, 'teamWiseProductList.id': data.id}, {
+                        $set: {
+                            'teamWiseProductList.$.orderStatus': "late",
+                            'teamWiseProductList.$.column': "running late",
+                            'teamWiseProductList.$.statusDateTime': statusDateTime,
+                        }
+                    });
+
+                    let sodPublishMessage = {
+                        message: 'running late',
+                        data: {
+                            id: _singleLateBooking.id,
+                            status: 'late',
+                            column: 'running late',
+                            statusDateTime: statusDateTime
+                        }
+                    };
+                    await socketPublishMessage(data.id, sodPublishMessage);
+                }
+
+            });
         }));
 
     } catch (error) {

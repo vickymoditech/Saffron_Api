@@ -249,7 +249,6 @@ export async function index(req, res) {
                                                 customer_id: InsertBooking.customer_id,
                                                 customerName: fullName,
                                                 basket: InsertBooking.basket,
-                                                //teamWiseProductList: BasketResponseGenerator.teamWiseProductList,
                                                 total: InsertBooking.total,
                                                 bookingDateTime: InsertBooking.bookingDateTime,
                                                 bookingStartTime: InsertBooking.bookingStartTime,
