@@ -94,9 +94,6 @@ export async function index(req, res) {
                 //check currentTime and booking selected time.
                 if (currentDate.getTime() < NormalEndDateTime.getTime()) {
 
-                    //Generate the Basket Response.
-                    let BasketResponseGenerator = await BasketGenerator(bookingProduct, uniqueId);
-
                     //get LastBooking order
                     let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
 
@@ -179,6 +176,9 @@ export async function index(req, res) {
 
                     if (!not_acceptAble) {
 
+                        //Generate the Basket Response.
+                        let BasketResponseGenerator = await BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId);
+
                         let BookingAdd = new Booking({
                             id: getGuid(),
                             customer_id: userId,
@@ -192,7 +192,7 @@ export async function index(req, res) {
                             column: 'recent orders',
                             customerName: fullName,
                             visited: false,
-                            statusDateTime: currentDate.toUTCString()
+                            statusDateTime: bookingStartDateTime
                         });
                         BookingAdd.save()
                             .then(async function (InsertBooking, err) {
@@ -328,7 +328,7 @@ export async function index(req, res) {
     }
 }
 
-async function BasketGenerator(bookingProduct, uniqueId) {
+async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
     try {
 
         let basketResponse = [];
@@ -353,9 +353,9 @@ async function BasketGenerator(bookingProduct, uniqueId) {
                         productList: [],
                         orderStatus: 'waiting',
                         column: 'recent orders',
-                        statusDateTime:"",
-                        startTime:"",
-                        endTime:""
+                        statusDateTime: bookingStartDateTime,
+                        startTime: '',
+                        endTime: ''
                     };
                     pushData.productList.push(productItem);
                     teamWiseProductList.push(pushData);
@@ -721,13 +721,13 @@ export async function updateBookingEmployeeOrder(req, res, next) {
 
                     let findResult1 = await Booking.find({
                         id: orderId,
-                        'teamWiseProductList.orderStatus': 'running'
+                        'teamWiseProductList.orderStatus': 'process'
                     }).exec();
                     console.log(findResult1);
 
                     let findResult2 = await Booking.find({
                         id: orderId,
-                        'teamWiseProductList.orderStatus': 'running late'
+                        'teamWiseProductList.orderStatus': 'late'
                     }).exec();
                     console.log(findResult2);
 
