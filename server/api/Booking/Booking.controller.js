@@ -716,19 +716,16 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'waiting'
                     }).exec();
-                    console.log(findResult);
 
                     let findResult1 = await Booking.find({
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'process'
                     }).exec();
-                    console.log(findResult1);
 
                     let findResult2 = await Booking.find({
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'late'
                     }).exec();
-                    console.log(findResult2);
 
                     if(!((findResult.length > 0) || (findResult1.length > 0) || (findResult2.length > 0))) {
 
