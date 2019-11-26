@@ -382,15 +382,16 @@ async function getProduct(productId, uniqueId, index = 0) {
             return singleProduct;
         } else {
             if (index === 0) {
+                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
+                setCache('productList', listProductList);
                 return getProduct(productId, uniqueId, 1);
             } else {
-                Log.writeLog(Log.eLogLevel.error, `[getTeam] : Product not found = ${productId}`, uniqueId);
+                Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
                 return null;
             }
         }
     } else {
-        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0})
-            .exec();
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
         setCache('productList', listProductList);
         return getProduct(productId, uniqueId, 1);
     }
@@ -437,6 +438,16 @@ async function getTeam(teamId, uniqueId, index = 0) {
             return singleTeam;
         } else {
             if (index === 0) {
+                teamList = await Oauth.find({role: 'employee'}, {
+                    _id: 0,
+                    __v: 0,
+                    description: 0,
+                    userId: 0,
+                    password: 0,
+                    role: 0,
+                    block: 0
+                }).exec();
+                setCache('teamList', teamList);
                 return getTeam(teamId, uniqueId, 1);
             } else {
                 Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
@@ -444,8 +455,15 @@ async function getTeam(teamId, uniqueId, index = 0) {
             }
         }
     } else {
-        teamList = await Oauth.find({role: {$in: ['admin', 'employee']}}, {_id: 0, __v: 0, description: 0})
-            .exec();
+        teamList = await Oauth.find({role: 'employee'}, {
+            _id: 0,
+            __v: 0,
+            description: 0,
+            userId: 0,
+            password: 0,
+            role: 0,
+            block: 0
+        }).exec();
         setCache('teamList', teamList);
         return getTeam(teamId, uniqueId, 1);
     }
@@ -766,7 +784,6 @@ export async function updateBookingEmployeeOrder(req, res, next) {
         console.log(error);
     }
 }
-
 
 export async function getTeamMemberBookingOrder(req, res) {
     let uniqueId = getGuid();
