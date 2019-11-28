@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import {registerEvents} from './BookingItems.events';
 
 var BookingItemsSchema = new mongoose.Schema({
     id: String,
@@ -9,5 +8,4 @@ var BookingItemsSchema = new mongoose.Schema({
     active: Boolean
 });
 
-registerEvents(BookingItemsSchema);
 export default mongoose.model('BookingItems', BookingItemsSchema);
