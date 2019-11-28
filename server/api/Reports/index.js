@@ -14,6 +14,9 @@ router.get('/getTotalBillablePrice', validations.validateAdminEmployeeAuthorizat
 //03 . GET /api/Reports/getOrderReport
 router.get('/getOrderStatusReport', validations.validateAdminEmployeeAuthorization, controller.getOrderStatusReport);
 
+//03 . GET /api/Reports/getTeamWiseOrderStatusReport
+router.get('/getTeamWiseOrderStatusReport', validations.validateAdminEmployeeAuthorization, controller.getTeamWiseOrderStatusReport);
+
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];

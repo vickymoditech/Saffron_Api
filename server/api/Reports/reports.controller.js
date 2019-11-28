@@ -84,7 +84,41 @@ export async function getOrderStatusReport(req, res, next) {
         response.push({status: 'finish', total: count});
         res.status(200).json(response);
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[getOrderReport] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
+        Log.writeLog(Log.eLogLevel.error, '[getOrderStatusReport] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
+        next(error);
+    }
+}
+
+export async function getTeamWiseOrderStatusReport(req, res, next) {
+    let uniqueId = getGuid();
+    try {
+        let response = [];
+
+        let getAllUser = await Oauth.find({role: 'employee'}, {
+            _id: 0,
+            __v: 0,
+            description: 0,
+            password: 0,
+            role: 0,
+            block: 0,
+        }).exec();
+
+        await Promise.all(getAllUser.map(async (data) => {
+            let tmp = {user: data, orderStatus: []};
+            let count = await Booking.count({"teamWiseProductList.id": data.id, "teamWiseProductList.orderStatus":"waiting"}).exec();
+            tmp.orderStatus.push({status: 'waiting', total: count});
+            count = await Booking.count({"teamWiseProductList.id": data.id, "teamWiseProductList.orderStatus":"process"}).exec();
+            tmp.orderStatus.push({status: 'process', total: count});
+            count = await Booking.count({"teamWiseProductList.id": data.id, "teamWiseProductList.orderStatus":"late"}).exec();
+            tmp.orderStatus.push({status: 'late', total: count});
+            count = await Booking.count({"teamWiseProductList.id": data.id, "teamWiseProductList.orderStatus":"finish"}).exec();
+            tmp.orderStatus.push({status: 'finish', total: count});
+            response.push(tmp);
+        }));
+        res.status(200).json(response);
+
+    } catch (error) {
+        Log.writeLog(Log.eLogLevel.error, '[getTeamWiseOrderStatusReport] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         next(error);
     }
 }
