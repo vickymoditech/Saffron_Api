@@ -36,7 +36,7 @@ export function index(req, res) {
 // Get userList based on Mobile Number
 export function index_contactNo(req, res) {
     let contactNo = '^' + req.params.contactNo + '.*';
-    return Oauth.find({userId: {$regex: contactNo}}, {_id: 0, __v: 0}).exec()
+    return Oauth.find({userId: {$regex: contactNo}, role: 'user'}, {_id: 0, __v: 0}).exec()
         .then(respondWithResult(res, 200))
         .catch(handleError(res));
 }
