@@ -6,16 +6,16 @@ import validate from 'express-validation';
 import {errorJsonResponse} from '../../config/commonHelper';
 
 //01 . GET /api/Reports/topUser
-router.get('/topUsers', validations.validateAdminEmployeeAuthorization, controller.getTopUser);
+router.get('/topUsers', validations.validateAuthorization, controller.getTopUser);
 
 //02 . GET /api/Reports/getTotalBillablePrice
-router.get('/getTotalBillablePrice', validations.validateAdminEmployeeAuthorization, controller.getTotalBillablePrice);
+router.get('/getTotalBillablePrice', validations.validateAuthorization, controller.getTotalBillablePrice);
 
 //03 . GET /api/Reports/getOrderReport
-router.get('/getOrderStatusReport', validations.validateAdminEmployeeAuthorization, controller.getOrderStatusReport);
+router.get('/getOrderStatusReport', validations.validateAuthorization, controller.getOrderStatusReport);
 
-//03 . GET /api/Reports/getTeamWiseOrderStatusReport
-router.get('/getTeamWiseOrderStatusReport', validations.validateAdminEmployeeAuthorization, controller.getTeamWiseOrderStatusReport);
+//04 . GET /api/Reports/getTeamWiseOrderStatusReport
+router.get('/getTeamWiseOrderStatusReport', validations.validateAuthorization, controller.getTeamWiseOrderStatusReport);
 
 
 router.use(function (err, req, res, next) {
