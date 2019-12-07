@@ -103,7 +103,7 @@ export async function index(req, res) {
                         let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata')
                             .format();
                         let addMinute = new Date(lastBookingDateTimeCalculation);
-                        if (currentDate.getTime() < addMinute.getTime()) {
+                        if (currentDate.getTime() < addMinute.getTime() && (_LastBooking.status !== "finish")) {
                             addMinute.setMinutes(addMinute.getMinutes() + totalTime);
                             //set arrivalTime
                             bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
