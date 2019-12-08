@@ -477,6 +477,8 @@ async function getTeamMemberProductList(product_id, teamMember_id, uniqueId, ind
             return singleTeamMemberProduct;
         } else {
             if (index === 0) {
+                teamMemberProductList = await TeamMemberProduct.find().exec();
+                setCache('teamMemberProductList', teamMemberProductList);
                 return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
             } else {
                 Log.writeLog(Log.eLogLevel.error, `[getTeamMemberProductList] : Record not found ProductId = ${product_id}  teamId = ${teamMember_id}`, uniqueId);
