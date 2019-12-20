@@ -13,7 +13,7 @@ router.post('/addTeamProduct', validations.validateAuthorization, validate(valid
 // 02. POST   /api/Teams/removeTeamService
 router.post('/removeTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamProduct);
 
-// 03. Get /api/Teams/teamMemberProductsList
+// 03. Get /api/Teams/TeamMemberProducts
 router.get('/:teamMemberId', validations.validateAuthorization, controller.teamMemberProductsList);
 
 router.use(function (err, req, res, next) {
