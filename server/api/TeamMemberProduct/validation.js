@@ -64,7 +64,15 @@ export default {
         }
     },
 
-    addRemoveTeamService: {
+    addTeamService: {
+        body: {
+            id: Joi.string().uuid().required(),
+            product_id: Joi.string().uuid().required(),
+            approxTime:Joi.number().integer().min(0).max(59),
+        }
+    },
+
+    RemoveTeamService: {
         body: {
             id: Joi.string().uuid().required(),
             product_id: Joi.string().uuid().required()

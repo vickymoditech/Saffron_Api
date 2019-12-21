@@ -9,9 +9,12 @@ export function addTeamProduct(req, res, next) {
 
             let id = req.body.id;
             let product_id = req.body.product_id;
+            let approxTime = req.body.approxTime;
+
             let TeamObject = {
                 id,
-                product_id
+                product_id,
+                approxTime
             };
 
             try {
@@ -29,7 +32,7 @@ export function addTeamProduct(req, res, next) {
                                             id: getGuid(),
                                             teamMember_id: TeamObject.id,
                                             product_id: TeamObject.product_id,
-                                            approxTime: 5,
+                                            approxTime: TeamObject.approxTime,
                                         });
 
                                         TeamMemberProductAdd.save()

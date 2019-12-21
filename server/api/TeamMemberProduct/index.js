@@ -8,10 +8,10 @@ import {errorJsonResponse} from '../../config/commonHelper';
 var router = express.Router();
 
 // 01. POST   /api/Teams/addTeamService
-router.post('/addTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.addTeamProduct);
+router.post('/addTeamProduct', validations.validateAuthorization, validate(validations.addTeamService), controller.addTeamProduct);
 
 // 02. POST   /api/Teams/removeTeamService
-router.post('/removeTeamProduct', validations.validateAuthorization, validate(validations.addRemoveTeamService), controller.removeTeamProduct);
+router.post('/removeTeamProduct', validations.validateAuthorization, validate(validations.RemoveTeamService), controller.removeTeamProduct);
 
 // 03. Get /api/Teams/TeamMemberProducts
 router.get('/:teamMemberId', validations.validateAuthorization, controller.teamMemberProductsList);
