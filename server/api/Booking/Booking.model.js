@@ -24,6 +24,9 @@ var BookingSchema = new mongoose.Schema({
     column: String,
     customerName: String,
     visited: Boolean,
+    paymentComplete: {type: Boolean, default: false},
+    paymentMemberId: {type: String, default: ""},
+    paymentMemberName: {type: String, default: ""},
     timeSlotFull: {type: Boolean, default: false},
     statusDateTime: Date
 });

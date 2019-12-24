@@ -573,67 +573,56 @@ export async function updateBookingOrder(req, res) {
     let uniqueId = getGuid();
     try {
 
-        let orderId = req.params.orderId;
+        const orderId = req.params.orderId;
+        const paymentMemberId = req.decoded.user.id;
+        const paymentMemberName = req.decoded.user.first_name + " " + req.decoded.user.last_name;
         let orderType = req.body.orderType;
 
-        let status = 'process';
-        let column = 'running';
-        let message = 'running';
+        if (orderType === 'payment finish') {
 
-        if (orderType === 'finish') {
-            status = 'finish';
-            column = 'finish';
-            message = 'finish';
-        }
+            const message = 'payment finish';
 
-        let currentTime = moment.tz('Asia/Kolkata')
-            .format();
-        let currentDate = new Date(currentTime);
-        let statusDateTime = currentDate.toUTCString();
+            const updateResult = await Booking.update({id: orderId}, {
+                paymentComplete: true,
+                paymentMemberId: paymentMemberId,
+                paymentMemberName: paymentMemberName
+            }).exec();
 
-        let updateResult = await Booking.update({id: orderId}, {
-            status: status,
-            column: column,
-            statusDateTime: statusDateTime
-        })
-            .exec();
+            if (updateResult) {
+                if (updateResult.nModified === 1 || updateResult.n === 1) {
+                    let sodPublishMessage = {
+                        message: message,
+                        data: {
+                            id: orderId,
+                            paymentComplete: true,
+                            paymentMemberId: paymentMemberId,
+                            paymentMemberName: paymentMemberName
+                        }
+                    };
+                    await socketPublishMessage('SOD', sodPublishMessage);
+                    let _singleLateBooking = await Booking.findOne({id: orderId}).exec();
 
-        if (updateResult) {
-            if (updateResult.nModified === 1 || updateResult.n === 1) {
+                    //TODO send to teamMember
+                    _singleLateBooking.teamWiseProductList.forEach(async (singleTeamWiseProductList) => {
+                        await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
+                    });
+                    Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
+                    res.status(200)
+                        .json({result: true});
 
-                let sodPublishMessage = {
-                    message: message,
-                    data: {
-                        id: orderId,
-                        orderType: orderType,
-                        status: status,
-                        column: column,
-                        statusDateTime: statusDateTime
-                    }
-                };
-                await socketPublishMessage('SOD', sodPublishMessage);
-
-                let _singleLateBooking = await Booking.findOne({id: orderId})
-                    .exec();
-
-                //TODO send to teamMember
-                _singleLateBooking.teamWiseProductList.forEach(async (singleTeamWiseProductList) => {
-                    await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
-                });
-
-                Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
-                res.status(200)
-                    .json({result: true});
-
+                } else {
+                    Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})), uniqueId);
+                    res.status(200)
+                        .json({result: false});
+                    console.log(updateResult);
+                }
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})), uniqueId);
-                res.status(200)
-                    .json({result: false});
-                console.log(updateResult);
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
+                console.log('contact to developer');
             }
         } else {
-            Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
-            console.log('contact to developer');
+            res.status(200)
+                .json({result: false})
         }
 
     } catch (error) {
