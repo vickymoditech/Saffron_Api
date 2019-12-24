@@ -627,7 +627,7 @@ export async function updateBookingOrder(req, res) {
                 console.log('contact to developer');
             }
         } else {
-            res.status(200)
+            res.status(400)
                 .json({result: false})
         }
 
