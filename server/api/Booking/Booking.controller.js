@@ -256,6 +256,9 @@ export async function index(req, res) {
                                                 status: InsertBooking.status,
                                                 column: InsertBooking.column,
                                                 statusDateTime: InsertBooking.statusDateTime,
+                                                paymentComplete: InsertBooking.paymentComplete,
+                                                paymentMemberId: InsertBooking.paymentMemberId,
+                                                paymentMemberName: InsertBooking.paymentMemberName
                                             }
                                         };
                                         await socketPublishMessage('SOD', publishMessage);
@@ -277,6 +280,9 @@ export async function index(req, res) {
                                                     status: InsertBooking.status,
                                                     column: InsertBooking.column,
                                                     statusDateTime: InsertBooking.statusDateTime,
+                                                    paymentComplete: InsertBooking.paymentComplete,
+                                                    paymentMemberId: InsertBooking.paymentMemberId,
+                                                    paymentMemberName: InsertBooking.paymentMemberName
                                                 }
                                             };
                                             await socketPublishMessage(singleObject.id, publishMessage);
