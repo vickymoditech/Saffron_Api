@@ -134,6 +134,7 @@
         "karma-webpack": "^2.0.3",
         "lazypipe": "^1.0.1",
         "mocha": "^3.0.2",
+        "natives": "^1.1.6",
         "ngx-bootstrap": "~1.6.3",
         "nodemon": "^1.17.5",
         "null-loader": "^0.1.1",

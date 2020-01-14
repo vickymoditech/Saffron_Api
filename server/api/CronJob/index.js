@@ -134,56 +134,62 @@ setInterval(async () => {
 
 }, 10000);
 
-setInterval(async () => {
-
+setInterval(async() => {
     let currentTime = moment.tz('Asia/Kolkata').format();
     let currentDate = new Date(currentTime);
     let hours = currentDate.getHours();
     let minutes = currentDate.getMinutes();
-
-    if (hours === 9 && minutes === 39) {
-        TimeSlot.find({}, {__v: 0, _id: 0}).then(async (timeSlotList, err) => {
-            if (!err) {
-
-                timeSlotList.forEach(async (singleTimeSlot) => {
-                    let split = singleTimeSlot.start_time.split(":");
-                    let NormalStartDateTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), split[0], split[1], 0);
-                    let BookingAdd = new Booking({
-                        id: getGuid(),
-                        customer_id: 10000000,
-                        basket: {},
-                        teamWiseProductList: {},
-                        total: 0,
-                        bookingDateTime: currentDate.toUTCString(),
-                        bookingStartTime: NormalStartDateTime.toUTCString(),
-                        bookingEndTime: NormalStartDateTime.toUTCString(),
-                        status: 'first Order',
-                        column: 'first Order',
-                        customerName: 'Developer Test',
-                        visited: false,
-                        statusDateTime: currentDate.toUTCString()
-                    });
-                    await BookingAdd.save().then(async function (InsertBooking, err) {
-                        if (!err) {
-                            if (InsertBooking) {
-                                Log.writeLog(Log.eLogLevel.info, '[setInterval] : ' + JSON.stringify("Save Successfully"));
-                            } else {
-                                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(InsertBooking,InsertBooking)));
-                            }
-                        } else {
-                            Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(),err.message.toString())));
-                        }
-                    });
-                });
-
-            } else {
-                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(),err.message.toString())));
-                console.log(err);
-            }
-        });
-    }
+    if (hours === 9 && minutes === 39)
+        await AddFirstOrder(currentDate);
 
 }, 60000);
 
+export async function AddFirstOrder(currentDate) {
+    TimeSlot.find({}, {__v: 0, _id: 0})
+        .then(async(timeSlotList, err) => {
+            if(!err) {
+                timeSlotList.forEach(async(singleTimeSlot) => {
+                    let split = singleTimeSlot.start_time.split(':');
+                    let NormalStartDateTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), split[0], split[1], 0);
+                    //Todo set Find query
+                    let FindTimeSlot = await Booking.findOne({bookingEndTime: NormalStartDateTime.toUTCString()});
+                    if(FindTimeSlot == null) {
+                        let BookingAdd = new Booking({
+                            id: getGuid(),
+                            customer_id: 10000000,
+                            basket: {},
+                            teamWiseProductList: {},
+                            total: 0,
+                            bookingDateTime: currentDate.toUTCString(),
+                            bookingStartTime: NormalStartDateTime.toUTCString(),
+                            bookingEndTime: NormalStartDateTime.toUTCString(),
+                            status: 'first Order',
+                            column: 'first Order',
+                            customerName: 'Developer Test',
+                            visited: false,
+                            statusDateTime: currentDate.toUTCString()
+                        });
+                        await BookingAdd.save()
+                            .then(async function(InsertBooking, err) {
+                                if(!err) {
+                                    if(InsertBooking) {
+                                        Log.writeLog(Log.eLogLevel.info, '[setInterval] : ' + JSON.stringify('Save Successfully'));
+                                    } else {
+                                        Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(InsertBooking, InsertBooking)));
+                                    }
+                                } else {
+                                    Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(), err.message.toString())));
+                                }
+                            });
+                    } else {
+                        console.log('order has been found in the db');
+                        Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + 'order has been found');
+                    }
+                });
+            } else {
+                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(), err.message.toString())));
+                console.log(err);
+            }
+        });
 
-
+}

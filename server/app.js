@@ -19,11 +19,13 @@ import expressConfig from './config/express';
 import registerRoutes from './routes';
 import seedDatabaseIfNeeded from './config/seed';
 import {socketOpen} from '../server/api/Socket';
+import {AddFirstOrder} from './api/CronJob/index';
 
 //const http2 = require('http2');
 let https = require('https');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
+let moment = require('moment-timezone');
 
 //todo Swagger
 //const swaggerDocument = require('./swagger.json');
@@ -70,9 +72,12 @@ function startServer() {
     new Log();
     Log.logInit();
 
-    app.angularFullstack = server.listen(config.port, config.ip, function () {
+    app.angularFullstack = server.listen(config.port, config.ip, async function() {
         console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
         Log.writeLog(Log.eLogLevel.info, 'Express server listening on ' + config.port + ', in ' + app.get('env') + ' mode');
+        let currentTime = moment.tz('Asia/Kolkata').format();
+        let currentDate = new Date(currentTime);
+        await AddFirstOrder(currentDate);
     });
 }
 
