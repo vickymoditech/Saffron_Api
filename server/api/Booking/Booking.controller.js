@@ -63,21 +63,21 @@ export async function index(req, res) {
 
         Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(requestObj), uniqueId);
 
-        if (currentDate.getHours() >= 7) {
+        if(currentDate.getHours() >= 7) {
 
             //Calculate the total time
-            await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+            await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
 
                 let TeamMemberProductSingle = await getTeamMemberProductList(singleBookingProduct.product_id, singleBookingProduct.teamMember_id, uniqueId);
                 let ProductItem = await getProduct(singleBookingProduct.product_id, uniqueId);
 
-                if (ProductItem !== null) {
+                if(ProductItem !== null) {
                     totalPrice += ProductItem.price;
                 } else {
                     allProductFound = false;
                 }
 
-                if (TeamMemberProductSingle !== null) {
+                if(TeamMemberProductSingle !== null) {
                     totalTime += TeamMemberProductSingle.approxTime;
                 } else {
                     allProductFound = false;
@@ -85,25 +85,26 @@ export async function index(req, res) {
 
             }));
 
-            if (!allProductFound) {
+            if(!allProductFound) {
                 let message = 'your order has been canceled, so please restart your application and place the booking again. we are sorry for this trouble.';
                 Log.writeLog(Log.eLogLevel.info, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(message, message)), uniqueId);
-                res.status(400).json(errorJsonResponse(message, message));
+                res.status(400)
+                    .json(errorJsonResponse(message, message));
             } else {
 
                 //check currentTime and booking selected time.
-                if (currentDate.getTime() < NormalEndDateTime.getTime()) {
+                if(currentDate.getTime() < NormalEndDateTime.getTime()) {
 
                     //get LastBooking order
                     let _LastBooking = await getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
 
-                    if (_LastBooking !== null && _LastBooking.visited === false) {
+                    if(_LastBooking !== null && _LastBooking.visited === false) {
 
                         //Get Booking LastTime
                         let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata')
                             .format();
                         let addMinute = new Date(lastBookingDateTimeCalculation);
-                        if (currentDate.getTime() < addMinute.getTime() && (_LastBooking.status !== "finish")) {
+                        if(currentDate.getTime() < addMinute.getTime() && (_LastBooking.status !== 'finish')) {
                             addMinute.setMinutes(addMinute.getMinutes() + totalTime);
                             //set arrivalTime
                             bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
@@ -119,14 +120,14 @@ export async function index(req, res) {
 
                         const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                         const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-                        if (!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
+                        if(!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
 
                             //check last order time and endTimeSlot time has less diff - 5
                             addMinute = new Date(lastBookingDateTimeCalculation);
                             const diffTimeActual = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                             const diffMinutesActual = Math.ceil(diffTimeActual / (1000 * 60));
 
-                            if (diffMinutesActual > 5) {
+                            if(diffMinutesActual > 5) {
 
                                 await Booking.findOneAndUpdate({
                                     visited: true,
@@ -152,7 +153,7 @@ export async function index(req, res) {
                                 }, {$set: {timeSlotFull: true}}, {sort: {bookingEndTime: -1}})
                                     .exec();
 
-                                throw new Error("your selected time slot has been full please select another time slot and please order again");
+                                throw new Error('your selected time slot has been full please select another time slot and please order again');
 
                             }
                         }
@@ -161,7 +162,7 @@ export async function index(req, res) {
 
                         //Never execute this part.
                         //first order set stating time and add minutes and generate end time
-                        if (currentDate.getTime() < NormalStartDateTime.getTime()) {
+                        if(currentDate.getTime() < NormalStartDateTime.getTime()) {
                             bookingStartDateTime = NormalStartDateTime.toUTCString();
                             let addMinute = NormalStartDateTime;
                             addMinute.setMinutes(NormalStartDateTime.getMinutes() + totalTime);
@@ -174,7 +175,7 @@ export async function index(req, res) {
                         }
                     }
 
-                    if (!not_acceptAble) {
+                    if(!not_acceptAble) {
 
                         //Generate the Basket Response.
                         let BasketResponseGenerator = await BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId);
@@ -195,9 +196,9 @@ export async function index(req, res) {
                             statusDateTime: bookingStartDateTime
                         });
                         BookingAdd.save()
-                            .then(async function (InsertBooking, err) {
-                                if (!err) {
-                                    if (InsertBooking) {
+                            .then(async function(InsertBooking, err) {
+                                if(!err) {
+                                    if(InsertBooking) {
                                         let responseObject = {
                                             id: InsertBooking.id,
                                             customer_id: InsertBooking.customer_id,
@@ -218,7 +219,7 @@ export async function index(req, res) {
                                         };
 
                                         //ProductItemStore into BookingItem Collection.
-                                        await Promise.all(bookingProduct.map(async (singleBookingProduct) => {
+                                        await Promise.all(bookingProduct.map(async(singleBookingProduct) => {
                                             let BookingItemsAdd = new BookingItems({
                                                 id: getGuid(),
                                                 booking_id: InsertBooking.id,
@@ -227,15 +228,17 @@ export async function index(req, res) {
                                                 active: true,
                                             });
                                             BookingItemsAdd.save()
-                                                .then(async function (InsertBookingItems, err) {
-                                                    if (!err) {
-                                                        if (!InsertBookingItems) {
+                                                .then(async function(InsertBookingItems, err) {
+                                                    if(!err) {
+                                                        if(!InsertBookingItems) {
                                                             Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Error in db BookingItems response')), uniqueId);
-                                                            res.status(400).json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
+                                                            res.status(400)
+                                                                .json(errorJsonResponse('Error in db BookingItems response', 'Error in db BookingItems response'));
                                                         }
                                                     } else {
                                                         Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(err.toString(), 'Contact to your Developer')), uniqueId);
-                                                        res.status(400).json(errorJsonResponse(err, 'Contact to your Developer'));
+                                                        res.status(400)
+                                                            .json(errorJsonResponse(err, 'Contact to your Developer'));
                                                     }
                                                 });
                                         }));
@@ -264,7 +267,7 @@ export async function index(req, res) {
                                         await socketPublishMessage('SOD', publishMessage);
 
                                         //ToDO send to TeamMember
-                                        BasketResponseGenerator.teamWiseProductList.map(async (singleObject) => {
+                                        BasketResponseGenerator.teamWiseProductList.map(async(singleObject) => {
                                             let publishMessage = {
                                                 message: 'new order',
                                                 data: {
@@ -292,7 +295,8 @@ export async function index(req, res) {
                                             totalTime,
                                             orderPlace: responseObject
                                         }), uniqueId);
-                                        res.status(200).json({totalTime, orderPlace: responseObject});
+                                        res.status(200)
+                                            .json({totalTime, orderPlace: responseObject});
 
                                     } else {
                                         Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(InsertBooking, 'Error in db response')), uniqueId);
@@ -326,7 +330,7 @@ export async function index(req, res) {
             res.status(400)
                 .json(errorJsonResponse(message, message));
         }
-    } catch (error) {
+    } catch(error) {
         Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         res.status(400)
             .json(errorJsonResponse(error.message.toString(), error.message.toString()));
@@ -339,12 +343,12 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
         let basketResponse = [];
         let teamWiseProductList = [];
 
-        await Promise.all(bookingProduct.map(async (bookingItem) => {
+        await Promise.all(bookingProduct.map(async(bookingItem) => {
 
             let productItem = await getProduct(bookingItem.product_id, uniqueId);
             let productTeam = await getTeam(bookingItem.teamMember_id, uniqueId);
 
-            if (productItem && productTeam) {
+            if(productItem && productTeam) {
                 let object = {
                     productItem,
                     productTeam
@@ -352,7 +356,7 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
                 basketResponse.push(object);
 
                 let teamMember = teamWiseProductList.find((teamMember) => teamMember.id === productTeam.id);
-                if (!teamMember) {
+                if(!teamMember) {
                     let pushData = {
                         id: productTeam.id,
                         productList: [],
@@ -367,39 +371,28 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
                 } else {
                     teamMember.productList.push(productItem);
                 }
-            } else
-                throw new Error("you have passed wrong id for basket generation");
+            } else {
+                throw new Error('you have passed wrong id for basket generation');
+            }
         }));
 
         return {basketResponse, teamWiseProductList};
 
-    } catch (error) {
+    } catch(error) {
         console.log(error);
         Log.writeLog(Log.eLogLevel.error, '[BasketGenerator] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
-        throw new Error("you have passed wrong id for basket generation");
+        throw new Error('you have passed wrong id for basket generation');
     }
 }
 
-async function getProduct(productId, uniqueId, index = 0) {
-    let listProductList = getCache('productList');
-    if (listProductList !== null) {
-        let singleProduct = listProductList.find((product) => product.id === productId);
-        if (singleProduct) {
-            return singleProduct;
-        } else {
-            if (index === 0) {
-                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
-                setCache('productList', listProductList);
-                return getProduct(productId, uniqueId, 1);
-            } else {
-                Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
-                return null;
-            }
-        }
+async function getProduct(productId, uniqueId) {
+    let singleProduct = await Product.findOne({id: productId}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0})
+        .exec();
+    if(singleProduct) {
+        return singleProduct;
     } else {
-        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
-        setCache('productList', listProductList);
-        return getProduct(productId, uniqueId, 1);
+        Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
+        return null;
     }
 }
 
@@ -412,7 +405,7 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
         .exec();
 
     //Todo should not be received null value
-    if (_LastBookingOrder === null) {
+    if(_LastBookingOrder === null) {
         Log.writeLog(Log.eLogLevel.error, '[getLastBookingOrder] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
 
         let _LastBookingOrderAgain = await Booking.findOneAndUpdate({
@@ -421,13 +414,13 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
         }, {sort: {bookingEndTime: -1}})
             .exec();
 
-        if (_LastBookingOrderAgain) {
-            throw new Error("your selected time slot has been full please select another time slot and please order again");
+        if(_LastBookingOrderAgain) {
+            throw new Error('your selected time slot has been full please select another time slot and please order again');
         } else {
             return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
         }
 
-    } else if (_LastBookingOrder.visited === true) {
+    } else if(_LastBookingOrder.visited === true) {
         Log.writeLog(Log.eLogLevel.info, '[getLastBookingOrder-true] : ' + JSON.stringify(errorJsonResponse(_LastBookingOrder, _LastBookingOrder)), uniqueId);
         return getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqueId);
     } else {
@@ -436,54 +429,35 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
     }
 }
 
-async function getTeam(teamId, uniqueId, index = 0) {
-    let teamList = getCache('teamList');
-    if (teamList !== null) {
-        let singleTeam = teamList.find((team) => team.id === teamId);
-        if (singleTeam) {
-            return singleTeam;
-        } else {
-            if (index === 0) {
-                teamList = await Oauth.find({role: 'employee'}, {
-                    _id: 0,
-                    __v: 0,
-                    description: 0,
-                    userId: 0,
-                    password: 0,
-                    role: 0,
-                    block: 0
-                }).exec();
-                setCache('teamList', teamList);
-                return getTeam(teamId, uniqueId, 1);
-            } else {
-                Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
-                return null;
-            }
-        }
+async function getTeam(teamId, uniqueId) {
+    let singleTeam = await Oauth.findOne({role: 'employee', id: teamId}, {
+        _id: 0,
+        __v: 0,
+        description: 0,
+        userId: 0,
+        password: 0,
+        role: 0,
+        block: 0
+    })
+        .exec();
+    if(singleTeam) {
+        return singleTeam;
     } else {
-        teamList = await Oauth.find({role: 'employee'}, {
-            _id: 0,
-            __v: 0,
-            description: 0,
-            userId: 0,
-            password: 0,
-            role: 0,
-            block: 0
-        }).exec();
-        setCache('teamList', teamList);
-        return getTeam(teamId, uniqueId, 1);
+        Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
+        return null;
     }
 }
 
 async function getTeamMemberProductList(product_id, teamMember_id, uniqueId, index = 0) {
     let teamMemberProductList = getCache('teamMemberProductList');
-    if (teamMemberProductList !== null) {
+    if(teamMemberProductList !== null) {
         let singleTeamMemberProduct = teamMemberProductList.find((teamMemberProduct) => teamMemberProduct.product_id === product_id && teamMemberProduct.teamMember_id === teamMember_id);
-        if (singleTeamMemberProduct) {
+        if(singleTeamMemberProduct) {
             return singleTeamMemberProduct;
         } else {
-            if (index === 0) {
-                teamMemberProductList = await TeamMemberProduct.find().exec();
+            if(index === 0) {
+                teamMemberProductList = await TeamMemberProduct.find()
+                    .exec();
                 setCache('teamMemberProductList', teamMemberProductList);
                 return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
             } else {
@@ -492,7 +466,8 @@ async function getTeamMemberProductList(product_id, teamMember_id, uniqueId, ind
             }
         }
     } else {
-        teamMemberProductList = await TeamMemberProduct.find().exec();
+        teamMemberProductList = await TeamMemberProduct.find()
+            .exec();
         setCache('teamMemberProductList', teamMemberProductList);
         return getTeamMemberProductList(product_id, teamMember_id, uniqueId, 1);
     }
@@ -569,7 +544,7 @@ export async function getBookingOrder(req, res) {
         res.status(200)
             .json(responseObject);
 
-    } catch (error) {
+    } catch(error) {
         Log.writeLog(Log.eLogLevel.error, '[getBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
@@ -581,10 +556,10 @@ export async function updateBookingOrder(req, res) {
 
         const orderId = req.params.orderId;
         const paymentMemberId = req.decoded.user.id;
-        const paymentMemberName = req.decoded.user.first_name + " " + req.decoded.user.last_name;
+        const paymentMemberName = req.decoded.user.first_name + ' ' + req.decoded.user.last_name;
         let orderType = req.body.orderType;
 
-        if (orderType === 'payment finish') {
+        if(orderType === 'payment finish') {
 
             const message = 'payment finish';
 
@@ -592,10 +567,11 @@ export async function updateBookingOrder(req, res) {
                 paymentComplete: true,
                 paymentMemberId: paymentMemberId,
                 paymentMemberName: paymentMemberName
-            }).exec();
+            })
+                .exec();
 
-            if (updateResult) {
-                if (updateResult.nModified === 1 || updateResult.n === 1) {
+            if(updateResult) {
+                if(updateResult.nModified === 1 || updateResult.n === 1) {
                     let sodPublishMessage = {
                         message: message,
                         data: {
@@ -606,10 +582,11 @@ export async function updateBookingOrder(req, res) {
                         }
                     };
                     await socketPublishMessage('SOD', sodPublishMessage);
-                    let _singleLateBooking = await Booking.findOne({id: orderId}).exec();
+                    let _singleLateBooking = await Booking.findOne({id: orderId})
+                        .exec();
 
                     //TODO send to teamMember
-                    _singleLateBooking.teamWiseProductList.forEach(async (singleTeamWiseProductList) => {
+                    _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
                         await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
                     });
                     Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
@@ -623,15 +600,15 @@ export async function updateBookingOrder(req, res) {
                     console.log(updateResult);
                 }
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse('contact to developer', {result: false})), uniqueId);
                 console.log('contact to developer');
             }
         } else {
             res.status(400)
-                .json({result: false})
+                .json({result: false});
         }
 
-    } catch (error) {
+    } catch(error) {
         Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
@@ -654,7 +631,7 @@ export async function updateBookingEmployeeOrder(req, res, next) {
         let column = 'running';
         let message = 'running';
 
-        if (orderType === 'finish') {
+        if(orderType === 'finish') {
             status = 'finish';
             column = 'finish';
             message = 'finish';
@@ -663,7 +640,7 @@ export async function updateBookingEmployeeOrder(req, res, next) {
 
         //Todo update innerData for TeamMember orderstatus,startTime,orderstatusTime
         let updateResultTeamMember = null;
-        if(orderType === 'finish'){
+        if(orderType === 'finish') {
             updateResultTeamMember = await Booking.update({id: orderId, 'teamWiseProductList.id': teamMemberId}, {
                 $set: {
                     'teamWiseProductList.$.orderStatus': status,
@@ -672,7 +649,7 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                     'teamWiseProductList.$.endTime': statusDateTime,
                 }
             });
-        }else{
+        } else {
             updateResultTeamMember = await Booking.update({id: orderId, 'teamWiseProductList.id': teamMemberId}, {
                 $set: {
                     'teamWiseProductList.$.orderStatus': status,
@@ -685,14 +662,15 @@ export async function updateBookingEmployeeOrder(req, res, next) {
 
         if(updateResultTeamMember) {
 
-            if (updateResultTeamMember.nModified > 0 || updateResultTeamMember.n > 0) {
+            if(updateResultTeamMember.nModified > 0 || updateResultTeamMember.n > 0) {
 
-                if(orderType !== 'finish'){
+                if(orderType !== 'finish') {
                     let updateResult = await Booking.update({id: orderId, column: {$ne: column}}, {
                         status: status,
                         column: column,
                         statusDateTime: statusDateTime
-                    }).exec();
+                    })
+                        .exec();
 
                     let sodPublishMessage = {
                         message: message,
@@ -705,7 +683,7 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                         }
                     };
 
-                    if (updateResult.nModified > 0 || updateResult.n > 0) {
+                    if(updateResult.nModified > 0 || updateResult.n > 0) {
                         await socketPublishMessage('SOD', sodPublishMessage);
                         Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderSOD] : ' + JSON.stringify({result: true}), uniqueId);
                     }
@@ -714,7 +692,7 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                     Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderTeamMember] : ' + JSON.stringify({result: true}), uniqueId);
                     res.status(200)
                         .json({result: true});
-                }else{
+                } else {
 
                     let sodPublishMessage = {
                         message: message,
@@ -730,17 +708,20 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                     let findResult = await Booking.find({
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'waiting'
-                    }).exec();
+                    })
+                        .exec();
 
                     let findResult1 = await Booking.find({
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'process'
-                    }).exec();
+                    })
+                        .exec();
 
                     let findResult2 = await Booking.find({
                         id: orderId,
                         'teamWiseProductList.orderStatus': 'late'
-                    }).exec();
+                    })
+                        .exec();
 
                     if(!((findResult.length > 0) || (findResult1.length > 0) || (findResult2.length > 0))) {
 
@@ -748,12 +729,13 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                             status: status,
                             column: column,
                             statusDateTime: statusDateTime
-                        }).exec();
+                        })
+                            .exec();
 
-                        if (updateResult.nModified > 0 || updateResult.n > 0) {
+                        if(updateResult.nModified > 0 || updateResult.n > 0) {
                             await socketPublishMessage('SOD', sodPublishMessage);
                             Log.writeLog(Log.eLogLevel.info, '[updateBookingOrderSOD] : ' + JSON.stringify({result: true}), uniqueId);
-                        }else{
+                        } else {
                             Log.writeLog(Log.eLogLevel.error, '[updateBookingOrderSOD] : ' + JSON.stringify(updateResult), uniqueId);
                             res.status(200)
                                 .json({result: false});
@@ -766,17 +748,17 @@ export async function updateBookingEmployeeOrder(req, res, next) {
                         .json({result: true});
                 }
 
-            }else{
-                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse("contact to developer", {result: false})), uniqueId);
+            } else {
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse('contact to developer', {result: false})), uniqueId);
                 res.status(200)
                     .json({result: false});
             }
-        }else{
+        } else {
             res.status(200)
                 .json({result: false});
         }
 
-    } catch (error) {
+    } catch(error) {
         Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }
@@ -802,7 +784,7 @@ export async function getTeamMemberBookingOrder(req, res) {
             runningOrder: [],
             runningLate: [],
             recentOrders: [],
-            recentComplete:[]
+            recentComplete: []
         };
 
         let recentOrders = await Booking.find({
@@ -876,7 +858,7 @@ export async function getTeamMemberBookingOrder(req, res) {
             .json(responseObject);
 
 
-    } catch (error) {
+    } catch(error) {
         Log.writeLog(Log.eLogLevel.error, '[getTeamMemberBookingOrder] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);
         console.log(error);
     }

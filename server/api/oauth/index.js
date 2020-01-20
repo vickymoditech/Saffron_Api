@@ -11,6 +11,10 @@ var router = express.Router();
 // 01. GET   /api/oauth/
 router.get('/', validations.validateAuthorization, controller.index);
 
+//07 .  Get /api/oauth/changeUserBlockStatus
+router.get('/getTodayOrderList', validations.validateAuthorizationUser, controller.getTodayOrderList);
+
+//03 .  Get /api/oauth/:contactNumber
 router.get('/:contactNo', validations.validateAuthorization, controller.index_contactNo);
 
 // 02. POST   /api/oauth/login
@@ -25,9 +29,10 @@ router.delete('/:userId', validations.validateAuthorization, validate(validation
 //05 . UPDATE /api/oauth/
 router.put('/', validations.validateAuthorizationUser, validate(validations.updateUser), controller.updateUser);
 
-//05 .  POST /api/oauth/userAvatar
+//06 .  POST /api/oauth/userAvatar
 router.post('/userAvatar', validations.validateAuthorizationUser, controller.uploadUserAvatar);
 
+//07 .  POST /api/oauth/changeUserBlockStatus
 router.post('/changeUserBlockStatus', validations.validateAuthorization, controller.changeUserBlockStatus);
 
 
