@@ -385,14 +385,26 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
     }
 }
 
-async function getProduct(productId, uniqueId) {
-    let singleProduct = await Product.findOne({id: productId}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0})
-        .exec();
-    if(singleProduct) {
-        return singleProduct;
+async function getProduct(productId, uniqueId, index = 0) {
+    let listProductList = getCache('productList');
+    if (listProductList !== null) {
+        let singleProduct = listProductList.find((product) => product.id === productId);
+        if (singleProduct) {
+            return singleProduct;
+        } else {
+            if (index === 0) {
+                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
+                setCache('productList', listProductList);
+                return getProduct(productId, uniqueId, 1);
+            } else {
+                Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
+                return null;
+            }
+        }
     } else {
-        Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
-        return null;
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
+        setCache('productList', listProductList);
+        return getProduct(productId, uniqueId, 1);
     }
 }
 
@@ -429,22 +441,42 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
     }
 }
 
-async function getTeam(teamId, uniqueId) {
-    let singleTeam = await Oauth.findOne({role: 'employee', id: teamId}, {
-        _id: 0,
-        __v: 0,
-        description: 0,
-        userId: 0,
-        password: 0,
-        role: 0,
-        block: 0
-    })
-        .exec();
-    if(singleTeam) {
-        return singleTeam;
+async function getTeam(teamId, uniqueId, index = 0) {
+    let teamList = getCache('teamLists');
+    if (teamList !== null) {
+        let singleTeam = teamList.find((team) => team.id === teamId);
+        if (singleTeam) {
+            return singleTeam;
+        } else {
+            if (index === 0) {
+                teamList = await Oauth.find({role: 'employee'}, {
+                    _id: 0,
+                    __v: 0,
+                    description: 0,
+                    userId: 0,
+                    password: 0,
+                    role: 0,
+                    block: 0
+                }).exec();
+                setCache('teamLists', teamList);
+                return getTeam(teamId, uniqueId, 1);
+            } else {
+                Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
+                return null;
+            }
+        }
     } else {
-        Log.writeLog(Log.eLogLevel.error, `[getTeam] : TeamMember not found = ${teamId}`, uniqueId);
-        return null;
+        teamList = await Oauth.find({role: 'employee'}, {
+            _id: 0,
+            __v: 0,
+            description: 0,
+            userId: 0,
+            password: 0,
+            role: 0,
+            block: 0
+        }).exec();
+        setCache('teamLists', teamList);
+        return getTeam(teamId, uniqueId, 1);
     }
 }
 

@@ -1,37 +1,21 @@
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
 import Oauth from '../oauth/oauth.model';
-import {errorJsonResponse, getGuid, UserAvatarImageUploadLocation} from '../../config/commonHelper';
-
+import {errorJsonResponse, getCache, getGuid, setCache, UserAvatarImageUploadLocation} from '../../config/commonHelper';
 var formidable = require('formidable');
 var fs = require('fs');
 var fs_extra = require('fs-extra');
 const isImage = require('is-image');
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode)
-                .json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode)
-            .send(err);
-    };
-}
-
 // Gets a list of Teams
-export function index(req, res) {
-    return Oauth.find({role: {$in: ['admin', 'employee']}}, {_id: 0, __v: 0, password: 0})
-        .exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+export async function index(req, res) {
+    let teamList = getCache('teamList');
+    if(teamList !== null) {
+        res.status(200).json(teamList);
+    } else {
+        teamList = await Oauth.find({role: {$in: ['employee']}}, {_id: 0, __v: 0, password: 0}).exec();
+        setCache('teamList', teamList);
+        res.status(200).json(teamList);
+    }
 }
 
 export function deleteTeam(req, res, next) {
@@ -47,6 +31,7 @@ export function deleteTeam(req, res, next) {
                             if (!err) {
                                 if (DeleteTeam) {
                                     if (DeleteTeam.result.n === 1) {
+                                        setCache('teamList', null);
                                         res.status(200)
                                             .json({id: teamId, result: 'Deleted Successfully'});
                                     } else {
@@ -130,10 +115,11 @@ export function addNewTeam(req, res, next) {
                                             .then(function (RegistrationSuccess, err) {
                                                 if (!err) {
                                                     if (RegistrationSuccess) {
+                                                        setCache('teamList', null);
                                                         res.status(200)
                                                             .json({
                                                                 data: RegistrationSuccess,
-                                                                result: "Registration Successfully"
+                                                                result: "Registration Successfully for Team Member"
                                                             });
                                                     } else {
                                                         res.status(400)
@@ -231,6 +217,7 @@ export function updateTeam(req, res, next) {
                                         if (!err) {
                                             if (UpdateTeam) {
                                                 if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
+                                                    setCache('teamList', null);
                                                     res.status(200)
                                                         .json({
                                                             data: TeamObject,
@@ -277,6 +264,7 @@ export function updateTeam(req, res, next) {
                         if (!err) {
                             if (UpdateTeam) {
                                 if (UpdateTeam.nModified === 1 || UpdateTeam.n === 1) {
+                                    setCache('teamList', null);
                                     res.status(200)
                                         .json({
                                             data: TeamObject,

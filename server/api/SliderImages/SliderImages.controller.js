@@ -1,39 +1,26 @@
 import SliderImages from './SliderImages.model';
-import {errorJsonResponse, SliderImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, SliderImageUploadLocation, getGuid, setCache, getCache} from '../../config/commonHelper';
 
 var formidable = require('formidable');
 var fs = require('fs');
 var fs_extra = require('fs-extra');
 const isImage = require('is-image');
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode).json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode).send(err);
-    };
-}
-
-// Gets a list of SliderImagess
-export function index(req, res) {
-    return SliderImages.find().exec()
-        .then(respondWithResult(res))
-        .catch(handleError(res));
+// Gets a list of SliderImages
+export async function index(req, res) {
+    let SliderList = getCache('sliderLists');
+    if(SliderList !== null) {
+        res.status(200).json(SliderList);
+    } else {
+        SliderList = await SliderImages.find().exec();
+        setCache('sliderLists', SliderList);
+        res.status(200).json(SliderList);
+    }
 }
 
 // Add New SliderImagess
 export function addNewSliderImage(req, res, next) {
     try {
-
         let form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             if (Object.keys(files).length > 0 && isImage(files.filetoupload.name)) {
@@ -60,6 +47,7 @@ export function addNewSliderImage(req, res, next) {
                                     .then(function (InsertSlider, err) {
                                         if (!err) {
                                             if (InsertSlider) {
+                                                setCache('sliderLists',null);
                                                 res.status(200)
                                                     .json({
                                                         data: InsertSlider,
@@ -97,6 +85,7 @@ export function deleteSliderImage(req, res) {
                 if (!err) {
                     if (DeleteSliderImage) {
                         if (DeleteSliderImage.result.n === 1) {
+                            setCache('sliderLists',null);
                             res.status(200)
                                 .json({id: sliderImageId, result: "Deleted Successfully"});
                         } else {

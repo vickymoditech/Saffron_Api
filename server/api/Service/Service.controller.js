@@ -1,5 +1,5 @@
 import Service from './Service.model';
-import {errorJsonResponse, serviceImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, serviceImageUploadLocation, getGuid, setCache, getCache} from '../../config/commonHelper';
 import Gallery from '../Gallery/Gallery.model';
 import Product from '../Product/Product.model';
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
@@ -13,31 +13,16 @@ var fs = require('fs');
 var fs_extra = require('fs-extra');
 const isImage = require('is-image');
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            // res.writeHead(200, {'Content-Type': 'text/plain'});
-            // res.end('Hello World\n');
-            // return res;
-            return res.status(statusCode).json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode).send(err);
-    };
-}
-
 // Gets a list of Services
-export function index(req, res) {
-    return Service.find({}, {_id: 0, __v: 0}).exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+export async function index(req, res) {
+    let serviceList = getCache('serviceList');
+    if(serviceList !== null) {
+        res.status(200).json(serviceList);
+    } else {
+        serviceList = await Service.find({}, {_id: 0, __v: 0}).exec();
+        setCache('serviceList', serviceList);
+        res.status(200).json(serviceList);
+    }
 }
 
 export function deleteService(req, res, next) {
@@ -74,6 +59,7 @@ export function deleteService(req, res, next) {
                                                                         if (!err) {
                                                                             if (DeleteService) {
                                                                                 if (DeleteService.result.n === 1) {
+                                                                                    setCache('serviceList', null);
                                                                                     res.status(200)
                                                                                         .json({
                                                                                             id: serviceId,
@@ -152,6 +138,7 @@ export function addNewService(req, res, next) {
                                     .then(function (InsertService, err) {
                                         if (!err) {
                                             if (InsertService) {
+                                                setCache('serviceList', null);
                                                 res.status(200)
                                                     .json({data: InsertService, result: "Save Successfully"});
                                             } else {
@@ -238,6 +225,7 @@ export function updateService(req, res, next) {
                                         if (!err) {
                                             if (UpdateService) {
                                                 if (UpdateService.nModified === 1 || UpdateService.n === 1) {
+                                                    setCache('serviceList', null);
                                                     res.status(200)
                                                         .json({
                                                             data: serviceObject,
@@ -283,6 +271,7 @@ export function updateService(req, res, next) {
                         if (!err) {
                             if (UpdateService) {
                                 if (UpdateService.nModified === 1 || UpdateService.n === 1) {
+                                    setCache('serviceList', null);
                                     res.status(200)
                                         .json({
                                             data: serviceObject,

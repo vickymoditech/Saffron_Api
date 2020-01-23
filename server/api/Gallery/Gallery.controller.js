@@ -1,6 +1,7 @@
 import Gallery from './Gallery.model';
 import Service from '../Service/Service.model';
-import {errorJsonResponse, GalleryImageUploadLocation, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, GalleryImageUploadLocation, getCache, getGuid, setCache} from '../../config/commonHelper';
+import Log from '../../config/Log';
 
 var formidable = require('formidable');
 var fs = require('fs');
@@ -8,36 +9,48 @@ var fs_extra = require('fs-extra');
 const isImage = require('is-image');
 
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode).json(entity);
-        }
-        return null;
-    };
-}
-
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode).send(err);
-    };
-}
-
 // Gets a list of Gallery
-export function index(req, res) {
-    return Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).limit(8).exec()
-        .then(respondWithResult(res, 200))
-        .catch(handleError(res));
+export async function index(req, res) {
+    let GalleryList = getCache('galleryLists');
+    if(GalleryList !== null) {
+        res.status(200).json(GalleryList);
+    } else {
+        GalleryList = await Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).limit(8).exec();
+        setCache('galleryLists', GalleryList);
+        res.status(200).json(GalleryList);
+    }
 }
+
+async function getGalleryList(service_id, uniqueId, index = 0) {
+    let GalleryList = getCache('galleryList');
+    if(GalleryList !== null) {
+        let singleServiceGalleryList = GalleryList.filter((data) => data.service_id === service_id);
+        if(singleServiceGalleryList) {
+            return singleServiceGalleryList;
+        } else {
+            if(index === 0) {
+                GalleryList = Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec();
+                setCache('galleryList', GalleryList);
+                return getGalleryList(service_id,uniqueId, 1);
+            } else {
+                Log.writeLog(Log.eLogLevel.error, `[getGalleryList] : Record not found Service_Id = ${service_id}`, uniqueId);
+                return null;
+            }
+        }
+    } else {
+        GalleryList = await Gallery.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec();
+        setCache('galleryList', GalleryList);
+        return getGalleryList(service_id,uniqueId, 1);
+    }
+}
+
 
 // Gets all the Gallery
-export function allGallery(req, res) {
-    if (req.params.serviceId) {
-        return Gallery.find({service_id: req.params.serviceId}, {_id: 0, __v: 0}).sort({date: -1}).exec()
-            .then(respondWithResult(res, 200))
-            .catch(handleError(res));
+export async function allGallery(req, res) {
+    if(req.params.serviceId) {
+        const uniqueId = getGuid();
+        const galleryList = await getGalleryList(req.params.serviceId, uniqueId);
+        res.status(200).json(galleryList);
     }
 }
 
@@ -50,6 +63,8 @@ export function deleteGallery(req, res) {
                 if (!err) {
                     if (DeleteGallery) {
                         if (DeleteGallery.result.n === 1) {
+                            setCache('galleryList', null);
+                            setCache('galleryLists', null);
                             res.status(200)
                                 .json({id: galleryId, result: "Deleted Successfully"});
                         } else {
@@ -112,6 +127,8 @@ export function addNewGallery(req, res, next) {
                                             .then(function (InsertService, err) {
                                                 if (!err) {
                                                     if (InsertService) {
+                                                        setCache('galleryList', null);
+                                                        setCache('galleryLists', null);
                                                         res.status(200)
                                                             .json({
                                                                 data: InsertService,
@@ -196,7 +213,8 @@ export function updateGallery(req, res, next) {
                                                 if (!err) {
                                                     if (UpdateGallery) {
                                                         if (UpdateGallery.nModified === 1 || UpdateGallery.n === 1) {
-
+                                                            setCache('galleryList', null);
+                                                            setCache('galleryLists', null);
                                                             res.status(200)
                                                                 .json({
                                                                     data: response,
@@ -255,6 +273,8 @@ export function updateGallery(req, res, next) {
                                 if (!err) {
                                     if (UpdateGallery) {
                                         if (UpdateGallery.nModified === 1 || UpdateGallery.n === 1) {
+                                            setCache('galleryList', null);
+                                            setCache('galleryLists', null);
                                             res.status(200)
                                                 .json({
                                                     data: response,

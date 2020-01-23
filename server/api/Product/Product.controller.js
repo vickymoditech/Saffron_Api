@@ -1,11 +1,7 @@
 import Product from './Product.model';
 import Service from '../Service/Service.model';
 import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
-import _ from 'lodash';
-import {errorJsonResponse, ProductImageUploadLocation, getGuid} from '../../config/commonHelper';
-
-var waterfall = require('async-waterfall');
-var async = require('async');
+import {errorJsonResponse, ProductImageUploadLocation, getGuid, setCache, getCache} from '../../config/commonHelper';
 var formidable = require('formidable');
 var fs = require('fs');
 var fs_extra = require('fs-extra');
@@ -30,49 +26,58 @@ function handleError(res, statusCode) {
 
 // Home Product Page
 export async function index(req, res) {
-    return Service.aggregate({"$unwind": "$id"},
-        {
-            "$lookup": {
-                "from": "products",
-                "localField": "id",
-                "foreignField": "service_id",
-                "as": "itemsObjects"
-            }
-        },
-        {
-            "$group": {
-                "_id": "$_id",
-                "service_id": {"$first": "$id"},
-                "image_url": {"$first": "$image_url"},
-                "title": {"$first": "$title"},
-                "description": {"$first": "$description"},
-                "date": {"$first": "$date"},
-                "products": {"$first": "$itemsObjects"}
-            }
-        },
-        {$sort: {date: 1}}).exec(async (error, ProductList) => {
+    let ProductsList = getCache('productsHomeLists');
+    if(ProductsList !== null) {
+        let response = {
+            AllProducts: ProductsList
+        };
+        res.status(200).json(response);
+    } else {
+        Service.aggregate({"$unwind": "$id"},
+            {
+                "$lookup": {
+                    "from": "products",
+                    "localField": "id",
+                    "foreignField": "service_id",
+                    "as": "itemsObjects"
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$_id",
+                    "service_id": {"$first": "$id"},
+                    "image_url": {"$first": "$image_url"},
+                    "title": {"$first": "$title"},
+                    "description": {"$first": "$description"},
+                    "date": {"$first": "$date"},
+                    "products": {"$first": "$itemsObjects"}
+                }
+            },
+            {$sort: {date: 1}}).exec(async (error, ProductList) => {
 
-        let i = 0;
-        let result = await Promise.all(ProductList.map(async (Service) => {
-            i++;
-            return await Promise.all(Service.products.map(async (Product) => {
+            let i = 0;
+            let result = await Promise.all(ProductList.map(async (Service) => {
                 i++;
-                Product.teamMember = [];
-                let TeamMember = await TeamMemberProduct.find({product_id: Product.id}).exec();
-                return await Promise.all(TeamMember.map(async (team) => {
+                return await Promise.all(Service.products.map(async (Product) => {
                     i++;
-                    Product.teamMember.push(team.teamMember_id);
-                    return i;
+                    Product.teamMember = [];
+                    let TeamMember = await TeamMemberProduct.find({product_id: Product.id}).exec();
+                    return await Promise.all(TeamMember.map(async (team) => {
+                        i++;
+                        Product.teamMember.push(team.teamMember_id);
+                        return i;
+                    }));
                 }));
             }));
-        }));
 
-        let response = {
-            AllProducts: ProductList
-        };
+            let response = {
+                AllProducts: ProductList
+            };
 
-        res.status(200).json(response);
-    });
+            setCache('productsHomeLists', ProductList);
+            res.status(200).json(response);
+        });
+    }
 }
 
 // Gets a list of Products
@@ -154,6 +159,7 @@ export function addNewProduct(req, res, next) {
                                             .then(function (InsertService, err) {
                                                 if (!err) {
                                                     if (InsertService) {
+                                                        setCache('productsHomeLists',null);
                                                         res.status(200)
                                                             .json({
                                                                 data: InsertService,
@@ -244,7 +250,7 @@ export function updateProduct(req, res, next) {
                                                 if (!err) {
                                                     if (UpdateProduct) {
                                                         if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
-
+                                                            setCache('productsHomeLists',null);
                                                             res.status(200)
                                                                 .json({
                                                                     data: response,
@@ -301,6 +307,7 @@ export function updateProduct(req, res, next) {
                                 if (!err) {
                                     if (UpdateProduct) {
                                         if (UpdateProduct.nModified === 1 || UpdateProduct.n === 1) {
+                                            setCache('productsHomeLists',null);
                                             res.status(200)
                                                 .json({
                                                     data: response,
@@ -349,6 +356,7 @@ export function deleteProduct(req, res, next) {
                             if (!err) {
                                 if (DeleteTeam) {
                                     if (DeleteTeam.result.n === 1) {
+                                        setCache('productsHomeLists',null);
                                         res.status(200)
                                             .json({id: productId, result: 'Deleted Successfully'});
                                     } else {
@@ -413,16 +421,4 @@ export function teamMember(req, res, next) {
     } catch (error) {
         res.status(400).json(errorJsonResponse(error, "Contact to your Developer"));
     }
-}
-
-function bookingOrder() {
-    try {
-
-    } catch (Error) {
-
-    }
-}
-
-function preBookingOrder() {
-    return null;
 }

@@ -1,30 +1,41 @@
 import Video from './Video.model';
 import Service from '../Service/Service.model';
-import {errorJsonResponse, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, getCache, getGuid, setCache} from '../../config/commonHelper';
+import Oauth from '../oauth/oauth.model';
+import TeamMemberProduct from '../TeamMemberProduct/TeamMemberProduct.model';
+import Log from '../../config/Log';
 
-function respondWithResult(res, statusCode) {
-    statusCode = statusCode || 200;
-    return function (entity) {
-        if (entity) {
-            return res.status(statusCode).json(entity);
+
+async function getVideoList(service_id,uniqueId, index = 0) {
+    let VideoList = getCache('videoList');
+    if(VideoList !== null) {
+        let singleServiceVideoList = VideoList.filter((data) => data.service_id === service_id);
+        if(singleServiceVideoList) {
+            return singleServiceVideoList;
+        } else {
+            if(index === 0) {
+                VideoList = await Video.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec();
+                setCache('videoList', VideoList);
+                return getVideoList(service_id,uniqueId, 1);
+            } else {
+                Log.writeLog(Log.eLogLevel.error, `[getVideoList] : Record not found Service_Id = ${service_id}`, uniqueId);
+                return null;
+            }
         }
-        return null;
-    };
+    } else {
+        VideoList = await Video.find({}, {_id: 0, __v: 0}).sort({date: -1}).exec();
+        setCache('videoList', VideoList);
+        return getVideoList(service_id,uniqueId, 1);
+    }
 }
 
-function handleError(res, statusCode) {
-    statusCode = statusCode || 500;
-    return function (err) {
-        res.status(statusCode).send(err);
-    };
-}
 
 // Gets all the Videos
-export function allVideos(req, res) {
+export async function allVideos(req, res) {
     if (req.params.serviceId) {
-        return Video.find({service_id: req.params.serviceId}, {_id: 0, __v: 0}).sort({date: -1}).exec()
-            .then(respondWithResult(res, 200))
-            .catch(handleError(res));
+        const uniqueId = getGuid();
+        let videoList = await getVideoList(req.params.serviceId, uniqueId);
+        res.status(200).json(videoList);
     }
 }
 
@@ -37,6 +48,7 @@ export function deleteVideo(req, res) {
                 if (!err) {
                     if (DeleteVideo) {
                         if (DeleteVideo.result.n === 1) {
+                            setCache('videoList', null);
                             res.status(200)
                                 .json({id: videoId, result: "Deleted Successfully"});
                         } else {
@@ -85,6 +97,7 @@ export function addNewVideo(req, res, next) {
                     .then(function (InsertService, err) {
                         if (!err) {
                             if (InsertService) {
+                                setCache('videoList', null);
                                 res.status(200)
                                     .json({
                                         data: InsertService,
@@ -136,7 +149,7 @@ export function updateGallery(req, res, next) {
                     if (!err) {
                         if (UpdateVideo) {
                             if (UpdateVideo.nModified === 1 || UpdateVideo.n === 1) {
-
+                                setCache('videoList', null);
                                 res.status(200)
                                     .json({
                                         data: request,
