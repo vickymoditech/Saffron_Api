@@ -502,7 +502,7 @@ export async function getTodayOrderList(req, res, next) {
                 $lte: NormalDateEndDateTime.toUTCString()
             }
         }, {teamWiseProductList: 0})
-            .sort({bookingStartTime: 1})
+            .sort({bookingDateTime: -1})
             .exec();
 
         let UserPoints = await Oauth.findOne({userId: userId}, {saffronPoint: 1, _id: 0})

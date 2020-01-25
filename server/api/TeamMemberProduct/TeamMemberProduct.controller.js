@@ -1,5 +1,5 @@
 import TeamMemberProduct from './TeamMemberProduct.model';
-import {errorJsonResponse, getGuid} from '../../config/commonHelper';
+import {errorJsonResponse, getGuid, setCache} from '../../config/commonHelper';
 import Product from '../Product/Product.model';
 import Oauth from '../oauth/oauth.model';
 
@@ -39,6 +39,8 @@ export function addTeamProduct(req, res, next) {
                                             .then(function(InsertTeamMemberProductAdd, err) {
                                                 if(!err) {
                                                     if(InsertTeamMemberProductAdd) {
+                                                        setCache('productsHomeLists',null);
+                                                        setCache('teamMemberProductList', null);
                                                         res.status(200)
                                                             .json({
                                                                 data: InsertTeamMemberProductAdd,
@@ -99,6 +101,8 @@ export function removeTeamProduct(req, res, next) {
                                     if(!err) {
                                         if(DeleteTeamMember) {
                                             if(DeleteTeamMember.result.n === 1) {
+                                                setCache('productsHomeLists',null);
+                                                setCache('teamMemberProductList', null);
                                                 res.status(200)
                                                     .json({
                                                         data: TeamObject,
