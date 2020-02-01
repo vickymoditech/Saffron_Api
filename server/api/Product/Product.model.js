@@ -9,7 +9,7 @@ let ProductSchema = new mongoose.Schema({
     image_url: String,
     title: String,
     description: String,
-    bookingValue: Boolean,
+    bookingValue: Number,
     date: String,
     sex: String
 });

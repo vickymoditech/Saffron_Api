@@ -13,7 +13,7 @@ router.post('/', validations.validateAuthorizationUser, validate(validations.new
 //Get all order for SOD
 router.get('/', validations.validateAuthorization, controller.getBookingOrder);
 
-//Order move order finish to payment success step
+//Order move to finish to payment success step
 router.put('/:orderId', validations.validateAuthorization, validate(validations.updateBookingOrder), controller.updateBookingOrder);
 
 //Order move to process or finish

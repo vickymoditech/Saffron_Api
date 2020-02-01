@@ -345,7 +345,7 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
 
         await Promise.all(bookingProduct.map(async(bookingItem) => {
 
-            let productItem = await getProduct(bookingItem.product_id, uniqueId);
+            let productItem = await getProduct(bookingItem.product_id, uniqueId, true);
             let productTeam = await getTeam(bookingItem.teamMember_id, uniqueId);
 
             if(productItem && productTeam) {
@@ -385,26 +385,33 @@ async function BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId) {
     }
 }
 
-async function getProduct(productId, uniqueId, index = 0) {
+async function getProduct(productId, uniqueId, count = false, index = 0) {
     let listProductList = getCache('productList');
-    if (listProductList !== null) {
+    if(listProductList !== null) {
         let singleProduct = listProductList.find((product) => product.id === productId);
-        if (singleProduct) {
+        if(singleProduct) {
+            if(count) {
+                await
+                    Product.update({id: productId}, {$inc: {bookingValue: 1}})
+                        .exec();
+            }
             return singleProduct;
         } else {
-            if (index === 0) {
-                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0}).exec();
+            if(index === 0) {
+                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0})
+                    .exec();
                 setCache('productList', listProductList);
-                return getProduct(productId, uniqueId, 1);
+                return getProduct(productId, uniqueId, count, 1);
             } else {
                 Log.writeLog(Log.eLogLevel.error, `[getProduct] : Product not found = ${productId}`, uniqueId);
                 return null;
             }
         }
     } else {
-        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0}).exec();
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0})
+            .exec();
         setCache('productList', listProductList);
-        return getProduct(productId, uniqueId, 1);
+        return getProduct(productId, uniqueId, count, 1);
     }
 }
 
@@ -443,12 +450,12 @@ async function getLastBookingOrder(NormalStartDateTime, NormalEndDateTime, uniqu
 
 async function getTeam(teamId, uniqueId, index = 0) {
     let teamList = getCache('teamLists');
-    if (teamList !== null) {
+    if(teamList !== null) {
         let singleTeam = teamList.find((team) => team.id === teamId);
-        if (singleTeam) {
+        if(singleTeam) {
             return singleTeam;
         } else {
-            if (index === 0) {
+            if(index === 0) {
                 teamList = await Oauth.find({role: 'employee'}, {
                     _id: 0,
                     __v: 0,
@@ -457,7 +464,8 @@ async function getTeam(teamId, uniqueId, index = 0) {
                     password: 0,
                     role: 0,
                     block: 0
-                }).exec();
+                })
+                    .exec();
                 setCache('teamLists', teamList);
                 return getTeam(teamId, uniqueId, 1);
             } else {
@@ -474,7 +482,8 @@ async function getTeam(teamId, uniqueId, index = 0) {
             password: 0,
             role: 0,
             block: 0
-        }).exec();
+        })
+            .exec();
         setCache('teamLists', teamList);
         return getTeam(teamId, uniqueId, 1);
     }
@@ -595,48 +604,48 @@ export async function updateBookingOrder(req, res) {
 
             const message = 'payment finish';
 
-            const updateResult = await Booking.update({id: orderId}, {
+            const updateResult = await Booking.findOneAndUpdate({id: orderId}, {
                 paymentComplete: true,
                 paymentMemberId: paymentMemberId,
                 paymentMemberName: paymentMemberName
             })
                 .exec();
 
+
             if(updateResult) {
-                if(updateResult.nModified === 1 || updateResult.n === 1) {
-                    let sodPublishMessage = {
-                        message: message,
-                        data: {
-                            id: orderId,
-                            paymentComplete: true,
-                            paymentMemberId: paymentMemberId,
-                            paymentMemberName: paymentMemberName
-                        }
-                    };
-                    await socketPublishMessage('SOD', sodPublishMessage);
-                    let _singleLateBooking = await Booking.findOne({id: orderId})
-                        .exec();
 
-                    //TODO send to teamMember
-                    _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
-                        await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
-                    });
-                    Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
-                    res.status(200)
-                        .json({result: true});
+                //Todo send push notification and Add Saffron Point here
+                await Oauth.update({contact_no: updateResult.customer_id}, {$inc: {saffronPoint: 5}})
+                    .exec();
 
-                } else {
-                    Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})), uniqueId);
-                    res.status(200)
-                        .json({result: false});
-                    console.log(updateResult);
-                }
+                let sodPublishMessage = {
+                    message: message,
+                    data: {
+                        id: orderId,
+                        paymentComplete: true,
+                        paymentMemberId: paymentMemberId,
+                        paymentMemberName: paymentMemberName
+                    }
+                };
+                await socketPublishMessage('SOD', sodPublishMessage);
+                let _singleLateBooking = await Booking.findOne({id: orderId})
+                    .exec();
+
+                //TODO send to teamMember
+                _singleLateBooking.teamWiseProductList.forEach(async(singleTeamWiseProductList) => {
+                    await socketPublishMessage(singleTeamWiseProductList.id, sodPublishMessage);
+                });
+                Log.writeLog(Log.eLogLevel.info, '[updateBookingOrder] : ' + JSON.stringify({result: true}), uniqueId);
+                res.status(200)
+                    .json({result: true});
+
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse('contact to developer', {result: false})), uniqueId);
-                console.log('contact to developer');
+                Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse(updateResult, {result: false})), uniqueId);
+                console.log(updateResult);
             }
         } else {
-            res.status(400)
+            Log.writeLog(Log.eLogLevel.error, '[updateBookingOrder] : ' + JSON.stringify(errorJsonResponse('contact to developer', {result: false})), uniqueId);
+            res.status(200)
                 .json({result: false});
         }
 

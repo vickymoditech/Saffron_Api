@@ -151,7 +151,7 @@ export function addNewProduct(req, res, next) {
                                             image_url: dbpath,
                                             title: title,
                                             description: description,
-                                            bookingValue: true,
+                                            bookingValue: 0,
                                             date: new Date().toISOString(),
                                             sex: sex
                                         });

@@ -13,6 +13,11 @@ var OauthSchema = new mongoose.Schema({
     userId: String,
     password: String,
     role: String,
+    saffronPoint: {
+        type: Number,
+        default: 0
+    },
+    registerDevice: [String],
     block: Boolean,
     image_url: String
 });
