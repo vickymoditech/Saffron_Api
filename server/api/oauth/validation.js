@@ -122,8 +122,8 @@ export default {
 
     updateUser: {
         body: {
-            first_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
-            last_name: Joi.string().regex(/^[a-zA-Z]{3,30}$/).required(),
+            first_name: Joi.string().regex(/^[a-zA-Z]{1,30}$/).required(),
+            last_name: Joi.string().regex(/^[a-zA-Z]{1,30}$/).required(),
             mobile_number: Joi.string().regex(/^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/).required(),
             password: Joi.string().required(),
             confirm_password: Joi.string().required().valid(Joi.ref('password')),
