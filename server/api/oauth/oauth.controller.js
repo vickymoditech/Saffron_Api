@@ -497,7 +497,7 @@ export async function getTodayOrderList(req, res, next) {
 
         const getCurrentDayOrders = await Booking.find({
             customer_id: userId,
-            bookingEndTime: {
+            bookingDateTime: {
                 $gte: NormalDateStartDateTime.toUTCString(),
                 $lte: NormalDateEndDateTime.toUTCString()
             }

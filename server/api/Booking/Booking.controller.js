@@ -393,7 +393,7 @@ async function getProduct(productId, uniqueId, index = 0) {
             return singleProduct;
         } else {
             if (index === 0) {
-                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
+                listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0}).exec();
                 setCache('productList', listProductList);
                 return getProduct(productId, uniqueId, 1);
             } else {
@@ -402,7 +402,7 @@ async function getProduct(productId, uniqueId, index = 0) {
             }
         }
     } else {
-        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, sex: 0, bookingValue: 0}).exec();
+        listProductList = await Product.find({}, {_id: 0, __v: 0, description: 0, date: 0, bookingValue: 0}).exec();
         setCache('productList', listProductList);
         return getProduct(productId, uniqueId, 1);
     }
