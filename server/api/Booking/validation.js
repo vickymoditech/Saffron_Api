@@ -211,6 +211,7 @@ export default {
 
     newBookingOrder: {
         body: {
+            orderType: Joi.string().required(),
             startTime: Joi.object({
                 hours: Joi.number().required(),
                 minutes: Joi.number().required(),

@@ -15,6 +15,7 @@ let _ = require('lodash');
 export async function index(req, res) {
     let uniqueId = getGuid();
     try {
+        let orderType = req.body.orderType;
         let startTimeHours = req.body.startTime.hours;
         let startTimeMinutes = req.body.startTime.minutes;
         let endTimeHours = req.body.endTime.hours;
@@ -37,6 +38,19 @@ export async function index(req, res) {
         let NormalEndDateTime = new Date(year, month, date, endTimeHours, endTimeMinutes, 0);
         let totalPrice = 0;
         let not_acceptAble = false;
+        let extraTime = 0;
+
+        switch (orderType) {
+            case "10":
+                extraTime = 10;
+                break;
+            case "15":
+                extraTime = 15;
+                break;
+            default:
+                extraTime = 0;
+                break;
+        }
 
         let requestObj = {
             startTimeHours,
@@ -101,25 +115,40 @@ export async function index(req, res) {
                     if(_LastBooking !== null && _LastBooking.visited === false) {
 
                         //Get Booking LastTime
-                        let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata')
-                            .format();
+                        let lastBookingDateTimeCalculation = moment.tz(_LastBooking.bookingEndTime, 'Asia/Kolkata').format();
                         let addMinute = new Date(lastBookingDateTimeCalculation);
+
+                        // check Slot is empty if empty then it will set current time
                         if(currentDate.getTime() < addMinute.getTime() && (_LastBooking.status !== 'finish')) {
-                            addMinute.setMinutes(addMinute.getMinutes() + totalTime);
+
+                            //Find differences
+                            const diffTime = Math.abs(addMinute.getTime() - currentDate.getTime());
+                            const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+                            let extraTimeToAdd = 0;
+
+                            if(diffMinutes >= extraTime && extraTime !== 0)
+                                extraTimeToAdd = Math.abs(extraTime - diffMinutes);
+
+                            
                             //set arrivalTime
-                            bookingStartDateTime = new Date(_LastBooking.bookingEndTime).toUTCString();
+                            const lastBookingDate  = new Date(lastBookingDateTimeCalculation);
+                            lastBookingDate.setMinutes(lastBookingDate.getMinutes() + extraTimeToAdd);
+                            bookingStartDateTime = lastBookingDate.toUTCString();
+                            addMinute.setMinutes(lastBookingDate.getMinutes() + totalTime);
                             //set order finish time.
                             bookingEndDateTime = addMinute.toUTCString();
+
                         } else {
-                            let currentTimeWithZeroMinutes = new Date(year, month, date, currentDate.getHours(), currentDate.getMinutes(), 0);
-                            bookingStartDateTime = currentTimeWithZeroMinutes.toUTCString();
+                            let currentTimeWithZeroMinutes = new Date(year, month, date, currentDate.getHours(), currentDate.getMinutes() + extraTime , 0);
                             addMinute = currentTimeWithZeroMinutes;
+                            bookingStartDateTime = currentTimeWithZeroMinutes.toUTCString();
                             addMinute.setMinutes(currentTimeWithZeroMinutes.getMinutes() + totalTime);
                             bookingEndDateTime = addMinute.toUTCString();
                         }
 
                         const diffTime = Math.abs(NormalEndDateTime.getTime() - addMinute.getTime());
                         const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+
                         if(!((NormalEndDateTime.getTime() >= addMinute.getTime()) && diffMinutes >= 0)) {
 
                             //check last order time and endTimeSlot time has less diff - 5
