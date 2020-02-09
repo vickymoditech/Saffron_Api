@@ -126,10 +126,9 @@ export async function index(req, res) {
                             const diffMinutes = Math.ceil(diffTime / (1000 * 60));
                             let extraTimeToAdd = 0;
 
-                            if(diffMinutes >= extraTime && extraTime !== 0)
+                            if(diffMinutes <= extraTime && extraTime !== 0)
                                 extraTimeToAdd = Math.abs(extraTime - diffMinutes);
 
-                            
                             //set arrivalTime
                             const lastBookingDate  = new Date(lastBookingDateTimeCalculation);
                             lastBookingDate.setMinutes(lastBookingDate.getMinutes() + extraTimeToAdd);
