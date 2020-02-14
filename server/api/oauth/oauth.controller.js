@@ -47,57 +47,69 @@ export function index_contactNo(req, res) {
 
 //Login Valid User
 export function login(req, res) {
-    if(req.body) {
-        let pass;
-        let userId;
-        let check_field = true;
+    try{
+        if(req.body) {
+            let pass;
+            let userId;
+            let registerDevice = req.body.registerDevice;
+            let check_field = true;
 
-        if(req.body.userId) {
-            userId = req.body.userId;
-            if(req.body.password) {
-                pass = req.body.password;
+            if(req.body.userId) {
+                userId = req.body.userId;
+                if(req.body.password) {
+                    pass = req.body.password;
+                } else {
+                    check_field = false;
+                    res.status(500)
+                        .json(errorJsonResponse('password is required', 'password is required'));
+                }
             } else {
                 check_field = false;
                 res.status(500)
-                    .json(errorJsonResponse('password is required', 'password is required'));
+                    .json(errorJsonResponse('userId is required', 'userId is required'));
             }
-        } else {
-            check_field = false;
-            res.status(500)
-                .json(errorJsonResponse('userId is required', 'userId is required'));
-        }
 
-        if(check_field) {
+            if(check_field) {
 
-            Oauth.findOne({userId: userId, password: pass, block: false}, {_id: 0, __v: 0})
-                .exec(async function(err, loginUser) {
-                    if(!err) {
-                        if(loginUser) {
-                            let expiresIn = 60 * 60 * 24; // expires in 24 hours
-                            let issued = moment(Date.now());
-                            let accessToken = jwt.sign({user: loginUser}, jwtdata.jwtSecretKey, {
-                                expiresIn: expiresIn
-                            });
-                            let expires = moment(issued)
-                                .add(expiresIn, 'seconds');
-
-                            res.status(200)
-                                .json({
-                                    accessToken,
-                                    expiresIn,
-                                    issued,
-                                    expires
+                Oauth.findOne({userId: userId, password: pass, block: false}, {_id: 0, __v: 0})
+                    .exec(async function(err, loginUser) {
+                        if(!err) {
+                            if(loginUser) {
+                                let expiresIn = 60 * 60 * 24; // expires in 24 hours
+                                let issued = moment(Date.now());
+                                let accessToken = jwt.sign({user: loginUser}, jwtdata.jwtSecretKey, {
+                                    expiresIn: expiresIn
                                 });
+                                let expires = moment(issued)
+                                    .add(expiresIn, 'seconds');
+
+                                //Todo add deviceRegister token
+                                const UserDeviceTokenFind = await Oauth.findOne({userId: userId, registerDevice: registerDevice});
+                                if(!UserDeviceTokenFind){
+                                    await Oauth.update({userId: userId},{$push:{registerDevice:registerDevice}});
+                                }
+
+                                res.status(200)
+                                    .json({
+                                        accessToken,
+                                        expiresIn,
+                                        issued,
+                                        expires
+                                    });
+                            } else {
+                                res.status(400)
+                                    .json(errorJsonResponse('Invalid user', 'Invalid user'));
+                            }
                         } else {
                             res.status(400)
-                                .json(errorJsonResponse('Invalid user', 'Invalid user'));
+                                .json(errorJsonResponse(err, 'sorry, come to the shop.'));
                         }
-                    } else {
-                        res.status(400)
-                            .json(errorJsonResponse(err, 'sorry, come to the shop.'));
-                    }
-                });
+                    });
+            }
         }
+    } catch(error) {
+        res.status(501)
+            .json(errorJsonResponse(error.toString(), error.toString()));
     }
 }
 
@@ -110,7 +122,7 @@ export function register(req, res, next) {
         let password = req.body.password;
         let role = req.body.role;
         let email_id = req.body.email_id;
-
+        let registerDevice = req.body.registerDevice ? req.body.registerDevice : [];
 
         try {
 
@@ -135,7 +147,8 @@ export function register(req, res, next) {
                             password: password,
                             role: role,
                             block: false,
-                            image_url: ''
+                            image_url: '',
+                            registerDevice: [registerDevice]
                         });
                         registrationUser.save()
                             .then(function(RegistrationSuccess, err) {

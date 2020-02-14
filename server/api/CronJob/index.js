@@ -103,7 +103,7 @@ setInterval(async () => {
 
                 if(data.orderStatus === 'waiting') {
 
-                    //Todo update record
+                    //Todo update record Innder data update and check.
                     await Booking.update({id: _singleLateBooking.id, 'teamWiseProductList.id': data.id}, {
                         $set: {
                             'teamWiseProductList.$.orderStatus': "late",
