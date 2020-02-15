@@ -60,6 +60,7 @@ export function deleteService(req, res, next) {
                                                                             if (DeleteService) {
                                                                                 if (DeleteService.result.n === 1) {
                                                                                     setCache('serviceList', null);
+                                                                                    setCache('productsHomeLists', null);
                                                                                     res.status(200)
                                                                                         .json({
                                                                                             id: serviceId,
@@ -139,6 +140,7 @@ export function addNewService(req, res, next) {
                                         if (!err) {
                                             if (InsertService) {
                                                 setCache('serviceList', null);
+                                                setCache('productsHomeLists', null);
                                                 res.status(200)
                                                     .json({data: InsertService, result: "Save Successfully"});
                                             } else {
@@ -226,6 +228,7 @@ export function updateService(req, res, next) {
                                             if (UpdateService) {
                                                 if (UpdateService.nModified === 1 || UpdateService.n === 1) {
                                                     setCache('serviceList', null);
+                                                    setCache('productsHomeLists', null);
                                                     res.status(200)
                                                         .json({
                                                             data: serviceObject,
@@ -272,6 +275,7 @@ export function updateService(req, res, next) {
                             if (UpdateService) {
                                 if (UpdateService.nModified === 1 || UpdateService.n === 1) {
                                     setCache('serviceList', null);
+                                    setCache('productsHomeLists', null);
                                     res.status(200)
                                         .json({
                                             data: serviceObject,
