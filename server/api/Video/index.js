@@ -13,7 +13,7 @@ router.delete('/:videoId', validations.validateAuthorization, controller.deleteV
 router.post('/', validations.validateAuthorization, validate(validations.videoAdd), controller.addNewVideo);
 
 // 03. UPDATE   /api/Videos/
-router.put('/', validations.validateAuthorization, validate(validations.videoUpdate), controller.updateGallery);
+router.put('/', validations.validateAuthorization, validate(validations.videoUpdate), controller.updateVideo);
 
 // 04. GET /api/Videos/All/:serviceId
 router.get('/All/:serviceId', controller.allVideos);
