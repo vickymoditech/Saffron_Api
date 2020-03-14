@@ -8,6 +8,7 @@ var controller = require('./coupon.controller');
 var router = express.Router();
 
 router.get('/', validations.validateAuthorization, controller.index);
+router.get('/all', controller.GetValidCouponIndex);
 router.post('/', validations.validateAuthorization, validate(validations.registerCoupon), controller.create);
 router.get('/:couponId/user/:userId', validations.validateAuthorizationUser, controller.upsert);
 router.delete('/:couponId', validations.validateAuthorization, controller.destroy);

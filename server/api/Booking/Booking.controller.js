@@ -324,7 +324,7 @@ export async function index(req, res) {
                                             orderPlace: responseObject
                                         }), uniqueId);
                                         res.status(200)
-                                            .json({totalTime, orderPlace: responseObject});
+                                            .json({orderPlace: responseObject});
 
                                     } else {
                                         Log.writeLog(Log.eLogLevel.error, '[POST:Bookings] : ' + JSON.stringify(errorJsonResponse(InsertBooking, 'Error in db response')), uniqueId);

@@ -108,6 +108,7 @@ export default {
             info: Joi.string().required(),
             minPrice: Joi.number().required(),
             maxDiscount: Joi.number().required(),
+            percentage: Joi.number().required(),
             startDate: Joi.date().required(),
             endDate: Joi.date().required(),
         }

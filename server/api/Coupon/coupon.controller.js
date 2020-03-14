@@ -1,9 +1,32 @@
 import Coupon from './coupon.model';
 import {errorJsonResponse, getGuid} from '../../config/commonHelper';
 import Oauth from '../oauth/oauth.model';
+let moment = require('moment-timezone');
 
 export async function index(req, res, next) {
     try {
+        Coupon.find({})
+            .exec((error, coupons) => {
+                if(!error) {
+                    res.status(200)
+                        .json(coupons);
+                } else {
+                    res.status(400)
+                        .json(errorJsonResponse(error.toString(), 'Internal server Error'));
+                }
+            });
+    } catch(error) {
+        res.status(500)
+            .json(errorJsonResponse(error.toString(), 'Internal server Error'));
+    }
+}
+
+export async function GetValidCouponIndex(req, res, next) {
+    try {
+        let currentDate = moment.tz('Asia/Kolkata').format();
+        console.log(currentDate);
+        currentDate = new Date(currentDate);
+        console.log(currentDate);
         Coupon.find({})
             .exec((error, coupons) => {
                 if(!error) {

@@ -1,7 +1,7 @@
 import Booking from '../Booking/Booking.model';
 import TimeSlot from '../TimeSlot/TimeSlot.model';
 import {socketPublishMessage} from '../Socket/index';
-import {getGuid} from '../../config/commonHelper';
+import {getGuid,errorJsonResponse} from '../../config/commonHelper';
 import Log from '../../config/Log';
 
 let moment = require('moment-timezone');
@@ -51,7 +51,7 @@ setInterval(async () => {
                     console.log(updateResult);
                 }
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(updateResult,'contact to Developer')));
+                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorJsonResponse(updateResult,'contact to Developer')));
                 console.log('contact to developer');
             }
 
@@ -128,7 +128,7 @@ setInterval(async () => {
         }));
 
     } catch (error) {
-        Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(error.message.toString(),error.message.toString())));
+        Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorJsonResponse(error.message.toString(),error.message.toString())));
         console.log(error);
     }
 
@@ -187,7 +187,7 @@ export async function AddFirstOrder(currentDate) {
                     }
                 });
             } else {
-                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorMessage(err.message.toString(), err.message.toString())));
+                Log.writeLog(Log.eLogLevel.error, '[setInterval] : ' + JSON.stringify(errorJsonResponse(err.message.toString(), err.message.toString())));
                 console.log(err);
             }
         });
