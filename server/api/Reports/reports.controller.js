@@ -15,6 +15,7 @@ export async function getTopUser(req, res, next) {
             block: 0,
         }).exec();
         let allTopUserId = [];
+        let responseTopUserId = [];
         await Promise.all(getAllUser.map(async (data) => {
             const getAllBookingCountTopUser = await Booking.count({customer_id: {$in: data.contact_no}}).exec();
             const tmp = {user: data, totalOrder: getAllBookingCountTopUser};
@@ -29,7 +30,11 @@ export async function getTopUser(req, res, next) {
                 }
             }
         }
-        res.status(200).json(allTopUserId);
+        for (let i = 0; i < 10; i++) {
+            responseTopUserId.push(allTopUserId[i]);
+        }
+
+        res.status(200).json(responseTopUserId);
 
     } catch (error) {
         Log.writeLog(Log.eLogLevel.error, '[getTopUser] : ' + JSON.stringify(errorJsonResponse(error.message.toString(), error.message.toString())), uniqueId);

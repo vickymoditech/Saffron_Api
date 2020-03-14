@@ -106,9 +106,10 @@ export default {
         body: {
             name: Joi.string().required(),
             info: Joi.string().required(),
-            minPrice: Joi.number().required(),
-            maxDiscount: Joi.number().required(),
             percentage: Joi.number().required(),
+            minPrice: Joi.number().required(),
+            maxPrice: Joi.number().required(),
+            maxDiscount: Joi.number().required(),
             startDate: Joi.date().required(),
             endDate: Joi.date().required(),
         }

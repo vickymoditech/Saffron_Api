@@ -21,14 +21,15 @@ export async function index(req, res, next) {
     }
 }
 
-export async function GetValidCouponIndex(req, res, next) {
+export async function GetValidCoupons(req, res, next) {
     try {
-        let currentDate = moment.tz('Asia/Kolkata').format();
-        console.log(currentDate);
-        currentDate = new Date(currentDate);
-        console.log(currentDate);
-        Coupon.find({})
-            .exec((error, coupons) => {
+        let dayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+        let NormalDateEndDateTime = new Date(dayDateTime);
+        Coupon.find({
+            endDate: {
+                $gte: NormalDateEndDateTime.toUTCString()
+            }
+        }).exec((error, coupons) => {
                 if(!error) {
                     res.status(200)
                         .json(coupons);
@@ -50,10 +51,12 @@ export async function create(req, res, next) {
                 id: getGuid(),
                 name: req.body.name,
                 info: req.body.info,
+                percentage: req.body.percentage,
                 minPrice: req.body.minPrice,
+                maxPrice: req.body.maxPrice,
                 maxDiscount: req.body.maxDiscount,
-                startDate: req.body.startDate,
-                endDate: req.body.endDate,
+                startDate: new Date(req.body.startDate).toUTCString(),
+                endDate: new Date(req.body.endDate).toUTCString(),
                 userId: []
             });
             coupon.save()
@@ -73,21 +76,29 @@ export async function create(req, res, next) {
     }
 }
 
-export async function upsert(req, res, next) {
+export async function checkCoupon(req, res, next) {
     try {
         const couponId = req.params.couponId;
         const userId = req.params.userId;
 
-        //Todo add deviceRegister token
-        const UserIdFind = await Oauth.findOne({id: couponId, userId: userId});
-        if(!UserIdFind) {
+        //Todo check coupon exist or not (date wise)
+        let dayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+        let NormalDateEndDateTime = new Date(dayDateTime);
+        const getCoupon = await Coupon.findOne({id: couponId,startDate: {$gte: NormalDateEndDateTime.toUTCString()},endDate: {$lte: NormalDateEndDateTime.toUTCString()}});
+        if(getCoupon){
+            //Todo check coupon valid for user ot not
+            const UserIdFind = await Coupon.findOne({id: couponId, userId: userId});
+            if(!UserIdFind) {
+                res.status(200)
+                    .json({result: 'success'});
+            } else {
+                res.status(400)
+                    .json(errorJsonResponse('you already have used this coupon', 'you already have used this coupon'));
+            }
+        }else{
             res.status(400)
-                .json({result: 'success'});
-        } else {
-            res.status(400)
-                .json(errorJsonResponse('you have already used this coupon', 'you have already used this coupon'));
+                .json(errorJsonResponse('Invalid Coupon', 'Invalid Coupon'));
         }
-
     } catch(error) {
         res.status(500)
             .json(errorJsonResponse(error.toString(), 'Internal server Error'));
