@@ -1,6 +1,7 @@
 import Coupon from './coupon.model';
 import {errorJsonResponse, getGuid} from '../../config/commonHelper';
 import Oauth from '../oauth/oauth.model';
+
 let moment = require('moment-timezone');
 
 export async function index(req, res, next) {
@@ -23,13 +24,17 @@ export async function index(req, res, next) {
 
 export async function GetValidCoupons(req, res, next) {
     try {
-        let dayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+        let dayDateTime = moment()
+            .tz('Asia/Kolkata')
+            .startOf('day')
+            .format();
         let NormalDateEndDateTime = new Date(dayDateTime);
         Coupon.find({
             endDate: {
                 $gte: NormalDateEndDateTime.toUTCString()
             }
-        }).exec((error, coupons) => {
+        })
+            .exec((error, coupons) => {
                 if(!error) {
                     res.status(200)
                         .json(coupons);
@@ -78,24 +83,27 @@ export async function create(req, res, next) {
 
 export async function checkCoupon(req, res, next) {
     try {
-        const couponId = req.params.couponId;
-        const userId = req.params.userId;
+        const couponName = req.params.couponName;
+        const user = req.decoded;
 
         //Todo check coupon exist or not (date wise)
-        let dayDateTime = moment().tz('Asia/Kolkata').startOf('day').format();
+        let dayDateTime = moment()
+            .tz('Asia/Kolkata')
+            .startOf('day')
+            .format();
         let NormalDateEndDateTime = new Date(dayDateTime);
-        const getCoupon = await Coupon.findOne({id: couponId,startDate: {$gte: NormalDateEndDateTime.toUTCString()},endDate: {$lte: NormalDateEndDateTime.toUTCString()}});
-        if(getCoupon){
+        const getCoupon = await Coupon.findOne({name: couponName, startDate: {$lte: NormalDateEndDateTime.toUTCString()}, endDate: {$gte: NormalDateEndDateTime.toUTCString()}});
+        if(getCoupon) {
             //Todo check coupon valid for user ot not
-            const UserIdFind = await Coupon.findOne({id: couponId, userId: userId});
+            const UserIdFind = await Coupon.findOne({id: getCoupon.id, userId: user.user.userId});
             if(!UserIdFind) {
                 res.status(200)
-                    .json({result: 'success'});
+                    .json({result: `${couponName} Successfully applied`, couponDetail: getCoupon});
             } else {
                 res.status(400)
                     .json(errorJsonResponse('you already have used this coupon', 'you already have used this coupon'));
             }
-        }else{
+        } else {
             res.status(400)
                 .json(errorJsonResponse('Invalid Coupon', 'Invalid Coupon'));
         }
