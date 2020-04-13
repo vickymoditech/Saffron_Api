@@ -11,16 +11,19 @@ var router = express.Router();
 // 01. GET   /api/oauth/
 router.get('/', validations.validateAuthorization, controller.index);
 
-//07 .  Get /api/oauth/changeUserBlockStatus
+//08 . GET   /api/oauth/getTodayOrderList
 router.get('/getTodayOrderList', validations.validateAuthorizationUser, controller.getTodayOrderList);
 
-//03 .  Get /api/oauth/:contactNumber
+//09 . GET   /api/oauth/getSaffronPoint
+router.get('/getSaffronPoint', validations.validateAuthorizationUser, controller.getSaffronPoint);
+
+//03 . GET   /api/oauth/:contactNumber
 router.get('/:contactNo', validations.validateAuthorization, controller.index_contactNo);
 
 // 02. POST   /api/oauth/login
 router.post('/login', controller.login);
 
-//03 . POST /api/oauth/register
+//03 . POST  /api/oauth/register
 router.post('/register', validate(validations.registerValidate), controller.register);
 
 //04 . DELETE /api/oauth/delete
@@ -29,10 +32,10 @@ router.delete('/:userId', validations.validateAuthorization, validate(validation
 //05 . UPDATE /api/oauth/
 router.put('/', validations.validateAuthorizationUser, validate(validations.updateUser), controller.updateUser);
 
-//06 .  POST /api/oauth/userAvatar
+//06 . POST  /api/oauth/userAvatar
 router.post('/userAvatar', validations.validateAuthorizationUser, controller.uploadUserAvatar);
 
-//07 .  POST /api/oauth/changeUserBlockStatus
+//07 . POST /api/oauth/changeUserBlockStatus
 router.post('/changeUserBlockStatus', validations.validateAuthorization, controller.changeUserBlockStatus);
 
 

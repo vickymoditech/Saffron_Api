@@ -21,6 +21,7 @@ export async function index(req, res) {
         let endTimeHours = req.body.endTime.hours;
         let endTimeMinutes = req.body.endTime.minutes;
         let bookingProduct = req.body.bookingProduct;
+        let saffronPoint = req.body.saffronPoint;
         let totalTime = 0;
         let allProductFound = true;
         let userId = req.decoded.user.userId;
@@ -207,6 +208,29 @@ export async function index(req, res) {
 
                         //Generate the Basket Response.
                         let BasketResponseGenerator = await BasketGenerator(bookingProduct, bookingStartDateTime, uniqueId);
+
+                        //Todo write code here for apply saffron point.
+                        //Todo check - 1 >=
+                        //Todo minus and add.
+                        if(saffronPoint) {
+                            const UserPoints = await Oauth.findOne({userId: userId}, {saffronPoint: 1, _id: 0})
+                                .exec();
+                            console.log(UserPoints.saffronPoint);
+                            if(UserPoints.saffronPoint > 0) {
+                                if(UserPoints.saffronPoint <= totalPrice) {
+                                    const calculate = totalPrice - UserPoints.saffronPoint;
+                                    const saffronPointUse = await Oauth.update({contact_no: userId}, {$inc: {saffronPointUse: UserPoints.saffronPoint, saffronPoint: -(UserPoints.saffronPoint)}}).exec();
+                                    if(saffronPointUse.nModified === 1) {
+                                        totalPrice = calculate;
+                                    }
+                                } else {
+                                    const saffronPointUse = await Oauth.update({contact_no: userId}, {$inc: {saffronPointUse: UserPoints.saffronPoint, saffronPoint: -(totalPrice)}}).exec();
+                                    if(saffronPointUse.nModified === 1) {
+                                        totalPrice = 0;
+                                    }
+                                }
+                            }
+                        }
 
                         let BookingAdd = new Booking({
                             id: getGuid(),

@@ -212,6 +212,8 @@ export default {
     newBookingOrder: {
         body: {
             orderType: Joi.string().required(),
+            saffronPoint: Joi.boolean().required(),
+            applyCoupon: Joi.string().allow(''),
             startTime: Joi.object({
                 hours: Joi.number().required(),
                 minutes: Joi.number().required(),

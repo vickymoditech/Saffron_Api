@@ -518,7 +518,7 @@ export async function getTodayOrderList(req, res, next) {
             .sort({bookingDateTime: -1})
             .exec();
 
-        let UserPoints = await Oauth.findOne({userId: userId}, {saffronPoint: 1, _id: 0})
+        let UserPoints = await Oauth.findOne({userId: userId}, {saffronPoint: 1, saffronPointUse: 1, _id: 0})
             .exec();
 
         res.status(200)
@@ -527,6 +527,20 @@ export async function getTodayOrderList(req, res, next) {
                 UserPoints
             });
 
+    } catch(error) {
+        res.status(400)
+            .json(errorJsonResponse(error.message.toString(), 'Contact to your Developer'));
+    }
+}
+
+export async function getSaffronPoint(req, res, next) {
+    try {
+        let userId = req.decoded.user.userId;
+        let UserPoints = await Oauth.findOne({userId: userId}, {saffronPoint: 1, _id: 0}).exec();
+        res.status(200)
+            .json({
+                UserPoints
+            });
     } catch(error) {
         res.status(400)
             .json(errorJsonResponse(error.message.toString(), 'Contact to your Developer'));
