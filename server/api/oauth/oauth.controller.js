@@ -45,6 +45,43 @@ export function index_contactNo(req, res) {
         .catch(handleError(res));
 }
 
+export function verificationContactNumberAndSendOTP(req, res, next) {
+    try{
+        let contactNo = req.params.contactNo;
+        //Todo random number generator
+        const digits = '0123456789';
+        let OTP = '';
+        for (let i = 0; i < 4; i++ ) {
+            OTP += digits[Math.floor(Math.random() * 10)];
+        }
+        //Todo - Send OTP to customer here.
+        Oauth.update({userId: contactNo},
+            {
+                otp: OTP
+            }
+        ).exec(function(err, UpdateUser) {
+                if(!err) {
+                    if(UpdateUser) {
+                        if(UpdateUser.nModified === 1 || UpdateUser.n === 1) {
+                            res.status(400)
+                                .json({result: true});
+                        }
+                    } else {
+                        res.status(400)
+                            .json(errorJsonResponse('Invalid Mobile Number', error.toString('Invalid Mobile Number')));
+                    }
+                } else {
+                    res.status(500)
+                        .json(errorJsonResponse(error.toString(), error.toString()));
+                }
+            });
+    }catch(error){
+        res.status(501)
+            .json(errorJsonResponse(error.toString(), error.toString()));
+    }
+}
+
+
 //Login Valid User
 export function login(req, res) {
     try{

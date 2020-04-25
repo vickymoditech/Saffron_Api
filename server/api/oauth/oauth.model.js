@@ -23,7 +23,9 @@ var OauthSchema = new mongoose.Schema({
     },
     registerDevice: [String],
     block: Boolean,
-    image_url: String
+    image_url: String,
+    isAuthenticate: Boolean,
+    otp: Number
 });
 
 registerEvents(OauthSchema);

@@ -38,6 +38,8 @@ router.post('/userAvatar', validations.validateAuthorizationUser, controller.upl
 //07 . POST /api/oauth/changeUserBlockStatus
 router.post('/changeUserBlockStatus', validations.validateAuthorization, controller.changeUserBlockStatus);
 
+//10 . GET   /api/oauth/verification/:contactNumber
+router.get('/verification/:contactNo', controller.verificationContactNumberAndSendOTP);
 
 router.use(function (err, req, res, next) {
     let arrayMessages = [];
